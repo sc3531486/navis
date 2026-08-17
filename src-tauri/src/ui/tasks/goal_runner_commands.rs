@@ -1,11 +1,11 @@
 // ── 归属扩展：navis-task ──
 // 迁移目标：extensions/navis-task/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::{
+// use [REMOVED: domains reference]
     apply_goal_runner_command, decide_goal_runner_next_task, GoalRunnerCommand, GoalRunnerDecision,
     GoalRunnerRequest, GoalRunnerStatePatch, TaskManager,
 };
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
 use crate::ui::dto::{
     GoalRunnerControlPayload, GoalRunnerPayload, UiComposerRunState, UiComposerTask,
 };

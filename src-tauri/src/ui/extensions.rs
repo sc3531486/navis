@@ -16,7 +16,7 @@ use crate::extension::{ExtensionInstaller, ExtensionLifecycle, ExtensionStore};
 use crate::foundation::config::Config;
 use crate::foundation::status::StatusClassify;
 use crate::security::sandbox::permission::{OperationRequest, OperationType};
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 use crate::ui::extension_storage::{
     clear_extension_ephemeral, ExtensionEphemeralStorage, ExtensionStorage,
 };

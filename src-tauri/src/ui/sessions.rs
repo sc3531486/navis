@@ -12,9 +12,9 @@ use super::{
     ui_bool, UI_MODE_KEY, UI_PERMISSION_POLICY_KEY, UI_PINNED_KEY, UI_REASONING_EFFORT_KEY,
     UI_TASK_COMPLETED_SEEN_AT_KEY, UI_TRANSCRIPT_VIEW_KEY, UI_UNREAD_KEY, UI_WORKTREE_KEY,
 };
-use crate::domains::agent_core::agent::TaskManager;
-use crate::domains::session::session::{Session, SessionStatus};
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::security::sandbox::permission::ApprovalMode;
 use chrono::Utc;
 use serde_json::json;

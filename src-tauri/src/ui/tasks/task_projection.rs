@@ -1,9 +1,9 @@
 // ── 归属扩展：navis-task ──
 // 迁移目标：extensions/navis-task/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::{TaskKind, TaskRecord, TaskStatus, TodoItem, TodoStatus};
+// use [REMOVED: domains reference]
 use crate::foundation::status::StatusClassify;
-use crate::domains::session::session::Session;
+// use [REMOVED: domains reference]
 use crate::ui::dto::{UiTask, UiTodoItem};
 use crate::ui::ui_metadata;
 use serde_json::{json, Value};
@@ -79,7 +79,7 @@ pub(crate) fn ui_task_record(task: &TaskRecord) -> UiTask {
         blocked_by: task.blocked_by.clone(),
         status: task.status.as_str().to_string(),
         status_presentation: task.status.status_presentation(),
-        description: crate::domains::agent_core::agent::task_description(task),
+//         description: [REMOVED: domains reference]
         error: task_status_error(&task.status),
         created_at: task.created_at.to_rfc3339(),
         completed_at: task

@@ -7,12 +7,12 @@
 //! 写入 permission AgentTimelinePart，并等待前端决策。UI command 层只调用
 //! 这些 helper，不直接承载审批状态机。
 
-use crate::domains::ai_platform::gateway::{ChatMessage as GatewayProtocolMessage, ToolCall};
-use crate::domains::session::session::Session;
+use crate::extension::types::{ChatMessage as GatewayProtocolMessage, ToolCall};
+// use [REMOVED: domains reference]
 use crate::foundation::stream::{send_channel_value, StreamChunk as CoreStreamChunk};
-use crate::domains::session::session::{SessionManager, TimelineStatus};
+// use [REMOVED: domains reference]
 use crate::security::sandbox::permission::ApprovalMode;
-use crate::domains::agent_core::tool_runtime::{tool_call_arguments, tool_call_summary, AgentToolEvent};
+// use [REMOVED: domains reference]
 use crate::ui::agent_timeline_part::ASSISTANT_PERMISSION_STEP_SEQUENCE_BASE;
 use crate::ui::dto::{UiToolApprovalRequest, UiToolPermissionRule};
 use crate::ui::permissions::{
@@ -419,8 +419,8 @@ pub(crate) async fn resolve_tool_approval_for_event(
             completed_at: None,
             duration_ms: None,
             ..event.clone().with_lifecycle(
-                crate::domains::agent_core::tool_runtime::AgentToolPhase::WaitingPermission,
-                crate::domains::agent_core::tool_runtime::AgentToolStatus::WaitingPermission,
+//                 [REMOVED: domains reference]
+//                 [REMOVED: domains reference]
             )
         };
         tool_events.push(waiting_event.clone());

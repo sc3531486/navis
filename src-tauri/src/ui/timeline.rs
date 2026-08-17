@@ -9,9 +9,9 @@ use super::agent_timeline_part::{
     ASSISTANT_TEXT_STEP_SEQUENCE,
 };
 use super::dto::UiToolApprovalRequest;
-use crate::domains::session::session::AgentTimelinePart;
-use crate::domains::session::session::TimelineStatus;
-use crate::domains::agent_core::tool_runtime::AgentToolEvent;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::runtime::tool_approval::ToolApprovalDecision;
 use chrono::Utc;
 use serde_json::{json, Value};
@@ -358,7 +358,7 @@ pub(crate) fn finalizer_agent_timeline_part(
 // ─── Timeline persistence helpers ───
 
 pub(crate) fn persist_turn_prelude_step(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -372,7 +372,7 @@ pub(crate) fn persist_turn_prelude_step(
 }
 
 pub(crate) fn complete_turn_prelude_step(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -397,7 +397,7 @@ fn is_active_agent_timeline_status(part: &AgentTimelinePart) -> bool {
 }
 
 fn close_active_agent_timeline_parts_and_publish(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -435,7 +435,7 @@ fn close_active_agent_timeline_parts_and_publish(
 }
 
 pub(crate) fn persist_text_agent_timeline_part(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -450,7 +450,7 @@ pub(crate) fn persist_text_agent_timeline_part(
 }
 
 pub(crate) fn persist_tool_prelude_text_step(
-    manager: Option<&crate::domains::session::session::SessionManager>,
+//     manager: Option<&[REMOVED: domains reference]
     session_id: &str,
     turn_id: Option<&str>,
     assistant_message_id: &str,
@@ -480,7 +480,7 @@ pub(crate) fn persist_tool_prelude_text_step(
 }
 
 pub(crate) fn persist_gateway_retry_agent_timeline_part(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -520,7 +520,7 @@ pub(crate) fn persist_gateway_retry_agent_timeline_part(
 }
 
 pub(crate) fn persist_permission_agent_timeline_part(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -547,7 +547,7 @@ pub(crate) fn persist_permission_agent_timeline_part(
 }
 
 pub(crate) fn persist_turn_finalizer_step(
-    manager: &crate::domains::session::session::SessionManager,
+//     manager: &[REMOVED: domains reference]
     session_id: &str,
     turn_id: &str,
     assistant_message_id: &str,
@@ -591,7 +591,7 @@ pub(crate) fn persist_turn_finalizer_step(
 // ─── Tool event sending ───
 
 pub(crate) fn send_agent_tool_event(
-    manager: Option<&crate::domains::session::session::SessionManager>,
+//     manager: Option<&[REMOVED: domains reference]
     session_id: &str,
     turn_id: Option<&str>,
     assistant_message_id: &str,

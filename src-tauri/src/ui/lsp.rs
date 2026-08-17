@@ -13,10 +13,10 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
-use crate::domains::session::session::SessionManager;
-use crate::domains::editor::file::worktree_fs::resolve_worktree_path;
-use crate::domains::ai_platform::lsp::diagnostics::{Diagnostic, DiagnosticSeverity};
-use crate::domains::ai_platform::lsp::manager::{CompletionItem, DefinitionLocation, HoverInfo, LSPManager};
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::worktree::session_worktree_root;
 
 #[derive(Debug, Clone, Deserialize)]

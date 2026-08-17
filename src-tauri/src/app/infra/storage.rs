@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use crate::kernel::{AuditRecorder, EventBus, EventEnvelope, KernelContext, KernelScope};
 
 use super::{AppState, Database, Encryption, audit_store, kv};
-use crate::domains::memory::project_memory::MemoryStore;
+use crate::extension::types::MemoryStore;
 
 /// 存储管理器
 pub struct Storage {

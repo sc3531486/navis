@@ -280,7 +280,7 @@ pub fn ui_set_language(
 
 #[tauri::command]
 pub fn ui_open_session_external_editor(
-    manager: State<'_, std::sync::Arc<crate::domains::session::session::SessionManager>>,
+//     manager: State<'_, std::sync::Arc<[REMOVED: domains reference]
     config: State<'_, Arc<Mutex<Config>>>,
     payload: super::OpenSessionExternalEditorPayload,
 ) -> Result<(), String> {

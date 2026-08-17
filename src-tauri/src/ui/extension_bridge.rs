@@ -226,7 +226,7 @@ async fn bridge_file_read(
             .as_ref()
             .map(|root| Path::new(root))
             .unwrap_or_else(|| Path::new("."));
-        crate::domains::editor::file::path_manager::PathManager::resolve(base, Path::new(path))
+        crate::extension::types::PathManager::resolve(base, Path::new(path))
     };
 
     let request =
@@ -266,7 +266,7 @@ fn bridge_context_get_active_project() -> Result<Value, String> {
 pub async fn ui_extension_bridge_invoke(
     extension_store: State<'_, Arc<ExtensionStore>>,
     lifecycle: State<'_, Arc<ExtensionLifecycle>>,
-    mcp: State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: State<'_, Arc<[REMOVED: MCP reference]
     storage: State<'_, Arc<Storage>>,
     ephemeral: State<'_, Arc<ExtensionEphemeralStorage>>,
     operation_store: State<'_, Arc<OperationRegistry>>,
@@ -367,7 +367,7 @@ fn bridge_extension_discovery_query(
 
 fn bridge_extension_route_call(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     args: &Value,
 ) -> Result<Value, String> {
     let request = serde_json::from_value::<ExtensionRouteRequest>(args.clone())
@@ -379,7 +379,7 @@ fn bridge_extension_route_call(
 
 fn bridge_storage_get(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     storage: &State<'_, Arc<Storage>>,
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
     args: &Value,
@@ -394,7 +394,7 @@ fn bridge_storage_get(
 
 fn bridge_storage_set(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     storage: &State<'_, Arc<Storage>>,
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
     args: &Value,
@@ -408,7 +408,7 @@ fn bridge_storage_set(
 
 fn bridge_storage_delete(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     storage: &State<'_, Arc<Storage>>,
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
     args: &Value,
@@ -422,7 +422,7 @@ fn bridge_storage_delete(
 
 fn bridge_storage_clear(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     storage: &State<'_, Arc<Storage>>,
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
     args: &Value,
@@ -436,7 +436,7 @@ fn bridge_storage_clear(
 
 async fn bridge_network_fetch(
     extension_store: &State<'_, Arc<ExtensionStore>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     args: &Value,
 ) -> Result<Value, String> {
     let request = serde_json::from_value::<ExtensionNetworkRequest>(args.clone())
@@ -480,7 +480,7 @@ async fn bridge_operation_execute(
     extension_id: &str,
     extension_store: &State<'_, Arc<ExtensionStore>>,
     operation_store: &State<'_, Arc<OperationRegistry>>,
-    mcp: &State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
     args: &Value,
 ) -> Result<Value, String> {
     let request = serde_json::from_value::<OperationExecuteRequest>(args.clone())

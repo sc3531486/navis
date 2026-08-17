@@ -17,7 +17,7 @@ use reqwest::Url;
 use crate::extension::models::NetworkPolicy;
 use crate::extension::{ExtensionStatus, ExtensionStore};
 use crate::kernel::{AuditRecord, AuditRecorder, AuditStatus, KernelContext, KernelScope};
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

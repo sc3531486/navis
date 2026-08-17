@@ -1,10 +1,10 @@
-use crate::domains::ai_platform::gateway::{
+use crate::extension::types::{
     ApiProtocol, CapabilityClipDiagnostic, CapabilitySet, GatewayProviderStatus,
 };
 use crate::extension::models::{ExtensionPermissions, MenuRisk};
 use crate::foundation::status::StatusPresentation;
 use crate::kernel::SchemaVersion;
-use crate::ui::agent_timeline_part::UiAgentTimelinePart;
+use crate::extension::types::UiAgentTimelinePart;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 

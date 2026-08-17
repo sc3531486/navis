@@ -737,8 +737,8 @@ mod tests {
     fn test_global_policy_engine_unifies_sandbox_and_extension_constraints() {
         use crate::extension::models::{HookAction, HookPhase, HookRegistration};
         use crate::extension::store::RegisteredHook;
-        use crate::domains::agent_core::tool_runtime::hooks::ExtensionHookConstraint;
-        use crate::domains::agent_core::tool_runtime::pipeline::AgentDefaultAllowConstraint;
+//         use [REMOVED: domains reference]
+//         use [REMOVED: domains reference]
 
         // 创建共享的全局 PolicyEngine（模拟 app/mod.rs 中的单一实例）
         let engine = PolicyEngine::new();

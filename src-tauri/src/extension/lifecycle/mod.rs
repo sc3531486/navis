@@ -22,15 +22,15 @@ mod state;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use crate::domains::ai_platform::gateway::protocol::CustomProtocolConfig;
-use crate::domains::ai_platform::gateway::request::{ApiProtocol, ProviderConfig};
+use crate::extension::types::CustomProtocolConfig;
+use crate::extension::types::{ApiProtocol, ProviderConfig};
 use crate::extension::models::{
     LSPServerConfig, LanguageSource, ViewRegistration, WorkModeRegistration,
 };
 use crate::extension::provider_validation::ExtensionProviderValidationPort;
 use crate::extension::skills::Skills;
 use crate::kernel::EventBus;
-use crate::domains::ai_platform::mcp::protocol::{MCPServerConfig, ToolDefinitionOverride};
+use crate::extension::types::{MCPServerConfig, ToolDefinitionOverride};
 
 use super::context::HostExtensionContext;
 use super::store::ExtensionStore;
@@ -82,7 +82,7 @@ pub trait GatewayCapabilityPort: Send + Sync {
     fn set_provider_capabilities(
         &self,
         provider_id: &str,
-        capabilities: crate::domains::ai_platform::gateway::protocol::CapabilitySet,
+        capabilities: crate::extension::types::CapabilitySet,
     ) -> anyhow::Result<()>;
     fn remove_provider_capabilities(&self, provider_id: &str) -> anyhow::Result<()>;
     fn remove_provider(&self, id: &str) -> anyhow::Result<()>;
@@ -100,7 +100,7 @@ pub trait McpCapabilityPort: Send + Sync {
     fn add_server(&self, config: MCPServerConfig) -> anyhow::Result<()>;
     fn start_server(&self, id: &str) -> anyhow::Result<()>;
     fn remove_server(&self, id: &str) -> anyhow::Result<()>;
-    fn register_tool(&self, tool: crate::domains::ai_platform::mcp::protocol::ToolDefinition)
+    fn register_tool(&self, tool: crate::extension::types::ToolDefinition)
         -> anyhow::Result<()>;
     fn unregister_server_tools(&self, server_id: &str) -> anyhow::Result<usize>;
     fn apply_tool_override(
@@ -187,7 +187,7 @@ pub(crate) struct ExtensionRuntimeHandle {
     pub(crate) provider_ids: Vec<String>,
     pub(crate) provider_capability_ids: Vec<String>,
     pub(crate) provider_validation_ids: Vec<String>,
-    pub(crate) protocols: Vec<crate::domains::ai_platform::gateway::request::ApiProtocol>,
+    pub(crate) protocols: Vec<crate::extension::types::ApiProtocol>,
     pub(crate) tool_server_ids: Vec<String>,
     pub(crate) tool_overrides: Vec<(String, String)>,
     pub(crate) mcp_servers: Vec<String>,
@@ -502,7 +502,7 @@ mod tests {
     use crate::extension::models::*;
     use crate::extension::skills::Skills;
     use crate::foundation::config::Config;
-    use crate::domains::ai_platform::mcp::MCP;
+//     use [REMOVED: MCP reference]
     use std::path::PathBuf;
     use std::sync::OnceLock;
     use tokio::runtime::Runtime;
@@ -1275,7 +1275,7 @@ mod tests {
         let skills = Arc::new(Mutex::new(
             Skills::with_event_bus(config, Arc::clone(&event_bus)).unwrap(),
         ));
-        let lsp = Arc::new(crate::domains::ai_platform::lsp::LSPManager::new(Arc::clone(&event_bus)).unwrap());
+        let lsp = Arc::new(crate::extension::types::LspManager::new(Arc::clone(&event_bus)).unwrap());
 
         let mut state = create_test_state("extension-lsp-language", ExtensionStatus::Installed);
         state.manifest.contributes.languages = Some(vec![LanguageRegistration {
@@ -1303,7 +1303,7 @@ mod tests {
         );
         assert_eq!(
             lsp.registry().get_source("gleam"),
-            Some(crate::domains::ai_platform::lsp::LanguageSource::Extension {
+            Some(crate::extension::types::LanguageSource::Extension {
                 owner: "extension-lsp-language".to_string()
             })
         );
@@ -1323,7 +1323,7 @@ mod tests {
         let skills = Arc::new(Mutex::new(
             Skills::with_event_bus(config, Arc::clone(&event_bus)).unwrap(),
         ));
-        let lsp = Arc::new(crate::domains::ai_platform::lsp::LSPManager::new(Arc::clone(&event_bus)).unwrap());
+        let lsp = Arc::new(crate::extension::types::LspManager::new(Arc::clone(&event_bus)).unwrap());
 
         let mut state = create_test_state("extension-lsp-builtin", ExtensionStatus::Installed);
         state.manifest.contributes.languages = Some(vec![LanguageRegistration {
@@ -1349,7 +1349,7 @@ mod tests {
         );
         assert_eq!(
             lsp.registry().get_source("rust"),
-            Some(crate::domains::ai_platform::lsp::LanguageSource::Builtin)
+            Some(crate::extension::types::LanguageSource::Builtin)
         );
     }
 
@@ -1363,7 +1363,7 @@ mod tests {
         let skills = Arc::new(Mutex::new(
             Skills::with_event_bus(config, Arc::clone(&event_bus)).unwrap(),
         ));
-        let lsp = Arc::new(crate::domains::ai_platform::lsp::LSPManager::new(Arc::clone(&event_bus)).unwrap());
+        let lsp = Arc::new(crate::extension::types::LspManager::new(Arc::clone(&event_bus)).unwrap());
 
         let mut state = create_test_state("extension-lsp-partial", ExtensionStatus::Installed);
         state.manifest.contributes.languages = Some(vec![
@@ -1394,7 +1394,7 @@ mod tests {
         assert!(lsp.registry().get_config("gleam").is_none());
         assert_eq!(
             lsp.registry().get_source("rust"),
-            Some(crate::domains::ai_platform::lsp::LanguageSource::Builtin)
+            Some(crate::extension::types::LanguageSource::Builtin)
         );
         assert_eq!(
             store.get("extension-lsp-partial").unwrap().status,
@@ -1461,7 +1461,7 @@ mod tests {
         let skills = Arc::new(Mutex::new(
             Skills::with_event_bus(config, Arc::clone(&event_bus)).unwrap(),
         ));
-        let lsp = Arc::new(crate::domains::ai_platform::lsp::LSPManager::new(Arc::clone(&event_bus)).unwrap());
+        let lsp = Arc::new(crate::extension::types::LspManager::new(Arc::clone(&event_bus)).unwrap());
 
         let mut state = create_test_state("extension-partial-skill", ExtensionStatus::Installed);
         state.manifest.contributes.skills = Some(vec![SkillDefinition {
@@ -1495,7 +1495,7 @@ mod tests {
             .is_none());
         assert_eq!(
             lsp.registry().get_source("rust"),
-            Some(crate::domains::ai_platform::lsp::LanguageSource::Builtin)
+            Some(crate::extension::types::LanguageSource::Builtin)
         );
         assert_eq!(
             store.get("extension-partial-skill").unwrap().status,

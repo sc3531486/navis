@@ -6,15 +6,15 @@ use super::dto::{
     UiWorktreeFileNode,
 };
 use crate::foundation::config::Config;
-use crate::domains::project::catalog::{ProjectManager, RecentWorktree};
-use crate::domains::session::session::SessionManager;
-use crate::domains::editor::file::path_manager::PathManager;
-use crate::domains::editor::file::worktree_fs::{
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+use crate::extension::types::PathManager;
+// use [REMOVED: domains reference]
     build_worktree_tree_with_policy_engine, read_worktree_text_file_with_policy_engine,
     resolve_worktree_root, write_worktree_text_file_with_policy_engine,
     WorktreeFileNode as FileWorktreeNode, DEFAULT_MAX_READ_BYTES, DEFAULT_MAX_TREE_ENTRIES,
 };
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 use chrono::Utc;
 use serde_json::Value;
 use std::path::{Path, PathBuf};

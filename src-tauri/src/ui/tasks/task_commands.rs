@@ -4,10 +4,10 @@
 use super::task_projection::{
     is_background_task_projection, session_todos_from_metadata, ui_task_record, ui_todo_item,
 };
-use crate::domains::agent_core::agent::{notify_parent_sidechain_task, TaskKind, TaskManager};
+// use [REMOVED: domains reference]
 use crate::foundation::stream::{stream_kind, StreamIndex};
-use crate::domains::session::session::SessionManager;
-use crate::domains::session::session::TimelineStatus;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::dto::{
     CancelStreamPayload, ClearFinishedTasksPayload, ListTasksPayload, ListTodosPayload,
     TaskIdPayload, ToolApprovalResponsePayload, UiTask, UiTodoItem,

@@ -3,9 +3,9 @@
 
 use super::common::{ensure_session_exists, has_active_session_task};
 use super::goal_runner_commands::goal_runner_next_composer_task;
-use crate::domains::agent_core::agent::TaskManager;
-use crate::domains::session::session::composer_runtime::{ComposerRuntime, SubmitDisposition};
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::composer_projection::{
     composer_run_state_projection, overlay_composer_runtime_state, runtime_composer_task,
     ui_composer_task,

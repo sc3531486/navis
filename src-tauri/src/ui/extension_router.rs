@@ -14,7 +14,7 @@ use tauri::State;
 
 use crate::extension::{ExtensionStatus, ExtensionStore};
 use crate::kernel::{AuditRecord, AuditRecorder, AuditStatus, KernelContext, KernelScope};
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 
 /// 跨扩展路由审计的 action 命名空间。
 const ROUTE_AUDIT_ACTION: &str = "extension.route.call";

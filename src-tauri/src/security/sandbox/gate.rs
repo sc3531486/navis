@@ -265,9 +265,9 @@ impl Sandbox {
         let target = if target.is_empty() { "." } else { target };
         let target_path = Path::new(target);
         let resolved_target = if target_path.is_absolute() {
-            crate::domains::editor::file::path_manager::PathManager::normalize(target_path)
+            crate::extension::types::PathManager::normalize(target_path)
         } else {
-            crate::domains::editor::file::path_manager::PathManager::resolve(worktree_path, target_path)
+            crate::extension::types::PathManager::resolve(worktree_path, target_path)
         };
 
         self.check_path(&resolved_target, &request.operation, worktree_path)

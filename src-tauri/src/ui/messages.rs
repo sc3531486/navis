@@ -4,19 +4,19 @@
 use super::agent_timeline_part::{ui_agent_timeline_part, UiAgentTimelinePart};
 use super::dto::*;
 use super::ToolApprovalStore;
-use crate::domains::ai_platform::gateway::{
+use crate::extension::types::{
     ChatMessage as GatewayProtocolMessage, ContentPart as GatewayContentPart,
     FileContent as GatewayFileContent, ImageContent as GatewayImageContent,
     ImageMediaType as GatewayImageMediaType, ImageSourceType as GatewayImageSourceType,
     MessageContent as GatewayMessageContent, MessageRole as GatewayMessageRole,
     TextContent as GatewayTextContent,
 };
-use crate::domains::session::session::{
+// use [REMOVED: domains reference]
     Message, MessageContent as StorageMessageContent, MessageRole as StorageMessageRole,
     SessionChange,
 };
-use crate::domains::session::session::SessionManager;
-use crate::domains::session::session::TimelineStatus;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use chrono::Utc;
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
@@ -143,7 +143,7 @@ pub(crate) fn message_content_text(content: &StorageMessageContent) -> String {
         StorageMessageContent::Parts(parts) => parts
             .iter()
             .filter_map(|part| match part {
-                crate::domains::session::session::store::ContentPart::Text(text) => {
+//                 [REMOVED: domains reference]
                     Some(text.text.as_str())
                 }
                 _ => None,
@@ -159,7 +159,7 @@ fn message_content_attachments(content: &StorageMessageContent) -> Vec<UiChatMes
         StorageMessageContent::Parts(parts) => parts
             .iter()
             .filter_map(|part| match part {
-                crate::domains::session::session::store::ContentPart::Image(image) => {
+//                 [REMOVED: domains reference]
                     Some(UiChatMessageAttachment {
                         kind: "image".to_string(),
                         name: "Image".to_string(),
@@ -171,7 +171,7 @@ fn message_content_attachments(content: &StorageMessageContent) -> Vec<UiChatMes
                         model_readable: Some(true),
                     })
                 }
-                crate::domains::session::session::store::ContentPart::File(file) => {
+//                 [REMOVED: domains reference]
                     Some(UiChatMessageAttachment {
                         kind: "file".to_string(),
                         name: file.name.clone(),
@@ -183,7 +183,7 @@ fn message_content_attachments(content: &StorageMessageContent) -> Vec<UiChatMes
                         model_readable: Some(true),
                     })
                 }
-                crate::domains::session::session::store::ContentPart::Text(_) => None,
+//                 [REMOVED: domains reference]
             })
             .collect(),
     }
@@ -217,8 +217,8 @@ pub(crate) fn storage_user_message_with_attachments(
     let mut parts = Vec::new();
     if !display_content.is_empty() {
         parts.push(
-            crate::domains::session::session::store::ContentPart::Text(
-                crate::domains::session::session::store::TextContent {
+//             [REMOVED: domains reference]
+//                 [REMOVED: domains reference]
                     text: display_content.to_string(),
                 },
             ),
@@ -234,8 +234,8 @@ pub(crate) fn storage_user_message_with_attachments(
                     .filter(|data| !data.is_empty())
                 {
                     parts.push(
-                        crate::domains::session::session::store::ContentPart::Image(
-                            crate::domains::session::session::store::ImageContent {
+//                         [REMOVED: domains reference]
+//                             [REMOVED: domains reference]
                                 media_type: attachment
                                     .mime_type
                                     .clone()
@@ -253,8 +253,8 @@ pub(crate) fn storage_user_message_with_attachments(
                     .filter(|text| !text.is_empty())
                 {
                     parts.push(
-                        crate::domains::session::session::store::ContentPart::File(
-                            crate::domains::session::session::store::FileContent {
+//                         [REMOVED: domains reference]
+//                             [REMOVED: domains reference]
                                 name: attachment.name.clone(),
                                 content: text.to_string(),
                             },
@@ -352,12 +352,12 @@ fn gateway_user_message_from_storage_content(
             let gateway_parts: Vec<GatewayContentPart> = parts
                 .iter()
                 .filter_map(|part| match part {
-                    crate::domains::session::session::store::ContentPart::Text(text) => {
+//                     [REMOVED: domains reference]
                         Some(GatewayContentPart::Text(GatewayTextContent {
                             text: text.text.clone(),
                         }))
                     }
-                    crate::domains::session::session::store::ContentPart::Image(image) => {
+//                     [REMOVED: domains reference]
                         let media_type =
                             GatewayImageMediaType::from_mime_str(&image.media_type).ok()?;
                         Some(GatewayContentPart::Image(GatewayImageContent {
@@ -370,7 +370,7 @@ fn gateway_user_message_from_storage_content(
                             size_bytes: image.data.len() as u64,
                         }))
                     }
-                    crate::domains::session::session::store::ContentPart::File(file) => {
+//                     [REMOVED: domains reference]
                         Some(GatewayContentPart::File(GatewayFileContent {
                             file_name: file.name.clone(),
                             file_type: "document".to_string(),

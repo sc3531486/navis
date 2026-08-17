@@ -6,8 +6,8 @@ use super::dto::{
     UiGatewayModelConfig, UiGatewayProtocolCatalog, UiGatewayProvider, UiGatewayProviderCatalog,
     UiGatewayProviderConfig,
 };
-use crate::domains::ai_platform::gateway::provider::builtin_provider_profile;
-use crate::domains::ai_platform::gateway::{
+use crate::extension::types::provider::builtin_provider_profile;
+use crate::extension::types::{
     Gateway, GatewayCapabilityCatalogProjection, GatewayConfig, GatewayModelProjection,
     GatewayProviderProjection, ModelConfig, ProtocolAdapterInfo, ProviderConfig,
 };
@@ -71,7 +71,7 @@ fn ui_gateway_protocol_catalog(info: ProtocolAdapterInfo) -> UiGatewayProtocolCa
     };
 
     UiGatewayProtocolCatalog {
-        id: crate::domains::ai_platform::gateway::ApiProtocol::from_str(&info.id),
+        id: crate::extension::types::ApiProtocol::from_str(&info.id),
         runtime_id: info.id,
         description: if info.description.trim().is_empty() {
             format!("{label} Gateway protocol adapter.")
@@ -493,7 +493,7 @@ pub fn ui_save_gateway_config(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domains::ai_platform::gateway::{ApiProtocol, CapabilitySet};
+    use crate::extension::types::{ApiProtocol, CapabilitySet};
 
     fn provider_projection(id: &str) -> GatewayProviderProjection {
         GatewayProviderProjection {
@@ -505,12 +505,12 @@ mod tests {
             protocols: Vec::new(),
             requires_secret: false,
             capabilities: CapabilitySet::default(),
-            capability_version: crate::domains::ai_platform::gateway::GATEWAY_CAPABILITY_PROJECTION_VERSION,
+            capability_version: crate::extension::types::GATEWAY_CAPABILITY_PROJECTION_VERSION,
             diagnostics: Vec::new(),
             configured: true,
             model_count: 1,
             available_model_count: 1,
-            status: crate::domains::ai_platform::gateway::GatewayProviderStatus::Available,
+            status: crate::extension::types::GatewayProviderStatus::Available,
         }
     }
 
@@ -521,11 +521,11 @@ mod tests {
         assert_eq!(provider.id, "custom");
         assert_eq!(
             provider.status,
-            crate::domains::ai_platform::gateway::GatewayProviderStatus::Available
+            crate::extension::types::GatewayProviderStatus::Available
         );
         assert_eq!(
             provider.capability_version,
-            crate::domains::ai_platform::gateway::GATEWAY_CAPABILITY_PROJECTION_VERSION
+            crate::extension::types::GATEWAY_CAPABILITY_PROJECTION_VERSION
         );
         assert_eq!(provider.model_count, 1);
         assert_eq!(provider.available_model_count, 1);

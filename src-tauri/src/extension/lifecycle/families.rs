@@ -1268,7 +1268,7 @@ mod tests {
     use crate::kernel::{EventBus, InMemoryEventBus};
     use crate::security::sandbox::permission::ApprovalMode;
     use crate::security::sandbox::{CommandRule, RuleAction, Sandbox};
-    use crate::domains::editor::backend::BackendProcessManager;
+    use crate::extension::types::BackendProcessManager;
     use std::collections::HashMap;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex, OnceLock};

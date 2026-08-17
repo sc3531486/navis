@@ -1,12 +1,12 @@
 // ── 归属扩展：navis-agent-core ──
 // 迁移目标：extensions/navis-agent-core/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::{ChatMessage as AgentChatMessage, TaskManager};
-use crate::domains::ai_platform::gateway::{ChatMessage as GatewayProtocolMessage, Gateway};
-use crate::domains::session::session::Session;
+// use [REMOVED: domains reference]
+use crate::extension::types::{ChatMessage as GatewayProtocolMessage, Gateway};
+// use [REMOVED: domains reference]
 use crate::foundation::stream::{send_channel_value, StreamChunk as CoreStreamChunk};
-use crate::domains::session::session::SessionManager;
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: domains reference]
+// use [REMOVED: MCP reference]
 use crate::ui::messages::{
     session_messages, storage_assistant_shell_message, storage_text_message,
     storage_user_message_with_attachments,
@@ -100,7 +100,7 @@ pub(crate) fn prepare_stream_session_turn(
     } else {
         storage_text_message(
             &payload.session_id,
-            crate::domains::session::session::MessageRole::User,
+//             [REMOVED: domains reference]
             display_content,
             None,
             None,

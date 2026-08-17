@@ -1,18 +1,18 @@
 // ── 归属扩展：navis-agent-core ──
 // 迁移目标：extensions/navis-agent-core/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::turn_output::{
+// use [REMOVED: domains reference]
     assistant_visible_content, assistant_visible_delta, has_open_internal_details_block,
     should_buffer_potential_text_tool_call,
 };
-use crate::domains::agent_core::agent::{mode_config_from_key, ChatMessage as AgentChatMessage};
-use crate::domains::ai_platform::gateway::ChatMessage as GatewayProtocolMessage;
+// use [REMOVED: domains reference]
+use crate::extension::types::ChatMessage as GatewayProtocolMessage;
 use crate::foundation::stream::{
     send_channel_value, stream_kind, StreamChunk as CoreStreamChunk, StreamIndex, StreamSource,
 };
-use crate::domains::session::session::TimelineStatus;
+// use [REMOVED: domains reference]
 use crate::security::sandbox::permission::ApprovalMode;
-use crate::domains::agent_core::tool_runtime::{
+// use [REMOVED: domains reference]
     assistant_tool_message, effective_gateway_tool_call, is_supported_gateway_tool,
     parse_text_tool_calls, tool_call_arguments, tool_call_summary, tool_started_event,
     AgentToolEvent, AgentToolPhase, AgentToolStatus,

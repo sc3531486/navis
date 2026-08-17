@@ -338,7 +338,7 @@ async fn builtin_file_read(
         .and_then(Value::as_str)
         .ok_or_else(|| "file.read requires a 'path' parameter".to_string())?;
     let base = worktree.map(Path::new).unwrap_or_else(|| Path::new("."));
-    let resolved = crate::domains::editor::file::path_manager::PathManager::resolve(base, Path::new(path));
+    let resolved = crate::extension::types::PathManager::resolve(base, Path::new(path));
 
     let mut request = OperationRequest::new(
         OperationType::FileRead,
@@ -399,7 +399,7 @@ pub fn ui_operation_register(
 pub async fn ui_operation_execute(
     extension_store: State<'_, Arc<ExtensionStore>>,
     operation_store: State<'_, Arc<OperationRegistry>>,
-    mcp: State<'_, Arc<crate::domains::ai_platform::mcp::MCP>>,
+//     mcp: State<'_, Arc<[REMOVED: MCP reference]
     request: OperationExecuteRequest,
 ) -> Result<Value, String> {
     execute_operation(

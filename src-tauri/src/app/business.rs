@@ -12,16 +12,16 @@ use std::sync::{Arc, Mutex};
 
 use tauri::Manager;
 
-use crate::domains::agent_core::agent; use crate::domains::ai_platform::gateway;
+// use crate::domains::agent_core::agent; use [REMOVED: domains reference]
 use crate::extension::skills;
-use crate::domains::project::catalog; use crate::domains::session::session;
-use crate::domains::session::session::SessionStore;
-use crate::domains::agent_core::tool_runtime::pipeline::AgentDefaultAllowConstraint;
-use crate::domains::editor::clipboard::policy::register_clipboard_constraints;
-use crate::domains::terminal::terminal::TerminalManager;
+// use crate::domains::project::catalog; use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::extension::lifecycle::{GatewayCapabilityPort, LspCapabilityPort, McpCapabilityPort};
-use crate::domains::ai_platform::mcp::protocol::{MCPServerConfig, ToolDefinition, ToolDefinitionOverride};
-use crate::domains::editor::backend; use crate::domains::ai_platform::lsp; use crate::domains::ai_platform::mcp;
+use crate::extension::types::{MCPServerConfig, ToolDefinition, ToolDefinitionOverride};
+// use crate::domains::editor::backend; use crate::domains::ai_platform::lsp; use [REMOVED: domains reference]
 use crate::ui;
 
 impl GatewayCapabilityPort for gateway::Gateway {

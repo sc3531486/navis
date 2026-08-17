@@ -1,8 +1,8 @@
 // ── 归属扩展：navis-task ──
 // 迁移目标：extensions/navis-task/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::{TaskKind, TaskManager};
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use std::sync::Mutex;
 
 pub(super) fn ensure_session_exists(

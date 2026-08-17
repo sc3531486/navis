@@ -6,8 +6,8 @@
 use anyhow::{Context, Result};
 use serde_json::Value;
 
-use crate::domains::ai_platform::gateway::protocol::{CapabilitySet, CustomProtocolConfig};
-use crate::domains::ai_platform::gateway::request::{ApiProtocol, ModelConfig, ProviderConfig};
+use crate::extension::types::{CapabilitySet, CustomProtocolConfig};
+use crate::extension::types::{ApiProtocol, ModelConfig, ProviderConfig};
 use crate::extension::models::{
     ExtensionContributes, ExtensionPermissionConstraint, GatewayAdapterRegistration,
     GatewayContributions, GatewayProviderRegistration, LSPServerConfig, LanguageRegistration,
@@ -16,7 +16,7 @@ use crate::extension::models::{
 use crate::extension::provider_validation::{
     ExtensionProviderValidationPort, ExtensionProviderValidationRequest,
 };
-use crate::domains::ai_platform::mcp::protocol::{
+use crate::extension::types::{
     MCPServerConfig, ToolDefinition, ToolDefinitionOverride, ToolRendererHint, ToolRiskLevel,
     ToolUiHint,
 };
@@ -438,7 +438,7 @@ pub(crate) fn extension_tool_definition(
         .map(parse_tool_risk)
         .transpose()?;
     definition.effective_risk = definition.declared_risk.unwrap_or_default().max(
-        crate::domains::ai_platform::mcp::protocol::platform_risk_override(&definition.name).unwrap_or_default(),
+        crate::extension::types::platform_risk_override(&definition.name).unwrap_or_default(),
     );
     Ok(definition)
 }

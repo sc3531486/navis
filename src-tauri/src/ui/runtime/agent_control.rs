@@ -8,14 +8,14 @@
 
 use super::agent_tool_loop::AgentBackend;
 use super::sidechain_task::start_sidechain_agent_task;
-use crate::domains::agent_core::agent::{sidechain_stop_requested, TaskManager, TaskRecord, TaskStatus};
-use crate::domains::agent_core::application::runtime::{
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
     AgentControlPorts, SidechainPort, SidechainReadRequest, SidechainStartRequest,
     SidechainStarted, SidechainStatus, SidechainTaskSnapshot, TodoPort, TodoUpdate,
     TodoUpdateRequest,
 };
-use crate::domains::session::session::SessionManager;
-use crate::domains::agent_core::tool_runtime::special::SpecialAgentToolHost;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::merge_ui_metadata;
 use crate::ui::tasks::{todo_items_from_values, todo_values};
 use anyhow::{anyhow, Result};
@@ -166,7 +166,7 @@ impl SidechainPort for UiAgentControlPort {
         };
 
         if should_notify {
-            crate::domains::agent_core::agent::notify_parent_sidechain_task(self.task_manager.as_ref(), task_id)
+//             [REMOVED: domains reference]
                 .map_err(|error| anyhow!(error))?;
         }
         self.find_task_snapshot(task_id)
@@ -189,8 +189,8 @@ pub(crate) fn build_agent_control_host(backend: &AgentBackend) -> SpecialAgentTo
 #[cfg(test)]
 mod tests {
     use super::UiAgentControlPort;
-    use crate::domains::agent_core::agent::{SidechainOutcome, TaskManager, TaskRecord};
-    use crate::domains::agent_core::application::runtime::SidechainStatus;
+//     use [REMOVED: domains reference]
+//     use [REMOVED: domains reference]
     use serde_json::json;
 
     fn sidechain_task() -> TaskRecord {

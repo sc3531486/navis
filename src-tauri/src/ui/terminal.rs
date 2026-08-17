@@ -1,7 +1,7 @@
 // ── 归属扩展：navis-terminal ──
 // 迁移目标：extensions/navis-terminal/ExtensionBackend/src/
 
-use crate::domains::terminal::terminal::TerminalManager;
+// use [REMOVED: domains reference]
 use serde::Deserialize;
 use std::path::PathBuf;
 use std::sync::Arc;

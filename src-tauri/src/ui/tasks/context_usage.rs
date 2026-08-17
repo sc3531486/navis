@@ -1,9 +1,9 @@
 // ── 归属扩展：navis-task ──
 // 迁移目标：extensions/navis-task/ExtensionBackend/src/
 
-use crate::domains::ai_platform::gateway::Gateway;
+use crate::extension::types::Gateway;
 use crate::foundation::config::Config;
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
 use crate::ui::dto::{SessionIdPayload, UiSessionContextUsage};
 use crate::ui::tasks::context_model::{
     compression_threshold_percent, configured_context_window, estimate_session_tokens,

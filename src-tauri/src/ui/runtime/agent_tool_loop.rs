@@ -10,23 +10,23 @@ use super::tool_approval_flow::{
     auto_tool_approval_reason, resolve_tool_approval_for_event, tool_approval_request,
     unsupported_gateway_tool_result,
 };
-use crate::domains::agent_core::agent::{
+// use [REMOVED: domains reference]
     mode_config_from_key, sidechain_stop_requested, update_sidechain_progress, TaskManager,
 };
-use crate::domains::ai_platform::gateway::{ChatMessage as GatewayProtocolMessage, ChatResponse, Gateway, ToolCall};
+use crate::extension::types::{ChatMessage as GatewayProtocolMessage, ChatResponse, Gateway, ToolCall};
 use crate::extension::skills::Skills;
 use crate::extension::ExtensionStore;
-use crate::domains::session::session::Session;
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::security::sandbox::permission::ApprovalMode;
-use crate::domains::agent_core::tool_runtime::{
+// use [REMOVED: domains reference]
     agent_tool_definitions, assistant_tool_message, assistant_tool_message_with_content,
     effective_gateway_tool_call, execute_agent_tool_call_async, is_supported_gateway_tool,
     is_supported_sidechain_gateway_tool, parse_text_tool_call, sidechain_agent_tool_definitions,
     tool_call_arguments, tool_call_summary, tool_started_event, AgentToolEvent, AgentToolExecution,
     AgentToolPhase, AgentToolStatus, ToolAvailability,
 };
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 use crate::ui::timeline::{
     persist_tool_prelude_text_step, send_agent_tool_event, ToolTimelineSequencer,
 };
@@ -80,12 +80,12 @@ pub(crate) async fn execute_ui_agent_tool_call_with_pipeline(
     tool_availability: &impl ToolAvailability,
     tool_call: &ToolCall,
     prior_messages: &[GatewayProtocolMessage],
-    on_progress: Option<&mut crate::domains::agent_core::tool_runtime::AgentToolProgressCallback>,
+//     on_progress: Option<&mut [REMOVED: domains reference]
     extension_hooks: &[crate::extension::store::RegisteredHook],
     skills: Option<Arc<Mutex<Skills>>>,
 ) -> std::result::Result<AgentToolExecution, anyhow::Error> {
     let agent_control_host = backend.map(build_agent_control_host);
-    let execution_context = crate::domains::agent_core::tool_runtime::AgentExecutionContext::new(
+//     let execution_context = [REMOVED: domains reference]
         session.id.clone(),
         session.worktree_root.clone(),
     );

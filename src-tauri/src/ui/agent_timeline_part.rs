@@ -2,11 +2,11 @@
 // 迁移目标：extensions/navis-agent-core/ExtensionBackend/src/
 
 use crate::foundation::status::{StatusClassify, StatusPresentation};
-use crate::domains::session::session::AgentTimelinePart;
+// use [REMOVED: domains reference]
 use crate::foundation::stream::{send_channel_value, StreamChunk as CoreStreamChunk};
-use crate::domains::session::session::SessionManager;
-use crate::domains::session::session::TimelineStatus;
-use crate::domains::agent_core::tool_runtime::AgentToolEvent;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use serde_json::json;
@@ -359,7 +359,7 @@ pub fn publish_agent_timeline_part_delta(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domains::agent_core::tool_runtime::{AgentToolPhase, AgentToolStatus};
+//     use [REMOVED: domains reference]
     use serde_json::json;
 
     fn tool_event(call_id: &str, status: AgentToolStatus) -> AgentToolEvent {

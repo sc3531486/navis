@@ -1,6 +1,6 @@
 use super::dto::UiToolPermissionRule;
 use crate::security::sandbox::permission::ApprovalMode;
-use crate::domains::agent_core::tool_runtime::NAVIS_TOOL_SEARCH;
+use crate::extension::types::NAVIS_TOOL_SEARCH;
 
 pub(super) const TOOL_PERMISSION_KEYS: [&str; 14] = [
     "read",

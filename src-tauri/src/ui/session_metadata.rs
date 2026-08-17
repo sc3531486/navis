@@ -10,9 +10,9 @@ use std::sync::Mutex;
 use chrono::Utc;
 use serde_json::{json, Value};
 
-use crate::domains::agent_core::agent::{TaskManager, TaskStatus};
-use crate::domains::session::session::Session;
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::security::sandbox::permission::ApprovalMode;
 
 pub(crate) const DEFAULT_SESSION_WORKTREE: &str = "Sessions";

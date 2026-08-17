@@ -1,14 +1,14 @@
 // ── 归属扩展：navis-agent-core ──
 // 迁移目标：extensions/navis-agent-core/ExtensionBackend/src/
 
-use crate::domains::agent_core::agent::turn_output::assistant_visible_content;
-use crate::domains::agent_core::agent::{
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
     mark_sidechain_failed_and_notify, notify_parent_sidechain_task_best_effort,
     sidechain_outcome_from_assistant_content, sidechain_stop_requested, TaskManager,
 };
-use crate::domains::agent_core::application::runtime::{SidechainStartRequest, SidechainStarted};
-use crate::domains::session::session::store::MessageRole as StorageMessageRole;
-use crate::domains::session::session::{SessionManager, TimelineStatus};
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::agent_timeline_part::record_agent_timeline_part;
 use crate::ui::messages::{storage_assistant_shell_message, storage_text_message};
 use crate::ui::runtime::agent_tool_loop::{

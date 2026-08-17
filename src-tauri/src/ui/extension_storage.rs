@@ -31,7 +31,7 @@ use crate::extension::{ExtensionState, ExtensionStatus, ExtensionStore};
 use crate::app::infra::Storage;
 use crate::security::sandbox::permission::{CheckResult, OperationRequest, OperationType};
 use crate::security::sandbox::Sandbox;
-use crate::domains::ai_platform::mcp::MCP;
+// use [REMOVED: MCP reference]
 
 #[path = "../extension/storage.rs"]
 pub(crate) mod storage;

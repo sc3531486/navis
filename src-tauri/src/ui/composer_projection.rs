@@ -3,10 +3,10 @@
 
 use super::dto::{UiChatMessageAttachment, UiComposerRunState, UiComposerTask};
 use super::session_composer_run_state;
-use crate::domains::session::session::composer_runtime::{
+// use [REMOVED: domains reference]
     ComposerAttachment, ComposerRuntime, ComposerTask as RuntimeComposerTask,
 };
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
 use std::sync::Mutex;
 
 pub(crate) fn composer_run_state_projection(

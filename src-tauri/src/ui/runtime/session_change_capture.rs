@@ -1,11 +1,11 @@
 // ── 归属扩展：navis-agent-core ──
 // 迁移目标：extensions/navis-agent-core/ExtensionBackend/src/
 
-use crate::domains::ai_platform::gateway::ToolCall;
-use crate::domains::session::session::{Session, SessionChange};
-use crate::domains::session::session::SessionManager;
-use crate::domains::agent_core::tool_runtime::{tool_call_arguments, AgentToolExecution};
-use crate::domains::editor::file::worktree_fs::{
+use crate::extension::types::ToolCall;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
     relative_display, resolve_worktree_root, resolve_worktree_write_path,
 };
 use chrono::Utc;

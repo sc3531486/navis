@@ -7,10 +7,10 @@ use std::sync::Mutex;
 
 use serde_json::Value;
 
-use crate::domains::agent_core::context::{token_counter::TokenCounter, TokenizerType};
-use crate::domains::ai_platform::gateway::Gateway;
+// use [REMOVED: domains reference]
+use crate::extension::types::Gateway;
 use crate::foundation::config::Config;
-use crate::domains::session::session::SessionManager;
+// use [REMOVED: domains reference]
 
 pub(crate) fn route_model_id(provider_id: &str, model_id: &str) -> String {
     format!("{}/{}", provider_id.trim(), model_id.trim())

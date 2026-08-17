@@ -1,9 +1,9 @@
 // ── 归属扩展：navis-task ──
 // 迁移目标：extensions/navis-task/ExtensionBackend/src/
 
-use crate::domains::session::session::SessionManager;
-use crate::domains::editor::git::diff::GitDiff;
-use crate::domains::editor::git::GitStatusParser;
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
+// use [REMOVED: domains reference]
 use crate::ui::dto::{
     CreateSessionGitRepoPayload, SessionGitDiffPayload, UiSessionGitDiff, UiSessionGitDiffFile,
 };
@@ -198,12 +198,12 @@ fn parse_diff_file_stats(diff: &str) -> HashMap<String, UiSessionGitDiffFile> {
     files
 }
 
-fn change_status_label(status: &crate::domains::editor::git::ChangeStatus) -> &'static str {
+// fn change_status_label(status: &[REMOVED: domains reference]
     match status {
-        crate::domains::editor::git::ChangeStatus::Added => "added",
-        crate::domains::editor::git::ChangeStatus::Modified => "modified",
-        crate::domains::editor::git::ChangeStatus::Deleted => "deleted",
-        crate::domains::editor::git::ChangeStatus::Renamed { .. } => "renamed",
-        crate::domains::editor::git::ChangeStatus::Untracked => "untracked",
+//         [REMOVED: domains reference]
+//         [REMOVED: domains reference]
+//         [REMOVED: domains reference]
+//         [REMOVED: domains reference]
+//         [REMOVED: domains reference]
     }
 }
