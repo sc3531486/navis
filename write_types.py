@@ -1,6 +1,8 @@
-use crate::extension::operation_runtime::McpOperationPort;
+import os
 
-//! 框架层通用类型定义
+types_path = r"D:\myworkspace\Navis Go\src-tauri\src\extension\types.rs"
+
+content = '''//! 框架层通用类型定义
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -92,7 +94,6 @@ pub fn platform_risk_override(_name: &str) -> Option<ToolRiskLevel> { None }
 pub struct SandboxStub;
 impl SandboxStub {
     pub fn audit_recorder(&self) -> AuditRecorderStub { AuditRecorderStub }
-    pub fn check(&self, _req: &crate::security::sandbox::permission::OperationRequest) -> crate::security::sandbox::permission::CheckResult { crate::security::sandbox::permission::CheckResult::allowed(crate::security::sandbox::permission::PermissionLevel::LightCheck) }
 }
 impl AsRef<SandboxStub> for SandboxStub { fn as_ref(&self) -> &Self { self } }
 pub struct AuditRecorderStub;
@@ -108,12 +109,6 @@ impl MCP {
     pub fn unregister_server_tools(&self, _id: &str) -> Result<usize, String> { Ok(0) }
     pub fn apply_tool_override(&self, _: &str, _: &str, _: &str, _: ToolDefinitionOverride) -> Result<(), String> { Ok(()) }
     pub fn remove_tool_override(&self, _: &str, _: &str, _: &str) -> Result<(), String> { Ok(()) }
-}
-
-impl McpOperationPort for MCP {
-    fn sandbox(&self) -> std::sync::Arc<crate::security::sandbox::Sandbox> {
-        std::sync::Arc::new(crate::security::sandbox::Sandbox::new())
-    }
 }
 
 // LSP
@@ -156,3 +151,8 @@ pub struct UiAgentTimelinePart {
     pub id: String, pub session_id: String, pub turn_id: String,
     pub message_id: String, pub sequence: i64, pub kind: String, pub data: Value,
 }
+'''
+
+with open(types_path, "w", encoding="utf-8", newline="\n") as f:
+    f.write(content)
+print("Written types.rs")

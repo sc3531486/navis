@@ -26,6 +26,7 @@ use crate::security::sandbox::permission::{
     CheckResult, OperationRequest, OperationType, PermissionLevel,
 };
 use crate::security::sandbox::Sandbox;
+use crate::extension::types::MCP;
 
 /// 操作执行所需的沙箱端口（领域无关契约）。
 ///
@@ -400,6 +401,7 @@ pub async fn ui_operation_execute(
     extension_store: State<'_, Arc<ExtensionStore>>,
     operation_store: State<'_, Arc<OperationRegistry>>,
 //     mcp: State<'_, Arc<[REMOVED: MCP reference]
+    mcp: State<'_, Arc<MCP>>,
     request: OperationExecuteRequest,
 ) -> Result<Value, String> {
     execute_operation(

@@ -13,6 +13,7 @@
 //! 命令不经过 `extension_bridge.rs` 的桥注册表，是独立 Tauri 命令：host:panel
 //! 与扩展 iframe 的宿主桥 dispatcher 直接 invoke（宿主侧可信，已校验来源）。
 
+
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -272,3 +273,4 @@ mod tests {
         assert!(rx.try_recv().is_err());
     }
 }
+

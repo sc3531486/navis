@@ -1,11 +1,11 @@
-pub mod types;
-pub mod interfaces;
-
 //! Extension domain.
 //!
 //! This module is the single composition boundary for installable extensions.
 //! Extension contributions stay here; the kernel only provides generic
 //! registries, policies, pipelines, and events.
+
+pub mod types;
+pub mod interfaces;
 
 pub(crate) mod host_view;
 
