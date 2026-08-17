@@ -1,0 +1,21 @@
+# Dependencies and generated build output
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/target-test-session/
+src-tauri/test_rb_size/
+src-tauri/test_rb_source/
+
+# Local tooling and temporary files
+.tmp/
+.playwright-mcp/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+

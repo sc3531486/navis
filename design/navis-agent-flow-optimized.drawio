@@ -1,0 +1,144 @@
+<mxfile host="app.diagrams.net" modified="2026-06-04T00:00:00.000Z" agent="Codex" version="24.7.17">
+  <diagram id="navis-agent-flow-optimized" name="navis optimized agent flow">
+    <mxGraphModel dx="1700" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lane-fe" value="Navis Frontend" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f7f4ea;strokeColor=#8a6f3e;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="390" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-session" value="Session + Agent Runtime" style="swimlane;whiteSpace=wrap;html=1;fillColor=#eef6f2;strokeColor=#4f7f69;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="40" width="420" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-context" value="Prompt + Tools Boundary" style="swimlane;whiteSpace=wrap;html=1;fillColor=#edf4fb;strokeColor=#527a9f;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="40" width="390" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-gateway" value="Gateway + Event Normalizer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5eef8;strokeColor=#7f5d8f;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="40" width="420" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-input" value="Composer submit&#xa;text, attachments, selected mode, selected model id" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-fe">
+          <mxGeometry x="45" y="70" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-optimistic" value="Optimistic UI state&#xa;append user bubble; disable duplicate send; keep abort button visible" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-fe">
+          <mxGeometry x="45" y="200" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-ipc" value="Tauri Channel subscription&#xa;ui_stream_session_message(turnId)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-fe">
+          <mxGeometry x="45" y="335" width="300" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-parts" value="AgentSteps renderer&#xa;thinking, tool, permission, diff, terminal, error, assistant text" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-fe">
+          <mxGeometry x="45" y="650" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-right" value="Right workspace panel&#xa;editor opens here; tool details/diff/terminal are contextual side views" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-fe">
+          <mxGeometry x="45" y="820" width="300" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-entry" value="UiSessionMessageService&#xa;validate session, mode, model id, request idempotency" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-session">
+          <mxGeometry x="50" y="80" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="store-user" value="SessionMessageStore&#xa;persist user message and turn shell before model call" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-session">
+          <mxGeometry x="50" y="210" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="runner" value="AgentTurnRunner&#xa;single loop owner: status, cancellation, max steps, compaction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-session">
+          <mxGeometry x="50" y="340" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="recorder" value="AgentStepRecorder&#xa;append/update/delta parts; publish exact UI events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-session">
+          <mxGeometry x="50" y="650" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="compaction" value="CompactionManager&#xa;trigger only on token pressure; summarize history, not project tree" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-session">
+          <mxGeometry x="50" y="815" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="prompt" value="PromptAssembler&#xa;mode role + env facts + instructions + skills + history" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-context">
+          <mxGeometry x="45" y="85" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="no-scan" value="Hard rule&#xa;No per-turn workspace snapshot or all-doc scan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ef;strokeColor=#278255;fontStyle=1;" vertex="1" parent="lane-context">
+          <mxGeometry x="45" y="215" width="300" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="tool-registry" value="Tool Catalog + HostAction&#xa;agent tools use MCP Kernel Registry; UI uses host actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-context">
+          <mxGeometry x="45" y="335" width="300" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="tool-runtime" value="ToolRuntime / MCP Executor&#xa;read, list, search, inspect, edit, write, bash, git, mcp tools" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-context">
+          <mxGeometry x="45" y="650" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="permission" value="Permission + Sandbox&#xa;ask before risky file writes, commands, external actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-context">
+          <mxGeometry x="45" y="815" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="request" value="GatewayRequestBuilder&#xa;provider/model by model id; provider timeout from Settings; stream idle timeout = timeout + 120s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-gateway">
+          <mxGeometry x="50" y="85" width="310" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="stream" value="GatewayStreamRuntime&#xa;SSE/non-SSE adapters; retry policy; cancellation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-gateway">
+          <mxGeometry x="50" y="230" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="normalizer" value="StreamEventNormalizer&#xa;text delta, reasoning, tool call, tool result, finish, error" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-gateway">
+          <mxGeometry x="50" y="365" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tool-loop" value="Tool loop continues&#xa;tool result messages go back through GatewayRequestBuilder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-gateway">
+          <mxGeometry x="50" y="650" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="finish" value="Final assistant state&#xa;complete / compact / retryable error / aborted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-gateway">
+          <mxGeometry x="50" y="815" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="n1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="fe-input" target="fe-optimistic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="fe-optimistic" target="fe-ipc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="fe-ipc" target="svc-entry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="svc-entry" target="store-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="store-user" target="runner">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="runner" target="prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="prompt" target="tool-registry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="tool-registry" target="request">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="request" target="stream">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="stream" target="normalizer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="normalizer" target="recorder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n12" value="render events" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="recorder" target="fe-parts">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="525" y="705" />
+              <mxPoint x="385" y="705" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n13" value="tool call" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="normalizer" target="tool-runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n14" value="tool result part" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="tool-runtime" target="tool-loop">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n15" value="continue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="tool-loop" target="runner">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1430" y="970" />
+              <mxPoint x="540" y="970" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="normalizer" target="finish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n17" value="details" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="fe-parts" target="fe-right">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

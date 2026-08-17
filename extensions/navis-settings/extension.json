@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "settingsSection",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Settings",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "settings-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-settings"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    }
+  },
+  "author": "navis",
+  "name": "Navis Settings",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-settings",
+  "description": "设置 / 命令面板入口扩展。"
+}

@@ -1,0 +1,73 @@
+.navis-extension-row-main {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.navis-extension-version {
+  color: #888888;
+  font-size: 10px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.navis-extension-meta {
+  color: #8a8a8a;
+  font-size: 10px;
+  line-height: 16px;
+  margin-top: 2px;
+}
+
+.navis-extension-actions {
+  align-items: flex-end;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.navis-extension-status {
+  color: #777777;
+  font-size: 10px;
+  line-height: 14px;
+  text-transform: capitalize;
+}
+
+.navis-extension-status.is-status-active {
+  color: #237a46;
+}
+
+.navis-extension-status.is-status-failed {
+  color: #a33a2f;
+}
+
+.navis-extension-toggle {
+  background: var(--navis-light-surface);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 6px;
+  color: #333333;
+  font-size: 11px;
+  height: 24px;
+  line-height: 22px;
+  min-width: 62px;
+  padding: 0 8px;
+}
+
+.navis-extension-toggle:hover:not(:disabled) {
+  background: var(--navis-light-hover);
+}
+
+.navis-extension-toggle:disabled {
+  color: #aaaaaa;
+  cursor: default;
+}
+
+.navis-extension-error {
+  color: #a33a2f;
+  font-size: 10px;
+  line-height: 16px;
+  margin-top: 6px;
+}
+
+

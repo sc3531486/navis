@@ -1,0 +1,6 @@
+package navis:fixture;
+
+/// 硬门验证用最小组件接口：仅导出 add(a, b) -> a+b。
+world root {
+    export add: func(a: s32, b: s32) -> s32;
+}

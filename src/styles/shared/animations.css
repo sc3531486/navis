@@ -1,0 +1,138 @@
+@keyframes navis-status-ready-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.14);
+  }
+}
+
+@keyframes navis-running-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes navis-execution-blink {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  45% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.64;
+  }
+}
+
+@keyframes navis-thinking-text-shimmer {
+  0% {
+    background-position: -120% 0;
+  }
+  100% {
+    background-position: 120% 0;
+  }
+}
+
+.navis-shimmer-text {
+  --navis-shimmer-base: currentColor;
+  --navis-shimmer-peak: #ffffff;
+  --navis-shimmer-duration: 1.45s;
+
+  background: linear-gradient(
+    90deg,
+    var(--navis-shimmer-base) 0%,
+    var(--navis-shimmer-base) 30%,
+    var(--navis-shimmer-peak) 50%,
+    var(--navis-shimmer-base) 70%,
+    var(--navis-shimmer-base) 100%
+  );
+  background-position: -120% 0;
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation: navis-thinking-text-shimmer var(--navis-shimmer-duration) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navis-shimmer-text {
+    animation: none;
+    background: none;
+    color: currentColor;
+  }
+
+  .navis-thinking-mark,
+  .navis-agent-prelude-mark.is-status-active,
+  .navis-agent-trace-step-group-mark.is-thinking,
+  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph,
+  .navis-agent-trace-row.is-status-queued .navis-agent-trace-glyph,
+  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph,
+  .navis-agent-trace-row.is-status-waiting .navis-agent-trace-glyph,
+  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph.is-reasoning::before,
+  .navis-agent-trace-row.is-status-queued .navis-agent-trace-glyph.is-reasoning::before,
+  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph.is-reasoning::before {
+    animation: none;
+  }
+}
+
+@keyframes navis-trace-count-add-old {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes navis-trace-count-add-new {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navis-trace-count-delete-old {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes navis-trace-count-delete-new {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navis-running-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.96);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

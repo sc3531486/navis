@@ -1,0 +1,60 @@
+.navis-sidebar-root {
+  background: var(--navis-light-panel);
+  padding: 8px 8px 10px;
+}
+
+.navis-sidebar-shell {
+  background: var(--navis-light-surface);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 14px;
+  box-shadow: none;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.navis-sidebar-mode {
+  padding: 12px 16px 10px;
+}
+
+.navis-mode-tabs {
+  background: var(--navis-light-cowork-tab);
+  border-radius: 8px;
+  height: 30px;
+  padding: 2px;
+}
+
+.navis-mode-tab {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #8d8d8a;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 5px;
+  font-weight: 500;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 5px;
+}
+
+.navis-mode-tab:hover {
+  background: color-mix(in srgb, var(--navis-light-cowork-tab) 74%, var(--navis-light-surface));
+  color: #242424;
+}
+
+.navis-mode-tab.is-active {
+  background: var(--navis-light-cowork-tab-selected);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  color: #111111;
+}
+
+.navis-mode-tab-mark {
+  color: currentColor;
+  flex-shrink: 0;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 10px;
+  line-height: 1;
+}

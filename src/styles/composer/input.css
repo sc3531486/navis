@@ -1,0 +1,84 @@
+.navis-composer.is-start-task .navis-composer-textarea {
+  font-size: 17px;
+  line-height: 24px;
+  max-height: 220px;
+  min-height: 104px;
+  padding: 10px 52px 10px 0;
+}
+
+.navis-composer.is-start-task .navis-send-button {
+  bottom: 20px;
+  height: 34px;
+  right: 18px;
+  width: 34px;
+}
+
+.navis-composer-textarea {
+  background: transparent;
+  color: #242424;
+  max-height: 160px;
+  min-height: 46px;
+  overflow-y: auto;
+  padding: 12px 44px 10px 14px;
+}
+
+.navis-composer-textarea::placeholder {
+  color: #7f7f7f;
+}
+
+.navis-send-button {
+  background: #242424;
+  bottom: 8px;
+  color: #ffffff;
+  right: 8px;
+  height: 24px;
+  transition:
+    background 140ms ease,
+    box-shadow 180ms ease,
+    transform 140ms ease;
+  width: 24px;
+}
+
+.navis-send-button:hover {
+  background: #000000;
+}
+
+.navis-send-button:active {
+  transform: scale(0.96);
+}
+
+.navis-send-button.is-running {
+  animation: navis-stop-button-pulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 0 3px rgb(36 36 36 / 0.12);
+}
+
+.navis-send-button.is-running:hover {
+  background: #000000;
+  box-shadow: 0 0 0 4px rgb(36 36 36 / 0.16);
+  transform: translateY(-1px);
+}
+
+.navis-send-button.is-running svg {
+  transform: scale(0.88);
+}
+
+@keyframes navis-stop-button-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgb(36 36 36 / 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 5px rgb(36 36 36 / 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navis-send-button {
+    transition: none;
+  }
+
+  .navis-send-button.is-running {
+    animation: none;
+  }
+}

@@ -1,0 +1,73 @@
+[package]
+name = "navis"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+
+[dependencies]
+tauri.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tokio-util = "0.7"
+portable-pty = "0.9"
+anyhow.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+axum = "0.8"
+log = "0.4"
+chrono.workspace = true
+uuid.workspace = true
+tracing.workspace = true
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "registry"] }
+tracing-appender = "0.2"
+regex = "1"
+dirs = "5"
+tempfile = "3"
+toml = "0.8"
+serde_yaml = "0.9"
+reqwest = { version = "0.12", features = ["json", "stream"] }
+futures.workspace = true
+futures-util.workspace = true
+wait-timeout = "0.2"
+glob = "0.3"
+parking_lot.workspace = true
+arc-swap.workspace = true
+flume.workspace = true
+triomphe.workspace = true
+downcast-rs = "1.2"
+backon = "1"
+crossbeam-channel = "0.5"
+im = "15"
+
+# Health 模块依赖
+sysinfo = "0.31"
+
+# File 模块依赖
+notify = "7"
+mime_guess = "2"
+
+# Clipboard 模块依赖
+arboard = "3"
+
+# Storage 模块依赖
+rusqlite = { version = "0.31", features = ["bundled"] }
+aes-gcm = "0.10"
+pbkdf2 = { version = "0.12", features = ["hmac"] }
+sha2 = "0.10"
+rand = "0.8"
+base64 = "0.22"
+zeroize = { version = "1", features = ["derive"] }
+tauri-plugin-dialog = "2.7.1"
+wasmtime = "47.0.3"
+cordis-rs = "0.1.1"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

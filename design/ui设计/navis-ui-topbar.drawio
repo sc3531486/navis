@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="drawio-skill" version="26.2.2">
+  <diagram name="顶部栏详情" id="navis-ui-topbar-detail">
+    <mxGraphModel connect="1" tooltips="1" pageScale="1" pageHeight="520" math="0" arrows="1" gridSize="10" shadow="0" pageWidth="1200" page="1" fold="1" grid="1" guides="1" dx="1500" dy="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="顶部栏详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="420" y="28" width="360" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="顶部栏当前实现高度 44px，只承载全局工具与窗口控制；会话标题、标题下拉、右侧面板菜单属于对话区标题栏。" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#666666;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="210" y="78" width="780" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="toolbarFrame" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="125" width="1060" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="toolbarBg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="70" y="125" width="1060" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="menuIcon" value="☰" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="94" y="146" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="sideIconFrame" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#242424;strokeWidth=2;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="138" y="151" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="sideIconDivider" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#242424;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="145" y="151" as="sourcePoint" />
+            <mxPoint x="145" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="searchIcon" value="⌕" style="text;html=1;align=center;verticalAlign=middle;fontSize=19;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="179" y="146" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="backIcon" value="←" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontColor=#777777;" vertex="1" parent="1">
+          <mxGeometry x="220" y="145" width="24" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="forwardIcon" value="→" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontColor=#BDBDBD;" vertex="1" parent="1">
+          <mxGeometry x="260" y="145" width="24" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="winMin" value="－" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="143" width="24" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="winMax" value="□" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1055" y="143" width="24" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="winClose" value="×" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="143" width="24" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="calloutLeft" value="全局工具：菜单 / 侧栏 / 搜索" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=8;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="85" y="250" width="310" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="calloutNav" value="导航历史：后退 / 前进" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=8;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="420" y="250" width="250" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="calloutWin" value="窗口控制：最小化 / 最大化 / 关闭" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=8;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="740" y="250" width="310" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="boundaryNote" value="不在顶部栏详情中展示会话标题或右侧面板菜单，避免和“对话消息区详情”的标题栏职责重叠。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="160" y="375" width="880" height="46" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

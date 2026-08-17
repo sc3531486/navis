@@ -1,0 +1,309 @@
+.navis-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--navis-dialog-scrim);
+  backdrop-filter: blur(4px);
+}
+
+.navis-dialog-content {
+  position: fixed;
+  z-index: 81;
+  top: 50%;
+  left: 50%;
+  width: min(90vw, 420px);
+  max-height: min(86vh, 640px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--navis-dialog-border);
+  border-radius: 13px;
+  background: var(--navis-dialog-surface);
+  box-shadow: var(--navis-dialog-shadow);
+  color: var(--navis-dialog-title);
+  padding: 20px 24px 18px;
+}
+
+.navis-dialog-content:focus {
+  outline: none;
+}
+
+.navis-dialog-title {
+  margin: 0;
+  color: var(--navis-dialog-title);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.16;
+}
+
+.navis-dialog-body {
+  outline: none;
+}
+
+.navis-dialog-message {
+  margin: 6px 0 0;
+  color: var(--navis-dialog-text);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.34;
+  white-space: pre-line;
+}
+
+.navis-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.navis-dialog-button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  height: 34px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 68px;
+  padding: 0 14px;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    color 120ms ease;
+}
+
+.navis-dialog-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--navis-dialog-focus);
+}
+
+.navis-dialog-button.is-secondary {
+  background: var(--navis-dialog-surface);
+  border-color: #d9d9d9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  color: var(--navis-dialog-title);
+}
+
+.navis-dialog-button.is-secondary:hover {
+  background: var(--navis-dialog-subtle);
+  border-color: #cfcfcf;
+}
+
+.navis-dialog-button.is-primary {
+  background: var(--navis-dialog-primary);
+  color: var(--navis-dialog-on-primary);
+}
+
+.navis-dialog-button.is-primary:hover {
+  background: var(--navis-dialog-primary-hover);
+}
+
+.navis-dialog-button.is-danger {
+  background: var(--navis-dialog-danger);
+  color: var(--navis-dialog-on-danger);
+}
+
+.navis-dialog-button.is-danger:hover {
+  background: var(--navis-dialog-danger-hover);
+}
+
+.navis-dialog-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.navis-dialog-close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  color: var(--navis-dialog-muted);
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 28px;
+}
+
+.navis-dialog-close:hover {
+  background: var(--navis-dialog-subtle);
+  color: var(--navis-dialog-title);
+}
+
+.navis-dialog-field-stack,
+.navis-dialog-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.navis-dialog-label {
+  color: var(--navis-dialog-strong);
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.navis-dialog-required {
+  color: var(--navis-dialog-danger);
+  margin-left: 4px;
+}
+
+.navis-dialog-input {
+  background: var(--navis-dialog-surface);
+  border: 1px solid #d5d5d5;
+  border-radius: 9px;
+  color: var(--navis-dialog-strong);
+  font-size: 15px;
+  line-height: 22px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.navis-dialog-input::placeholder {
+  color: #9a9a9a;
+}
+
+.navis-dialog-input:focus {
+  border-color: #777777;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+
+.navis-dialog-option {
+  background: var(--navis-dialog-surface);
+  border: 1px solid var(--navis-dialog-line);
+  border-radius: 9px;
+  color: var(--navis-dialog-strong);
+  display: block;
+  padding: 11px 12px;
+  text-align: left;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+  width: 100%;
+}
+
+.navis-dialog-option:hover,
+.navis-dialog-option.is-selected {
+  background: var(--navis-dialog-hover);
+  border-color: #c9c9c9;
+}
+
+.navis-dialog-option.is-selected {
+  box-shadow: inset 3px 0 0 #555555;
+}
+
+.navis-dialog-option.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.navis-dialog-option-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 20px;
+}
+
+.navis-dialog-option-description {
+  color: var(--navis-dialog-muted);
+  display: block;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 2px;
+}
+
+.navis-dialog-code-block {
+  background: var(--navis-dialog-subtle);
+  border: 1px solid var(--navis-dialog-line);
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 11px 12px;
+}
+
+.navis-dialog-code-row {
+  align-items: flex-start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 96px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.navis-dialog-code-key {
+  color: var(--navis-dialog-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.navis-dialog-code-value {
+  color: var(--navis-dialog-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+.navis-dialog-risk {
+  border: 1px solid var(--navis-dialog-line);
+  border-radius: 9px;
+  margin-top: 12px;
+  padding: 11px 12px;
+}
+
+.navis-dialog-risk.is-low {
+  background: #f0f7f1;
+  border-color: #bdd8c2;
+}
+
+.navis-dialog-risk.is-medium {
+  background: #fff7e6;
+  border-color: #ead49b;
+}
+
+.navis-dialog-risk.is-high {
+  background: #fff0f0;
+  border-color: #e7b6b8;
+}
+
+.navis-dialog-risk-title {
+  color: var(--navis-dialog-strong);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 18px;
+}
+
+.navis-dialog-risk-message {
+  color: var(--navis-dialog-text);
+  font-size: 12px;
+  line-height: 18px;
+  margin: 4px 0 0;
+}
+
+@media (max-width: 640px) {
+  .navis-dialog-content {
+    width: calc(100vw - 28px);
+    padding: 18px 18px 16px;
+  }
+
+  .navis-dialog-actions {
+    gap: 8px;
+  }
+
+  .navis-dialog-button {
+    min-width: 64px;
+  }
+}

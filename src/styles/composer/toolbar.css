@@ -1,0 +1,109 @@
+.navis-composer-toolbar {
+  background: var(--navis-light-panel);
+  border-radius: 0 0 10px 10px;
+  margin-top: 3px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.navis-composer-toolbar-left {
+  gap: 6px;
+}
+
+.navis-composer-toolbar-right {
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.navis-composer-mode-switch {
+  align-items: center;
+  background: var(--navis-light-surface);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 8px;
+  color: #333333;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 7px;
+  height: 28px;
+  padding: 0 6px 0 9px;
+}
+
+.navis-composer-mode-switch:hover {
+  background: var(--navis-light-hover);
+  border-color: var(--navis-light-line-strong);
+}
+
+.navis-composer-mode-switch.is-on {
+  border-color: #c7def8;
+  color: #1d4f8f;
+}
+
+.navis-composer-mode-switch svg {
+  color: currentColor;
+  flex: 0 0 auto;
+}
+
+.navis-permission-trigger,
+.navis-provider-button,
+.navis-model-button {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.navis-permission-menu-anchor {
+  position: relative;
+}
+
+.navis-permission-trigger {
+  align-items: center;
+  background: var(--navis-light-permission);
+  border: 0;
+  border-radius: 7px;
+  color: #7a6400;
+  display: flex;
+  gap: 4px;
+}
+
+.navis-permission-trigger:hover {
+  background: color-mix(in srgb, var(--navis-light-permission) 70%, #d9cf94);
+}
+
+.navis-composer-plus-trigger {
+  background: var(--navis-light-card);
+  color: #242424;
+}
+
+.navis-composer-plus-trigger:hover {
+  background: var(--navis-light-hover);
+}
+
+.navis-permission-trigger svg {
+  height: 10px;
+  width: 10px;
+}
+
+.navis-model-button {
+  color: #555555;
+  font-size: 10.5px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-provider-button {
+  border: 0;
+  color: #555555;
+  font-size: 10.5px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-provider-button:hover,
+.navis-model-button:hover {
+  background: var(--navis-light-hover);
+}

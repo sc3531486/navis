@@ -1,0 +1,42 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "rightWorkspace",
+        "activation_events": [],
+        "name": "Background Tasks",
+        "config": {},
+        "renderer": "host:panel",
+        "id": "navis-task.panel"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-task"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    }
+  },
+  "author": "navis",
+  "name": "Navis Task",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-task",
+  "description": "任务 / 审批 / 目标运行器业务扩展。"
+}

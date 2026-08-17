@@ -1,0 +1,146 @@
+.navis-shell-window {
+  background: var(--navis-light-shell);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 12px;
+  box-sizing: border-box;
+  color: #5f5f5f;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.navis-shell-window-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  height: 34px;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.navis-shell-window-title {
+  color: #666666;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.navis-shell-window-command {
+  align-items: baseline;
+  color: #171717;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 12px 9px;
+}
+
+.navis-shell-window-command code {
+  color: inherit;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 18px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-shell-window-prompt {
+  color: #111111;
+  flex: 0 0 auto;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.navis-shell-window-body {
+  box-sizing: border-box;
+  color: #3a3a3a;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 0;
+  max-height: min(240px, 34vh);
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto;
+  padding: 0 12px 34px;
+  scrollbar-gutter: stable;
+  white-space: pre-wrap;
+  width: 100%;
+  word-break: break-word;
+}
+
+.navis-shell-window-body > pre {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  white-space: inherit;
+}
+
+.navis-shell-window.is-terminal .navis-shell-window-body {
+  white-space: pre;
+}
+
+.navis-shell-window-copy {
+  background: color-mix(in srgb, var(--navis-light-panel) 92%, transparent);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 999px;
+  color: #746b5a;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 18px;
+  opacity: 0;
+  padding: 0 8px;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.navis-shell-window:hover .navis-shell-window-copy,
+.navis-shell-window-copy:focus-visible {
+  opacity: 1;
+}
+
+.navis-shell-window-status {
+  align-items: center;
+  background: color-mix(in srgb, var(--navis-light-shell) 92%, transparent);
+  border-radius: 999px;
+  bottom: 8px;
+  color: #7a7a7a;
+  display: inline-flex;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  gap: 5px;
+  line-height: 18px;
+  padding: 1px 8px;
+  position: absolute;
+  right: 10px;
+  z-index: 1;
+}
+
+.navis-shell-window-status::before {
+  border-radius: 999px;
+  content: '';
+  display: inline-block;
+  height: 6px;
+  width: 6px;
+}
+
+.navis-shell-window-status.is-status-active::before,
+.navis-shell-window-status.is-status-waiting::before,
+.navis-shell-window-status.is-status-active::before {
+  animation: navis-status-ready-pulse 1.35s ease-in-out infinite;
+  background: #6aa276;
+}
+
+.navis-shell-window-status.is-status-succeeded::before {
+  background: #6aa276;
+}
+
+.navis-shell-window-status.is-status-failed::before {
+  background: #c75252;
+}
+
+.navis-shell-window-status.is-status-cancelled::before,
+.navis-shell-window-status.is-status-cancelled::before,
+.navis-shell-window-status.is-status-unknown::before {
+  background: #a0a0a0;
+}

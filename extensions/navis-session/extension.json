@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "chatAside",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Session",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "session-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-session"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    }
+  },
+  "author": "navis",
+  "name": "Navis Session",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-session",
+  "description": "会话与消息 UI 扩展。"
+}

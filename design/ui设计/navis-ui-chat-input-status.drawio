@@ -1,0 +1,124 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="对话输入与状态区详情" id="navis-ui-chat-input-status-detail">
+    <mxGraphModel dx="1202" dy="815" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="720" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="对话输入框与多功能栏详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="390" y="28" width="420" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="inputSectionLabel" value="A 对话输入框（Prompt 输入区，默认一行高度，超出后自动增高）" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="90" y="92" width="420" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="queueGoalRule" value="Queue / goal strip: when goal tracking is on but no goal exists, placeholder shows “What goal should Navis pursue?”; first send only sets the goal; second prompt starts execution. Strip stays above input with inset width. State is stored in Session.metadata.ui.composerRun and restored per session." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#555555;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="530" y="86" width="560" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="inputRegionOutline" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=1;dashed=1;strokeDashPattern=8 5;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="108" width="1040" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="inputBox" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="90" y="120" width="1000" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="placeholder" value="What goal should Navis pursue? / Describe the first step to start / Request the next change" style="text;html=1;align=left;verticalAlign=middle;fontSize=15;fontColor=#B8B8B8;spacingLeft=14;" parent="1" vertex="1">
+          <mxGeometry x="105" y="128" width="420" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="send" value="↩" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#B8B8B8;" parent="1" vertex="1">
+          <mxGeometry x="1050" y="129" width="24" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="barSectionLabel" value="B 对话输入框多功能栏（扩展关键扩展区）" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="90" y="190" width="360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="barRegionOutline" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#2E9D73;strokeWidth=1;dashed=1;strokeDashPattern=8 5;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="208" width="1040" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="functionBar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="90" y="220" width="1000" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="permissionChip" value="Full access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2EED7;strokeColor=none;arcSize=12;fontSize=13;fontColor=#8A6D00;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="224" width="150" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="attachButton" value="＋" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=none;arcSize=16;fontSize=16;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="252" y="224" width="22" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="planRunningChip" value="◌ 计划" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;arcSize=18;fontSize=12;fontColor=#777777;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="286" y="224" width="58" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="goalRunningChip" value="◎ 目标" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F0F0;strokeColor=none;arcSize=18;fontSize=12;fontColor=#777777;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="352" y="224" width="58" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="modelState" value="mimo-v2.5-pro (1M context) · High" style="text;html=1;align=right;verticalAlign=middle;fontSize=13;fontColor=#444444;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="690" y="224" width="270" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorBase" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DDDDDD;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="976" y="227" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorUsage" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=3;" parent="1" vertex="1">
+          <mxGeometry x="976" y="227" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorHole" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="981" y="232" width="6" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="attachMenu" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="252" y="48" width="300" height="252" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem1" value="⌘  添加照片和文件" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="64" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem2" value="▱  添加文件夹" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="96" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem3" value="/  Slash commands" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="128" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem4" value="⊞  添加连接器" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="160" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem5" value="◔  Add extensions..." style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="192" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachDivider1" value="" style="line;strokeWidth=1;fillColor=none;strokeColor=#EDEDED;" parent="1" vertex="1">
+          <mxGeometry x="272" y="226" width="260" height="1" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem6" value="☑  计划模式                         off/on" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="236" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem7" value="◎  追求目标                         off/on" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="272" y="268" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="contextTooltip" value="Used 7.8% (78K / 1M) · Compression threshold 80%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=8;fontSize=11;fontColor=#242424;align=center;verticalAlign=middle;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="650" y="170" width="420" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="contextTooltipArrow" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#DADADA;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="984" y="204" as="sourcePoint" />
+            <mxPoint x="984" y="227" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="extensionEntryRef" value="+ 菜单扩展点：附件、命令、连接器、扩展入口" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#2E6D52;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="210" y="340" width="310" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="statusControlsRef" value="Status controls: permission policy, model selector, context status, plan/goal running chips (blinking means executing; hover shows x to close)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#2E6D52;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="540" y="340" width="300" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorRef" value="上下文扩展点：圆环状态 + hover 横条" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#2E6D52;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="860" y="340" width="250" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="barNote" value="结构约定：A 区只负责输入文本与发送，默认一行高度，输入超过一行后自动增高；运行队列和目标状态条紧贴 A 区上方，但不与输入框同宽，左右保留一段内收距离；B 区负责扩展入口、权限、Model + Effort 联合选择、上下文状态。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="90" y="430" width="980" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="contextNote" value="Context ring fills color by usage. Hovering the ring shows a horizontal detail bar above it with used percent, total context, and compression threshold." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="90" y="466" width="980" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="workspaceRowRef" value="会话工作目录行（位于目标/队列下方、A 区输入框上方）：当前目录按钮和文件夹 + 都打开“最近打开过的目录”菜单；展示最近 10 个；菜单底部“选择新的工作目录”才调用系统目录选择器；选择结果写入当前 Session.worktreeRoot。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#2E6D52;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="90" y="512" width="980" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="sessionStartStateRef" value="startWorkspace 可复用：会话开始页引用这里的紧凑输入框、发送按钮、工作目录行和 Model + Effort 选择，但页面布局属于 navis-ui-start-workspace.drawio。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#3F5F99;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="90" y="572" width="470" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="taskStartStateRef" value="startWorkspace 可复用：任务开始页引用这里的 + 菜单、权限、上下文、Model + Effort 等控件，但居中任务输入卡片由开始页单独定义。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7F1;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#6B4A2B;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="590" y="572" width="480" height="42" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

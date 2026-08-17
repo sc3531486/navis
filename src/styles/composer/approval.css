@@ -1,0 +1,64 @@
+.navis-composer-input-shell.is-approval {
+  border-color: #d7d7d7;
+  padding: 8px 10px;
+}
+
+.navis-composer-approval {
+  min-height: 76px;
+}
+
+.navis-composer-approval.is-busy {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.navis-composer-approval .navis-dialog-body {
+  gap: 7px;
+}
+
+.navis-composer-approval .navis-dialog-message {
+  font-size: 12px;
+  line-height: 18px;
+  margin: 0;
+}
+
+.navis-composer-approval .navis-dialog-code-block {
+  max-height: 112px;
+  overflow: auto;
+  padding: 6px 8px;
+}
+
+.navis-composer-approval .navis-dialog-code-row {
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.navis-composer-approval .navis-dialog-code-key {
+  min-width: 72px;
+}
+
+.navis-composer-approval .navis-dialog-risk {
+  padding: 6px 8px;
+}
+
+.navis-composer-approval .navis-dialog-risk-title,
+.navis-composer-approval .navis-dialog-risk-message {
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.navis-composer-approval .navis-dialog-actions {
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.navis-composer-approval .navis-dialog-button {
+  font-size: 12px;
+  height: 26px;
+  padding: 0 10px;
+}
+
+.navis-composer-approval .navis-plan-review-input {
+  min-height: 62px;
+  resize: vertical;
+}

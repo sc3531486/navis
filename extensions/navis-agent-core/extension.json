@@ -1,0 +1,44 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "capabilities": {
+      "provides": [
+        "navis-agent-core",
+        "agent.engine",
+        "agent.turn",
+        "agent.context",
+        "agent.tool-runtime",
+        "agent.thinking",
+        "agent.sidechain",
+        "agent.self-evolution",
+        "application.runtime"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    },
+    "gateway.providers": [],
+    "middlewares": [],
+    "skills": [],
+    "roles": []
+  },
+  "author": "navis",
+  "name": "Navis Agent Core",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-agent-core",
+  "description": "Agent 引擎扩展：turn 编排、上下文组装、工具运行时、行为模式、Extended Thinking、Sidechain、自我进化。"
+}

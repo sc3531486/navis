@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="drawio-skill" version="26.2.2">
+  <diagram name="右侧面板详情" id="navis-ui-right-panel-detail">
+    <mxGraphModel dx="1500" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="右侧面板展开逻辑详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="470" y="24" width="460" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="默认关闭时不占宽度；开启后按菜单数量动态分列。奇数项在当前最右侧新开一列，偶数项将当前最右列纵向平分。" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#666666;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="220" y="70" width="960" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="defaultLabel" value="默认状态：右侧栏关闭" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="70" y="118" width="260" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="defaultShell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="150" width="1260" height="165" as="geometry" />
+        </mxCell>
+        <mxCell id="defaultChat" value="对话区域 / 对话输入区 / 多功能栏横向填满" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2E9D73;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;fontSize=14;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="95" y="175" width="1210" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="defaultNote" value="右侧不预留固定宽度。只有真正打开菜单/面板时，才从右侧切出面板区。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="95" y="288" width="700" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ruleLabel" value="开启后的分列规则" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="70" y="350" width="220" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="case1Title" value="1 个菜单打开" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="70" y="388" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="case1Shell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="418" width="285" height="245" as="geometry" />
+        </mxCell>
+        <mxCell id="case1Main" value="主区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E5E5E5;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#666666;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="88" y="438" width="140" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case1Panel" value="面板 1&#xa;竖向填充" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="238" y="438" width="95" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case1Note" value="第 1 个菜单在右侧新开一列，单列竖向填满。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="88" y="638" width="245" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="case2Title" value="2 个菜单打开" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="385" y="388" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="case2Shell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="385" y="418" width="285" height="245" as="geometry" />
+        </mxCell>
+        <mxCell id="case2Main" value="主区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E5E5E5;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#666666;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="403" y="438" width="140" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case2Panel1" value="面板 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="553" y="438" width="95" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case2Panel2" value="面板 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="553" y="548" width="95" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case2Note" value="第 2 个菜单不新开列，而是把当前右列纵向平分。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="403" y="638" width="245" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="case3Title" value="3 个菜单打开" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="700" y="388" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Shell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="418" width="285" height="245" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Main" value="主区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E5E5E5;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#666666;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="718" y="438" width="92" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Panel1" value="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="820" y="438" width="70" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Panel2" value="2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="820" y="548" width="70" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Panel3" value="面板 3&#xa;新右列" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="900" y="438" width="63" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case3Note" value="第 3 个菜单在当前最右侧新开一列，并先竖向填满。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="718" y="638" width="245" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="case4Title" value="4 个菜单打开" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="388" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Shell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="418" width="315" height="245" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Main" value="主区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#E5E5E5;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#666666;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1033" y="438" width="129" height="205" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Panel1" value="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1172" y="438" width="63" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Panel2" value="2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1172" y="548" width="63" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Panel3" value="3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1245" y="438" width="63" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Panel4" value="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=2;arcSize=8;fontSize=12;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1245" y="548" width="63" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="case4Note" value="第 4 个菜单不再新开列，而是把第 3 个所在列纵向平分为 3 / 4 两块。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1033" y="638" width="275" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="generalTitle" value="通用规则" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="70" y="710" width="160" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="generalCard" value="1. 默认关闭：右侧面板不展示，不占任何横向宽度。&#xa;2. 奇数编号面板（1 / 3 / 5 ...）：在当前最右侧新开一列，并先竖向填满。&#xa;3. 偶数编号面板（2 / 4 / 6 ...）：不新开列，直接把当前最右列纵向平分。&#xa;4. 因此 5 会新开第 3 列，6 再把第 5 的列平分；后续按同样节奏递推。&#xa;5. 每列都受最小宽度约束；若再新开列会让最右列小于最小宽度，则应停止新开、改为页签化/折叠化处理。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#242424;align=left;verticalAlign=top;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="70" y="742" width="830" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="minWidthNote" value="最小宽度约束建议：每个面板区域不得窄于可用交互宽度；触发阈值后不要再硬分列，而要切换为标签堆叠、折叠或二级切换。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7F1;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#6B4A2B;align=left;verticalAlign=top;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="742" width="400" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="triggerNote" value="触发来源：对话区域右上角的右侧面板按钮。右侧面板区一旦打开，就进入这套动态分列逻辑，而不是固定的单列侧边栏。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1" link="navis-ui-chat-messages.drawio">
+          <mxGeometry x="930" y="840" width="390" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="backgroundTasksDataNote" value="Background tasks 面板数据源：前端通过 ui_list_tasks 读取后端 TaskManager 的统一 Task 投影；ui_stream_session_message 负责创建 Task、标记运行/完成/失败、记录用户/助手消息并推送 AgentSteps。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#2E6D52;align=left;verticalAlign=middle;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="900" width="400" height="52" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

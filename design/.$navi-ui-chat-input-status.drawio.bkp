@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="drawio-skill" version="26.2.2">
+  <diagram name="对话输入与状态区详情" id="navi-ui-chat-input-status-detail">
+    <mxGraphModel dx="1500" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="720" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="对话输入框与多功能栏详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="390" y="28" width="420" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="inputSectionLabel" value="对话输入框" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="92" width="240" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="inputBox" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="120" width="1000" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="placeholder" value="Type / for commands" style="text;html=1;align=left;verticalAlign=middle;fontSize=15;fontColor=#B8B8B8;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="105" y="134" width="420" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="send" value="↩" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#B8B8B8;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="140" width="32" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="barSectionLabel" value="对话输入框多功能栏" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="214" width="240" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="functionBar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="90" y="244" width="1000" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="permissionChip" value="Bypass permissions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2EED7;strokeColor=none;arcSize=12;fontSize=13;fontColor=#8A6D00;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="90" y="248" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="attachButton" value="＋" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=none;arcSize=16;fontSize=16;fontColor=#242424;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="252" y="248" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="modelState" value="Opus 4.7 1M · High" style="text;html=1;align=right;verticalAlign=middle;fontSize=13;fontColor=#444444;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="790" y="248" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorBase" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DDDDDD;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="976" y="254" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorUsage" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="976" y="254" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="contextIndicatorHole" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="981" y="259" width="6" height="6" as="geometry" />
+        </mxCell>
+        <mxCell id="attachMenu" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="252" y="82" width="300" height="178" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem1" value="⌘  Add files or photos                         Ctrl+U" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="272" y="100" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem2" value="▱  Add folder" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="272" y="132" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem3" value="/  Slash commands" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="272" y="164" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem4" value="⊞  Add connectors" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="272" y="196" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="attachItem5" value="◔  Add extensions..." style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="272" y="228" width="260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="contextTooltip" value="已使用 7.8%（78K / 1M）   ·   总上下文 1M   ·   压缩阈值 80%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=8;fontSize=11;fontColor=#242424;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="650" y="204" width="420" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="contextTooltipArrow" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#DADADA;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="984" y="238" as="sourcePoint" />
+            <mxPoint x="984" y="254" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="barNote" value="多功能栏承载权限策略、附件/命令入口、模型状态和上下文状态；输入框独立保持上方固定。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="430" width="980" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="contextNote" value="上下文圆环根据使用比例自动填充颜色；鼠标悬停圆环时，在圆环上方横条展示已使用占比、总上下文和压缩阈值。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="466" width="980" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

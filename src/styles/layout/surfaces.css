@@ -1,0 +1,6 @@
+.navis-panel-surface {
+  background: var(--navis-light-panel);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 10px;
+  box-shadow: none;
+}

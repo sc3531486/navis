@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "rightWorkspace",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Knowledge",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "knowledge-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-knowledge"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    }
+  },
+  "author": "navis",
+  "name": "Navis Knowledge",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-knowledge",
+  "description": "知识库与 RAG 业务扩展。"
+}

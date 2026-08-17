@@ -1,0 +1,127 @@
+// WASM 组件轨契约 — navis:host 包（design/37 §四、design/36 §10.2）
+//
+// 容器提供的 host 接口（唯一出站通道），组件消费；门禁在容器，
+// 未声明能力 = 不授权 = 调用 fail-closed。
+//
+// 类型约定：
+// - `value` 以 JSON 字符串承载（跨 WIT 边界的通用载荷），避免在 WIT 中
+//   引入自研"任意值"编码；后续如需结构化类型可在 types 接口中演进。
+// - `host-handle` 当前为空资源，保留 init 扩展面。
+// - 设计文档 operation 接口写作 `list`，但 `list` 是 WIT 保留关键字
+//   （list 类型），此处命名为 `list-operations` 保持语义一致。
+package navis:host;
+
+/// 共享类型（组件与宿主共用的值、记录与枚举）。
+interface types {
+    /// 通用载荷：payload / 返回值以 JSON 字符串承载。
+    type value = string;
+
+    /// host 句柄：init 时宿主授予；当前为空资源，保留扩展面。
+    record host-handle {}
+
+    /// 受控操作请求（execute 入参）。
+    record operation-request {
+        operation: string,
+        target: string,
+        params: option<value>,
+    }
+
+    /// 受控操作描述（list-operations 返回值）。
+    record operation-description {
+        id: string,
+        label: string,
+    }
+
+    /// 会话快照（context.get-session 返回值）。
+    record session-snapshot {
+        id: string,
+        title: string,
+    }
+
+    /// 项目快照（context.get-active-project 返回值）。
+    record project-snapshot {
+        id: string,
+        name: string,
+    }
+
+    /// HTTP 请求（network.fetch 入参）。
+    record http-request {
+        method: string,
+        url: string,
+        headers: list<tuple<string, string>>,
+        body: option<string>,
+    }
+
+    /// HTTP 响应（network.fetch 返回值）。
+    record http-response {
+        status: u16,
+        headers: list<tuple<string, string>>,
+        body: option<string>,
+    }
+
+    /// 事件订阅句柄（event.subscribe 返回值）。
+    record subscription {
+        id: string,
+    }
+
+    /// 日志级别（log.write 入参）。
+    enum log-level {
+        trace,
+        debug,
+        info,
+        warn,
+        error,
+    }
+}
+
+/// 受控操作执行（门禁在容器，对应 runtime.operation.execute / list）。
+interface operation {
+    use types.{operation-request, operation-description, value};
+    execute: func(op: operation-request) -> result<value, string>;
+    list-operations: func() -> list<operation-description>;
+}
+
+/// 上下文快照（对应 context host 接口）。
+interface context {
+    use types.{session-snapshot, project-snapshot};
+    get-session:        func() -> result<session-snapshot, string>;
+    get-active-project: func() -> result<project-snapshot, string>;
+}
+
+/// 扩展 KV 存储（对应 34 §2.5 storage 声明）。
+interface storage {
+    use types.{value};
+    get:    func(key: string, scope: string) -> result<option<value>, string>;
+    set:    func(key: string, value: value, scope: string) -> result<_, string>;
+    delete: func(key: string, scope: string) -> result<_, string>;
+}
+
+/// 网络能力（对应 34 §2.6 network 声明；fail-closed）。
+interface network {
+    use types.{http-request, http-response};
+    fetch: func(request: http-request) -> result<http-response, string>;
+}
+
+/// 事件订阅 / 发射（对应 34 §2.3 event 接口）。
+interface event {
+    use types.{value, subscription};
+    subscribe: func(pattern: string) -> result<subscription, string>;
+    emit:      func(topic: string, payload: value) -> result<_, string>;
+}
+
+/// 日志写入（组件侧受控输出，门禁在容器）。
+interface log {
+    use types.{log-level};
+    write: func(level: log-level, message: string) -> result<_, string>;
+}
+
+/// 宿主世界：组件导入的 host 接口全集；能力授予按组件 capabilities 裁剪，
+/// 未声明的接口调用即失败（fail-closed，host.rs 中按 capability 校验）。
+world host {
+    import operation;
+    import context;
+    import storage;
+    import network;
+    import event;
+    import log;
+}

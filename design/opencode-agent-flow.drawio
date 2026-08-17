@@ -1,0 +1,149 @@
+<mxfile host="app.diagrams.net" modified="2026-06-04T00:00:00.000Z" agent="Codex" version="24.7.17">
+  <diagram id="opencode-agent-flow" name="opencode agent flow">
+    <mxGraphModel dx="1680" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lane-ui" value="Client / UI entry" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f7f4ea;strokeColor=#8a6f3e;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="330" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-api" value="HTTP API + Session Prompt" style="swimlane;whiteSpace=wrap;html=1;fillColor=#eef6f2;strokeColor=#4f7f69;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="40" width="420" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-ctx" value="Context assembly" style="swimlane;whiteSpace=wrap;html=1;fillColor=#edf4fb;strokeColor=#527a9f;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="40" width="340" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-llm" value="LLM runtime + processor" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5eef8;strokeColor=#7f5d8f;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="40" width="420" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-submit" value="TUI Prompt submit&#xa;prompt/index.tsx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-ui">
+          <mxGeometry x="40" y="70" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-branch" value="Branch input mode&#xa;shell / slash command / normal prompt" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-ui">
+          <mxGeometry x="65" y="175" width="200" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="api-run" value="CLI run / stream transport&#xa;run.ts, stream.transport.ts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-ui">
+          <mxGeometry x="40" y="330" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-sync" value="TUI sync store updates&#xa;message.updated / part.updated / delta" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-ui">
+          <mxGeometry x="40" y="710" width="250" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-render" value="Session view renders assistant parts&#xa;text / reasoning / tool / error / footer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#8a6f3e;" vertex="1" parent="lane-ui">
+          <mxGeometry x="40" y="835" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="http-prompt" value="HTTP handler&#xa;SessionHttpApi.prompt / promptAsync" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-api">
+          <mxGeometry x="50" y="80" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="create-user" value="createUserMessage&#xa;resolve text/file/agent parts; save user message" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-api">
+          <mxGeometry x="50" y="205" width="300" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="loop" value="SessionPrompt.runLoop&#xa;load compacted messages; find latest user/assistant/tasks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-api">
+          <mxGeometry x="50" y="335" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="loop-branch" value="Need subtask / compaction / assistant round?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-api">
+          <mxGeometry x="70" y="465" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="assistant-msg" value="Create assistant message + processor handle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5fff9;strokeColor=#4f7f69;" vertex="1" parent="lane-api">
+          <mxGeometry x="50" y="630" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="env" value="SystemPrompt.environment&#xa;model id, cwd, workspace root, git, platform, date" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="90" width="260" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="instructions" value="Instruction.system&#xa;global/project/config instruction files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="215" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="skills" value="SystemPrompt.skills&#xa;available skill summary; skill tool loads details later" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="335" width="260" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="tools" value="SessionTools.resolve + ToolRegistry.tools&#xa;agent/model/permission/extension/MCP filters" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="460" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="messages" value="MessageV2.toModelMessages&#xa;history + prior tool calls/results" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7fbff;strokeColor=#527a9f;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="590" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="no-scan" value="No automatic project tree scan&#xa;files are read only by explicit file parts or model tool calls" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ef;strokeColor=#278255;fontStyle=1;" vertex="1" parent="lane-ctx">
+          <mxGeometry x="40" y="725" width="260" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="request" value="LLMRequestPrep.prepare&#xa;merge provider/agent/user system; params; filtered tools" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="90" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="stream" value="LLM.stream&#xa;native runtime optional; AI SDK streamText fallback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="220" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="normalize" value="Normalize provider stream to LLMEvent&#xa;text / reasoning / tool input / tool result / finish" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="350" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="processor" value="SessionProcessor.process&#xa;persist assistant text/reasoning/tool parts; publish events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="480" width="310" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tool-exec" value="Tool execute adapter&#xa;read/glob/grep/edit/shell/task/skill/MCP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="625" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="finish" value="Loop continues after tool results&#xa;or stops/compacts on finish/overflow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcf7ff;strokeColor=#7f5d8f;" vertex="1" parent="lane-llm">
+          <mxGeometry x="45" y="765" width="310" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="ui-submit" target="ui-branch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="ui-branch" target="http-prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="api-run" target="http-prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="http-prompt" target="create-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="create-user" target="loop">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="loop" target="loop-branch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="loop-branch" target="assistant-msg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="assistant-msg" target="tools">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="tools" target="request">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="request" target="stream">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="stream" target="normalize">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="normalize" target="processor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="processor" target="tool-exec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="tool results become message parts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="tool-exec" target="finish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" value="continue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="finish" target="loop">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1330" y="930" />
+              <mxPoint x="520" y="930" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e16" value="events" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="processor" target="ui-sync">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1280" y="760" />
+              <mxPoint x="320" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#555555;" edge="1" parent="1" source="ui-sync" target="ui-render">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

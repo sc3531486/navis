@@ -1,0 +1,19 @@
+.navis-close-icon {
+  background-color: currentColor;
+  display: inline-block;
+  height: 14px;
+  mask-image: var(--navis-close-icon-url);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: var(--navis-close-icon-url);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  width: 14px;
+}
+
+.navis-close-icon.is-small {
+  height: 12px;
+  width: 12px;
+}

@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="drawio-skill" version="26.2.2">
+  <diagram name="左侧栏详情" id="navi-ui-left-sidebar-detail">
+    <mxGraphModel connect="1" tooltips="1" pageScale="1" pageHeight="950" math="0" arrows="1" gridSize="10" shadow="0" pageWidth="1500" page="1" fold="1" grid="1" guides="1" dx="1500" dy="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="左侧栏详情：模式、菜单、Group、Gateway" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="405" y="28" width="690" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="cwTitle" value="Cowork 模式" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="70" y="98" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cwShell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="70" y="140" width="360" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="cwModeBand" value="模式区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="165" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMode" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="90" y="198" width="320" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="cwActive" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="92" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cwModeCowork" value="Cowork" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="92" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cwModeCode" value="Code" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="198" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cwModeCustom" value="Custom" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="304" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenuBand" value="模式菜单区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="268" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenuCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="300" width="320" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenu314" value="＋  New task" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="105" y="314" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenu344" value="▱  Projects" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="105" y="344" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenu374" value="○  Scheduled" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="105" y="374" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenu404" value="⌘  Live artifacts" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="105" y="404" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMenu434" value="▭  Customize" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="105" y="434" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroupBand" value="Group 区域：group 下是会话" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="496" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroupCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="528" width="320" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroup542" value="Recents⌄" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="105" y="542" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroup570" value="○  AutoCAD 平面图" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="105" y="570" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwSel598" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="100" y="596" width="300" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroup598" value="◉  AutoCAD 平面图      ⋮" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="105" y="598" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroup626" value="○  AutoCAD平面图深化" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="105" y="626" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGroup654" value="○  效果图转CAD图纸" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="105" y="654" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwMore" value="⋮" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="372" y="544" width="24" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwScroll" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DADADA;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="404" y="548" width="5" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGatewayBand" value="Gateway 固定按钮" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="90" y="812" width="320" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cwGateway" value="✳  Gateway                                      ⌄" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1" link="navi-ui-gateway-menu.drawio">
+          <mxGeometry x="90" y="840" width="320" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="cdTitle" value="Code 模式" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="525" y="98" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cdShell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="525" y="140" width="360" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="cdModeBand" value="模式区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="545" y="165" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMode" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="545" y="198" width="320" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="cdActive" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="653" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cdModeCowork" value="Cowork" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="547" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cdModeCode" value="Code" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="653" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cdModeCustom" value="Custom" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="759" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMenuBand" value="模式菜单区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="545" y="268" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMenuCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="545" y="300" width="320" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMenu314" value="＋  New session" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="560" y="314" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMenu344" value="▭  Customize" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="560" y="344" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroupBand" value="Group 区域：group 下是会话" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="545" y="496" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroupCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="545" y="528" width="320" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup542" value="设计文档" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#555555;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="542" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup570" value="○  流水设计审查" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="570" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup598" value="○  流水设计文档编写" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="598" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup626" value="message-center" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#555555;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="626" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup654" value="○  message-center架构文档" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="654" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup682" value="○  压测" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="682" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup710" value="workbee" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#555555;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="710" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup738" value="○  开发" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="738" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdSel766" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="555" y="764" width="300" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGroup766" value="◉  WorkBee产品设计审查" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="766" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdMore" value="⋮" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="827" y="544" width="24" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdScroll" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DADADA;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="859" y="548" width="5" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGatewayBand" value="Gateway 固定按钮" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="545" y="812" width="320" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cdGateway" value="✳  Gateway                                      ⌄" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1" link="navi-ui-gateway-menu.drawio">
+          <mxGeometry x="545" y="840" width="320" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="cuTitle" value="Custom 模式" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="980" y="98" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cuShell" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="980" y="140" width="360" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="cuModeBand" value="模式区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="165" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMode" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="198" width="320" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="cuActive" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1214" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cuModeCowork" value="Cowork" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1002" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cuModeCode" value="Code" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1108" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cuModeCustom" value="Custom" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1214" y="201" width="102" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenuBand" value="模式菜单区域" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="268" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenuCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="300" width="320" height="185" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenu314" value="○  Drawio 拆图助手" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="314" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenu344" value="○  PPT 智能排版" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="344" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenu374" value="○  RAG 知识卡片" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="374" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenu404" value="●  Knowledge search" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="404" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMenu434" value="○  Agent 可视化面板" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="434" width="290" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuPluginNameNote" value="Custom 菜单显示 work_modes.name；点击进入对应模式插件" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#8B8B8B;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="462" width="295" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroupBand" value="Group 区域：group 下是会话" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="496" width="320" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroupCard" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="528" width="320" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup542" value="当前模式：Knowledge search" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#555555;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="542" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup570" value="○  知识库索引优化" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="570" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup598" value="○  文档引用整理" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="598" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup626" value="○  RAG 结果评估" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="626" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup654" value="项目会话" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#555555;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="654" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuSel682" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="680" width="300" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup682" value="◉  Navi UI 布局设计" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="682" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGroup710" value="○  插件交互评审" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="710" width="285" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuMore" value="⋮" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="1282" y="544" width="24" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuScroll" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DADADA;strokeColor=none;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="1314" y="548" width="5" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGatewayBand" value="Gateway 固定按钮" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="812" width="320" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="cuGateway" value="✳  Gateway                                      ⌄" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1" link="navi-ui-gateway-menu.drawio">
+          <mxGeometry x="1000" y="840" width="320" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="footnote" value="左侧栏排除最上方全局顶部栏；三个模式共享“模式区域 / 模式菜单区域 / Group 区域 / Gateway 按钮”的布局骨架。Gateway 按钮链接到独立菜单详情图。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="150" y="910" width="1200" height="36" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

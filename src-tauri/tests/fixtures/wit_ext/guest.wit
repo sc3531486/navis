@@ -1,0 +1,18 @@
+package navis:ext;
+
+/// 端到端验证用 guest 世界（design/37 C1-5 验证轨）。
+///
+/// 与生产 `navis:ext/ext` 世界（src-tauri/wit/ext/）的唯一差异：本世界
+/// 额外 import 被验证的 host 接口（`navis:host/log`、`navis:host/operation`），
+/// 使 guest 在 activate 期间可调用 host 的 log.write / operation.list-operations，
+/// 验证 host 接口在真实组件中的全链路（host 侧 bindings_host 世界按 navis:host 包
+/// 提供同名接口，接口 ID 一致即互操作）。
+///
+/// 注意：外部接口世界导入语法为 `import namespace:package/interface;`（本地名
+/// 默认取接口名），不支持 `import alias: namespace:package/interface` 形式。
+world guest {
+    import navis:host/operation;
+    import navis:host/log;
+    export lifecycle;
+    export message;
+}

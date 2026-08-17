@@ -1,0 +1,212 @@
+.navis-workspace-diff {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.navis-workspace-diff-toolbar {
+  align-items: center;
+  border-bottom: 0;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  min-height: 30px;
+  padding: 4px 8px;
+}
+
+.navis-workspace-diff-tabs {
+  align-items: center;
+  background: var(--navis-light-cowork-tab);
+  border-radius: 7px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+}
+
+.navis-workspace-diff-tabs button {
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  color: #666666;
+  font-size: 10.5px;
+  height: 22px;
+  padding: 0 8px;
+}
+
+.navis-workspace-diff-tabs button.is-active {
+  background: var(--navis-light-cowork-tab-selected);
+  box-shadow: none;
+  color: #242424;
+}
+
+.navis-workspace-diff-summary {
+  align-items: center;
+  border-bottom: 0;
+  color: #777777;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 10.5px;
+  gap: 9px;
+  line-height: 24px;
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.navis-workspace-diff-summary .is-add {
+  color: #237a46;
+}
+
+.navis-workspace-diff-summary .is-delete {
+  color: #a33a2f;
+}
+
+.navis-workspace-diff-root {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-workspace-diff-repo-card {
+  align-items: center;
+  border-bottom: 0;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.navis-workspace-diff-repo-card strong {
+  color: #242424;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.navis-workspace-diff-repo-card p,
+.navis-workspace-diff-muted {
+  color: #777777;
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.navis-workspace-diff-files {
+  border-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 168px;
+  overflow: auto;
+}
+
+.navis-workspace-diff-turn {
+  background: #fffaf0;
+  border-bottom: 1px solid #eadfcb;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 10px;
+}
+
+.navis-workspace-diff-turn header {
+  align-items: center;
+  color: #7a5a25;
+  display: flex;
+  font-size: 10.5px;
+  font-weight: 600;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.navis-workspace-diff-turn-file {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid #efe1c6;
+  border-radius: 7px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  min-height: 34px;
+  padding: 5px 8px;
+}
+
+.navis-workspace-diff-turn-file + .navis-workspace-diff-turn-file {
+  margin-top: 5px;
+}
+
+.navis-workspace-diff-turn-file strong {
+  color: #2f281e;
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-workspace-diff-turn-file span {
+  color: #8a7353;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.navis-workspace-diff-turn-file .is-add {
+  color: #237a46;
+}
+
+.navis-workspace-diff-turn-file .is-delete {
+  color: #a33a2f;
+}
+
+.navis-workspace-diff-file {
+  align-items: center;
+  background: var(--navis-light-panel);
+  border: 0;
+  border-bottom: 0;
+  color: #333333;
+  display: grid;
+  font-size: 11px;
+  gap: 8px;
+  grid-template-columns: 64px minmax(0, 1fr) auto auto;
+  min-height: 28px;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.navis-workspace-diff-file:hover {
+  background: var(--navis-light-hover);
+}
+
+.navis-workspace-diff-file-status {
+  color: #777777;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.navis-workspace-diff-file-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-workspace-diff-file-stat {
+  font-variant-numeric: tabular-nums;
+}
+
+.navis-workspace-diff-file-stat.is-add {
+  color: #237a46;
+}
+
+.navis-workspace-diff-file-stat.is-delete {
+  color: #a33a2f;
+}
+
+.navis-workspace-diff-code {
+  flex: 1;
+  margin: 0;
+  min-height: 0;
+}
+

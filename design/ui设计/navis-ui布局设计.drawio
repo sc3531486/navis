@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="drawio-skill" version="26.2.2">
+  <diagram name="总览 - Navis UI 布局索引" id="navis-ui-layout-overview">
+    <mxGraphModel connect="1" tooltips="1" pageScale="1" pageHeight="1180" math="0" arrows="1" gridSize="10" shadow="0" pageWidth="1600" page="1" fold="1" grid="1" guides="1" dx="1500" dy="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Navis UI 布局总览" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="480" y="28" width="640" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="总览保留整体布局缩略图，并引用顶部、左侧、对话消息、输入框与多功能栏、右侧、Gateway 菜单、菜单功能 01 / 02 详情图。" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#666666;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="350" y="72" width="900" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="app" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="120" y="140" width="1160" height="690" as="geometry" />
+        </mxCell>
+        <mxCell id="topbar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="140" width="1160" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="left" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="140" y="205" width="270" height="585" as="geometry" />
+        </mxCell>
+        <mxCell id="mode" value="Cowork   Code   Custom" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="160" y="225" width="230" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="menu" value="模式菜单区域" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="160" y="288" width="230" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="groups" value="Group / 会话区域" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="160" y="415" width="230" height="255" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="Gateway   v" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="160" y="710" width="230" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="chatHeader" value="▣  Navis / 当前会话  &gt;                                      右侧面板按钮" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#242424;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="445" y="205" width="770" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="chatBody" value="对话消息正文区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="445" y="250" width="770" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="input" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="445" y="705" width="770" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="inputFieldMini" value="A Input: Request the next change" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=1;arcSize=8;fontSize=11;fontColor=#B8B8B8;align=left;verticalAlign=middle;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="465" y="735" width="725" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="inputBarMini" value="B Toolbar: Full access     +                       Opus 4.7 1M · High    ○" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=10;fontColor=#555555;align=left;verticalAlign=middle;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="465" y="767" width="725" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="right" value="默认关闭，不占宽度" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#5B8DEF;strokeWidth=1;dashed=1;arcSize=6;fontSize=10;fontColor=#5B8DEF;verticalLabelPosition=bottom;verticalAlign=top;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="205" width="14" height="585" as="geometry" />
+        </mxCell>
+        <mxCell id="topOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-topbar.drawio">
+          <mxGeometry x="105" y="125" width="1190" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="leftOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#5B8DEF;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-left-sidebar.drawio">
+          <mxGeometry x="130" y="195" width="290" height="610" as="geometry" />
+        </mxCell>
+        <mxCell id="msgOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#2E9D73;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-chat-messages.drawio">
+          <mxGeometry x="430" y="195" width="805" height="505" as="geometry" />
+        </mxCell>
+        <mxCell id="inputOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-chat-input-status.drawio">
+          <mxGeometry x="430" y="695" width="805" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rightOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#5B8DEF;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-right-panel.drawio">
+          <mxGeometry x="1200" y="195" width="55" height="610" as="geometry" />
+        </mxCell>
+        <mxCell id="gatewayOverlay" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#2E9D73;strokeWidth=2;dashed=1;strokeDashPattern=8 5;arcSize=8;" vertex="1" parent="1" link="navis-ui-gateway-menu.drawio">
+          <mxGeometry x="80" y="690" width="340" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="card1" value="&lt;b&gt;01 顶部栏&lt;/b&gt;&lt;br/&gt;全局导航、侧栏切换、搜索、后退/前进、窗口控制。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-topbar.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-topbar.drawio">
+          <mxGeometry x="1320" y="150" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card2" value="&lt;b&gt;02 左侧栏&lt;/b&gt;&lt;br/&gt;Cowork / Code / Custom 三态；模式菜单、Group 会话、Gateway 固定按钮。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-left-sidebar.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-left-sidebar.drawio">
+          <mxGeometry x="1320" y="260" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card3" value="&lt;b&gt;03 对话消息&lt;/b&gt;&lt;br/&gt;36px 标题栏、消息正文、Navis AgentSteps / Turn Timeline。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-chat-messages.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-chat-messages.drawio">
+          <mxGeometry x="1320" y="370" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card4" value="&lt;b&gt;04 输入框与多功能栏&lt;/b&gt;&lt;br/&gt;A/B 区、工作目录行、+ 菜单、权限、Model + Effort、上下文状态；供会话态和开始页复用。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-chat-input-status.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-chat-input-status.drawio">
+          <mxGeometry x="1320" y="480" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card5" value="&lt;b&gt;05 右侧面板&lt;/b&gt;&lt;br/&gt;默认关闭不占宽度；开启后按 1 / 2 / 3 / 4+ 菜单动态分列与纵向平分。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-right-panel.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-right-panel.drawio">
+          <mxGeometry x="1320" y="590" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card6" value="&lt;b&gt;06 Gateway 菜单&lt;/b&gt;&lt;br/&gt;Gateway 按钮当前只触发 Settings、Language；Settings 使用紧凑 dialog。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-gateway-menu.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-gateway-menu.drawio">
+          <mxGeometry x="1320" y="700" width="255" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="card9" value="&lt;b&gt;07 开始页&lt;/b&gt;&lt;br/&gt;New session / New task 的独立开始页状态，复用输入组件但不属于输入区本体。&lt;br/&gt;&lt;font color='#5B8DEF'&gt;navis-ui-start-workspace.drawio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=1;shadow=0;arcSize=6;fontSize=12;fontColor=#242424;spacing=8;" vertex="1" parent="1" link="navis-ui-start-workspace.drawio">
+          <mxGeometry x="1320" y="1040" width="255" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagTop" value="01 顶部栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#F26B3A;" vertex="1" parent="1" link="navis-ui-topbar.drawio">
+          <mxGeometry x="560" y="150" width="110" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagLeft" value="02 左侧栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#5B8DEF;" vertex="1" parent="1" link="navis-ui-left-sidebar.drawio">
+          <mxGeometry x="145" y="202" width="110" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagMsg" value="03 对话消息" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#2E9D73;" vertex="1" parent="1" link="navis-ui-chat-messages.drawio">
+          <mxGeometry x="445" y="202" width="120" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagInput" value="04 输入/功能栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#F26B3A;" vertex="1" parent="1" link="navis-ui-chat-input-status.drawio">
+          <mxGeometry x="445" y="704" width="130" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagRight" value="05 右侧面板" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#5B8DEF;" vertex="1" parent="1" link="navis-ui-right-panel.drawio">
+          <mxGeometry x="1085" y="202" width="150" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewTagGateway" value="06 Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;arcSize=8;shadow=0;strokeColor=#2E9D73;" vertex="1" parent="1" link="navis-ui-gateway-menu.drawio">
+          <mxGeometry x="92" y="704" width="120" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="overviewStartStateNote" value="开始态索引：New session 与 New task 属于 startWorkspace 开始页；两者都可先选择最近打开目录（最多 10 个）或选择新工作目录，提交后再创建真实 Session。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#2E6D52;align=left;verticalAlign=middle;spacing=8;" vertex="1" parent="1" link="navis-ui-start-workspace.drawio">
+          <mxGeometry x="445" y="760" width="610" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

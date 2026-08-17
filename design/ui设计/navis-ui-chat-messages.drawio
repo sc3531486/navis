@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="对话消息区详情" id="navis-ui-chat-messages-detail">
+    <mxGraphModel dx="1202" dy="815" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="820" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="对话消息区详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="365" y="28" width="320" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="area" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" parent="1" vertex="1">
+          <mxGeometry x="140" y="110" width="760" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="header" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="140" y="110" width="760" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="headerIconScreen" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#242424;strokeWidth=2;arcSize=8;" parent="1" vertex="1">
+          <mxGeometry x="162" y="121" width="16" height="11" as="geometry" />
+        </mxCell>
+        <mxCell id="headerIconStand" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#242424;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="132" as="sourcePoint" />
+            <mxPoint x="170" y="136" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="headerIconBase" value="" style="endArrow=none;html=1;rounded=1;strokeColor=#242424;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="158" y="137" as="sourcePoint" />
+            <mxPoint x="180" y="137" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="headerTitle" value="Navis / Navis产品设计审查" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="195" y="116" width="260" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="headerTitleMenuButton" value="&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;arcSize=30;fontSize=12;fontColor=#555555;" parent="1" vertex="1">
+          <mxGeometry x="455" y="118" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="toggle" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="836" y="116" width="38" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="toggleIconFrame" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#242424;strokeWidth=2;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="846" y="121" width="14" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="toggleIconDivider" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#242424;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="853" y="121" as="sourcePoint" />
+            <mxPoint x="853" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="toggleChevron" value="⌄" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#242424;" vertex="1" parent="1">
+          <mxGeometry x="861" y="121" width="12" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="titleMenuExample" value="Open in              〉  Current / Right / Configured tools&#xA;Rename              R&#xA;Transcript view    〉  Standard / Compact / Raw&#xA;Fork                 F&#xA;Archive              A&#xA;Delete               D" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=6;fontSize=11;fontColor=#242424;align=left;verticalAlign=top;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="500" y="170" width="168" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="rightMenuExample" value="⊞  Diff             ⇧ +Ctrl+D&#xA;◇  Background tasks       ✓&#xA;☑  Plan&#xA;＋  Extension panel..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=6;fontSize=11;fontColor=#242424;align=left;verticalAlign=top;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="706" y="170" width="192" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="titleMenuTriggerHalo" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#F26B3A;strokeWidth=2;dashed=1;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="451" y="115" width="28" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="titleMenuTriggerLine" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#F26B3A;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="476" y="139" as="sourcePoint" />
+            <mxPoint x="500" y="178" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="titleMenuTriggerLabel" value="标题后 &gt;/v 按钮触发" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=10;fontColor=#7A3A26;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="482" y="120" width="118" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="rightMenuTriggerHalo" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#2E9D73;strokeWidth=2;dashed=1;arcSize=20;" parent="1" vertex="1">
+          <mxGeometry x="832" y="113" width="46" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="rightMenuTriggerLine" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#2E9D73;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="850" y="140" as="sourcePoint" />
+            <mxPoint x="802" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rightMenuTriggerLabel" value="右侧面板按钮触发" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=10;fontColor=#2E6D52;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="720" y="118" width="108" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="msg1" value="零残留。design/ 目录下所有文档的旧产品名引用已全部替换为 Navis。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="180" y="205" width="680" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="msg2" value="—  Background task completed Agent “统一产品名为 Navis” completed · 6m 26s 〉" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="180" y="248" width="680" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="done" value="全部 4 个 Agent 完成 ✅" style="text;html=1;align=left;verticalAlign=middle;fontSize=15;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="180" y="300" width="360" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="table" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E0E0E0;strokeWidth=1;shadow=0;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="180" y="350" width="680" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="th" value="Agent                         任务                                结果" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="200" y="365" width="630" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="row400" value="1        Rust 代码                         ✅ 22 个文件" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="200" y="400" width="630" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="row432" value="2        前端代码                         ✅ 34 个文件" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="200" y="432" width="630" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="row464" value="3        配置文件                         ✅ 5 个文件" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="200" y="464" width="630" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="row496" value="4        设计文档                         ✅ 22 个文件" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="200" y="496" width="630" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="verifyTitle" value="最终验证：" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="180" y="555" width="140" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="verifySearch" value="Searched code 〉" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=none;arcSize=20;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="180" y="590" width="150" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="verifyText" value="全项目零残留。Rust 代码、前端代码、设计文档中已无旧产品名引用。" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="180" y="625" width="680" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="autoCompressInputBox" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=0;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="180" y="680" width="680" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="autoCompressLeftLine" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#E0E0E0;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="205" y="693" as="sourcePoint" />
+            <mxPoint x="362" y="693" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="autoCompressRightLine" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#E0E0E0;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="598" y="693" as="sourcePoint" />
+            <mxPoint x="765" y="693" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="autoCompressMarqueeText" value="&lt;span style=&quot;color:#B8B8B8&quot;&gt;正&lt;/span&gt;&lt;span style=&quot;color:#8B8B8B&quot;&gt;在&lt;/span&gt;&lt;span style=&quot;color:#666666&quot;&gt;自&lt;/span&gt;&lt;span style=&quot;color:#242424;font-weight:700&quot;&gt;动&lt;/span&gt;&lt;span style=&quot;color:#666666&quot;&gt;压&lt;/span&gt;&lt;span style=&quot;color:#8B8B8B&quot;&gt;缩&lt;/span&gt;&lt;span style=&quot;color:#B8B8B8&quot;&gt;上&lt;/span&gt;&lt;span style=&quot;color:#CFCFCF&quot;&gt;下&lt;/span&gt;&lt;span style=&quot;color:#DADADA&quot;&gt;文&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="360" y="680" width="240" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="autoCompressMarqueeNote" value="逐字错峰高亮：左 → 右循环" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="390" y="703" width="180" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotKeyboard" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C95F3E;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="786" y="701" width="48" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotBody" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D86945;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="798" y="682" width="28" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotHeadLeft" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D86945;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="790" y="688" width="8" height="13" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotHeadRight" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D86945;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="826" y="688" width="8" height="13" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotEyeLeft" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#242424;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="803" y="687" width="4" height="4" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotEyeRight" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#242424;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="818" y="687" width="4" height="4" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotArmFrameA" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#D86945;strokeWidth=3;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="802" y="701" as="sourcePoint" />
+            <mxPoint x="796" y="709" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="typingMascotArmFrameB" value="" style="endArrow=none;html=1;rounded=0;strokeColor=#D86945;strokeWidth=3;opacity=45;dashed=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="823" y="701" as="sourcePoint" />
+            <mxPoint x="831" y="707" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="typingMascotLegLeft" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D86945;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="800" y="702" width="5" height="12" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotLegRight" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D86945;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="820" y="702" width="5" height="12" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotMotionNote" value="小人敲键盘动效：双手上下交替" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=10;fontColor=#7A3A26;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="675" y="650" width="190" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="typingMascotMotionArrow" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#F26B3A;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="770" y="674" as="sourcePoint" />
+            <mxPoint x="808" y="684" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inputRef" value="输入框与状态区见：navis-ui-chat-input-status.drawio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=8;fontSize=12;fontColor=#242424;" parent="1" vertex="1" link="navis-ui-chat-input-status.drawio">
+          <mxGeometry x="180" y="750" width="520" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="titleMenuRef" value="标题菜单：按钮紧跟标题；默认 &gt;，展开后 v；图标源 gateway-v.svg，颜色继承灰色。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="500" y="306" width="235" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="rightMenuRef" value="面板菜单：点击右侧面板按钮展开" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="706" y="292" width="190" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="thinkingStateRef" value="发送中状态：对话流内先展示临时用户消息，再展示 Navis 思考中行（闪烁图标 + 已用秒数）。工具过程作为 Navis AgentSteps / Turn Timeline 显示：一行总览（edited/read/listed/ran）+ 可展开过程行，不展示原始 tool_call/XML 文本。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=11;fontColor=#2E6D52;align=left;verticalAlign=middle;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="180" y="790" width="720" height="58" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

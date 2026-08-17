@@ -1,0 +1,441 @@
+.navis-composer-running-chip {
+  align-items: center;
+  background: var(--navis-light-card);
+  border: 0;
+  border-radius: 999px;
+  color: #777777;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 12px;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px 0 7px;
+  position: relative;
+}
+
+.navis-composer-running-chip:hover {
+  background: var(--navis-light-hover);
+  color: #555555;
+}
+
+.navis-composer-running-chip .navis-running-icon,
+.navis-composer-running-chip .navis-running-close {
+  align-items: center;
+  display: inline-flex;
+  height: 14px;
+  justify-content: center;
+  width: 14px;
+}
+
+.navis-composer-running-chip .navis-running-icon {
+  color: #888888;
+  transition: opacity 120ms ease;
+}
+
+.navis-composer-running-chip .navis-running-icon svg {
+  height: 14px;
+  width: 14px;
+}
+
+.navis-composer-running-chip .navis-running-close {
+  background: #8f8f8f;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 12px;
+  left: 7px;
+  line-height: 1;
+  opacity: 0;
+  position: absolute;
+  top: 5px;
+  transition: opacity 120ms ease;
+}
+
+.navis-composer-running-chip:hover .navis-running-icon {
+  opacity: 0;
+}
+
+.navis-composer-running-chip:hover .navis-running-close {
+  opacity: 1;
+}
+
+.navis-composer-running-chip.is-running .navis-running-icon {
+  animation: navis-running-pulse 1.35s ease-in-out infinite;
+}
+
+.navis-composer-run-stack {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: -1px;
+  max-width: min(1040px, calc(100% - 48px));
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.navis-plan-phase-line {
+  height: 34px;
+  margin-bottom: -1px;
+  position: relative;
+}
+
+.navis-plan-phase-track {
+  background: #d7d7d4;
+  border-radius: 999px;
+  height: 2px;
+  left: 24px;
+  position: absolute;
+  right: 24px;
+  top: 17px;
+}
+
+.navis-plan-phase-track::before {
+  background: #35b8b3;
+  border-radius: inherit;
+  content: "";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: var(--navis-plan-progress, 0%);
+}
+
+.navis-plan-phase-node {
+  height: 24px;
+  position: absolute;
+  top: 6px;
+  transform: translateX(-50%);
+  width: 24px;
+  z-index: 2;
+}
+
+.navis-plan-phase-dot {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  width: 24px;
+}
+
+.navis-plan-phase-dot span {
+  align-items: center;
+  background: var(--navis-light-surface);
+  border: 2px solid #9f9f9f;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--navis-light-panel);
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 8px;
+  font-weight: 700;
+  height: 10px;
+  justify-content: center;
+  line-height: 1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  width: 10px;
+}
+
+.navis-plan-phase-dot.is-completed span {
+  background: #8f8f8f;
+  border-color: #8f8f8f;
+  height: 18px;
+  width: 18px;
+}
+
+.navis-plan-phase-dot.is-in_progress span {
+  background: var(--navis-light-surface);
+  border-color: #9f9f9f;
+  box-shadow: 0 0 0 2px var(--navis-light-panel);
+  height: 18px;
+  position: relative;
+  width: 18px;
+}
+
+.navis-plan-phase-dot.is-in_progress span::before {
+  animation: navis-plan-phase-spin 1.1s linear infinite;
+  border: 2px solid transparent;
+  border-top-color: #8f8f8f;
+  border-radius: 999px;
+  content: "";
+  inset: -2px;
+  position: absolute;
+}
+
+.navis-plan-phase-dot.is-pending span {
+  background: var(--navis-light-surface);
+  border-color: #9f9f9f;
+  height: 18px;
+  width: 18px;
+}
+
+@keyframes navis-plan-phase-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.navis-queue-strip,
+.navis-goal-strip-row {
+  align-items: center;
+  background: var(--navis-light-permission);
+  color: #555555;
+  display: flex;
+  gap: 10px;
+  height: 34px;
+  min-width: 0;
+  padding: 0 8px 0 13px;
+}
+
+.navis-queue-strip {
+  border: 1px solid var(--navis-light-line);
+  border-bottom: 0;
+  border-radius: 0;
+}
+
+.navis-queue-strip.is-guided {
+  animation: navis-queue-guided-flash 1s ease-out;
+}
+
+.navis-queue-strip:first-child {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.navis-goal-strip {
+  background: var(--navis-light-permission);
+  border: 1px solid var(--navis-light-line);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  color: #555555;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.navis-goal-strip-row {
+  border: 0;
+  height: 34px;
+  padding-left: 13px;
+  padding-right: 8px;
+}
+
+.navis-goal-strip.is-paused .navis-goal-strip-running-icon svg {
+  animation: none;
+  opacity: 0.58;
+}
+
+.navis-queue-strip + .navis-goal-strip {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.navis-queue-strip-icon {
+  color: #9a9a9a;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.navis-queue-strip-text {
+  color: #777777;
+  flex: 1;
+  font-size: 12px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-queue-strip-action {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #777777;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 12px;
+  gap: 4px;
+  height: 24px;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+.navis-queue-strip-action:hover {
+  background: var(--navis-light-hover);
+  color: #333333;
+}
+
+.navis-queue-strip-action.is-reference {
+  padding: 0;
+  width: 24px;
+}
+
+.navis-guide-queued-icon {
+  background: currentColor;
+  display: inline-block;
+  height: 15px;
+  mask: var(--navis-guide-queued-url) center / contain no-repeat;
+  -webkit-mask: var(--navis-guide-queued-url) center / contain no-repeat;
+  width: 15px;
+}
+
+@keyframes navis-queue-guided-flash {
+  0% {
+    background: rgb(255 255 254);
+    box-shadow: inset 0 0 0 1px rgb(36 36 36 / 0.1);
+  }
+
+  100% {
+    background: var(--navis-light-permission);
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+}
+
+.navis-hover-tooltip-anchor {
+  display: contents;
+}
+
+.navis-hover-tooltip {
+  background: #242424;
+  border-radius: 7px;
+  bottom: calc(100% + 6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  left: 50%;
+  max-width: 260px;
+  min-width: 160px;
+  padding: 7px 9px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.navis-hover-tooltip-label {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 15px;
+  white-space: normal;
+}
+
+.navis-hover-tooltip-detail {
+  color: #cfcfcf;
+  font-size: 10.5px;
+  line-height: 14px;
+}
+
+.navis-goal-strip-running-icon {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.navis-goal-strip-running-icon svg {
+  color: #9a9a9a;
+  height: 15px;
+  width: 15px;
+}
+
+.navis-goal-strip-running-icon.is-running svg {
+  animation: navis-running-pulse 1.35s ease-in-out infinite;
+}
+
+.navis-goal-strip-main {
+  align-items: baseline;
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.navis-goal-strip-title {
+  color: #242424;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.navis-goal-strip-text {
+  color: #777777;
+  font-size: 12px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-goal-strip-time {
+  color: #777777;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.navis-goal-strip-icon,
+.navis-goal-strip-chevron {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #777777;
+  display: flex;
+  flex-shrink: 0;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.navis-goal-strip-icon:hover,
+.navis-goal-strip-chevron:hover {
+  background: var(--navis-light-hover);
+  color: #333333;
+}
+
+.navis-goal-chevron {
+  background-color: currentColor;
+  display: block;
+  height: 10px;
+  mask-image: var(--navis-chevron-url);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  transform: rotate(-90deg);
+  transition: transform 120ms ease;
+  width: 10px;
+  -webkit-mask-image: var(--navis-chevron-url);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.navis-goal-strip.is-expanded .navis-goal-chevron {
+  transform: rotate(0deg);
+}
+
+.navis-goal-strip-detail {
+  border-top: 1px solid var(--navis-light-line);
+  display: grid;
+  gap: 4px;
+  padding: 8px 13px 10px 38px;
+}
+
+.navis-goal-strip-detail-label {
+  color: #777777;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.navis-goal-strip-detail-text {
+  color: #3f3f3d;
+  font-size: 12px;
+  line-height: 17px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

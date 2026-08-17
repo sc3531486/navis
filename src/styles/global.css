@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@source not "../../*.log";
+@source not "../../dist";
+@source not "../../src-tauri/target";
+
+

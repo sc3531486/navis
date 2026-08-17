@@ -1,0 +1,88 @@
+{
+  "id": "navis-demo",
+  "name": "Navis Demo Extension",
+  "version": "0.1.0",
+  "description": "白板容器最小扩展骨架：注册并执行一个受控操作，演示领域无关的扩展机制。",
+  "author": "navis",
+  "permissions": {
+    "filesystem": [],
+    "terminal": [],
+    "network": [],
+    "ipc": [],
+    "events": [],
+    "resources": {
+      "max_memory_mb": 512,
+      "max_cpu_percent": 50.0,
+      "timeout_ms": 30000
+    }
+  },
+  "contributes": {
+    "views": [
+      {
+        "id": "demo-html",
+        "name": "Demo HTML",
+        "zone": "chatAside",
+        "renderer": "html:sandbox",
+        "entry": "ExtensionUI/index.html",
+        "config": {},
+        "activation_events": []
+      }
+    ],
+    "commands": [
+      {
+        "id": "demo.run",
+        "label": "Demo Run",
+        "description": "执行 navis-demo.echo 受控操作",
+        "action": {
+          "type": "RunScript",
+          "script": "demo-run",
+          "args": {}
+        }
+      }
+    ],
+    "menus": [
+      {
+        "id": "demo.run",
+        "label": "Demo Run",
+        "target": "Tools",
+        "group": "demo",
+        "command": "demo.run"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "demo-run",
+        "entry": "ExtensionUI/scripts/main.js",
+        "runOn": [
+          "message"
+        ]
+      }
+    ],
+    "capabilities": {
+      "invoke": [
+        "runtime.operation.register",
+        "runtime.operation.execute",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set",
+        "extensions.query"
+      ],
+      "provides": [
+        "demo"
+      ]
+    },
+    "storage": {
+      "scopes": [
+        "global"
+      ]
+    },
+    "backendServices": [
+      {
+        "id": "demo-server",
+        "entry": "ExtensionBackend/demo-server.mjs",
+        "transport": "stdio",
+        "protocol": "jsonrpc"
+      }
+    ]
+  }
+}

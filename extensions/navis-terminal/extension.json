@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "bottomDrawer",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Terminal",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "terminal-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-terminal"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    },
+    "terminal_providers": [
+      {
+        "id": "navis-pty",
+        "name": "Navis PTY 终端",
+        "type": "pty",
+        "description": "基于系统 PTY 的终端提供者"
+      }
+    ]
+  },
+  "author": "navis",
+  "name": "Navis Terminal",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-terminal",
+  "description": "终端扩展：PTY 管理、Shell 集成、终端历史与流式输出。"
+}

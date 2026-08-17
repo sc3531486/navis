@@ -1,0 +1,90 @@
+<mxGraphModel adaptiveColors="auto">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="title" value="Navis Go — Layered Microkernel Architecture (Tauri 2 Desktop)" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="10" width="1160" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe" value="Frontend — SolidJS + TypeScript (strict)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontSize=14;fontStyle=1;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="60" width="1160" height="130" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe1" value="Agent Timeline&#10;(streaming render)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="fe">
+      <mxGeometry x="20" y="45" width="210" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe2" value="CodeMirror 6 Editor&#10;(LSP · Diff · multi-language)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="fe">
+      <mxGeometry x="250" y="45" width="220" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe3" value="Integrated Terminal&#10;(xterm.js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="fe">
+      <mxGeometry x="490" y="45" width="200" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe4" value="Command Palette&#10;(fuzzy search + AI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="fe">
+      <mxGeometry x="710" y="45" width="200" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="fe5" value="30+ Reactive Stores&#10;(4-layer state architecture)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="fe">
+      <mxGeometry x="930" y="45" width="210" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="ipc" value="Tauri IPC — ~70 typed commands · event bus projections · high-frequency channels (token streaming)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="240" width="1160" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="be" value="Rust Backend (tokio async)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontSize=14;fontStyle=1;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="335" width="1160" height="475" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd" value="Business Domains" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=13;fontStyle=1;spacingTop=6;" vertex="1" parent="be">
+      <mxGeometry x="20" y="35" width="1120" height="185" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd1" value="AI&#10;&#10;Agent state machine&#10;LLM Gateway (multi-provider)&#10;Context assembly" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="bd">
+      <mxGeometry x="15" y="35" width="220" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd2" value="Tool&#10;&#10;MCP engine (multi-transport,&#10;circuit breaker)&#10;file / edit / terminal / git / lsp" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="bd">
+      <mxGeometry x="250" y="35" width="230" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd3" value="Extension&#10;&#10;Extension system&#10;(16 contribution types)&#10;Skills" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="bd">
+      <mxGeometry x="495" y="35" width="200" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd4" value="Project&#10;&#10;Catalog&#10;Session lifecycle&#10;Knowledge" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="bd">
+      <mxGeometry x="710" y="35" width="190" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="bd5" value="Security&#10;&#10;Auth&#10;Sandbox&#10;Permission constraints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="bd">
+      <mxGeometry x="915" y="35" width="190" height="135" as="geometry"/>
+    </mxCell>
+    <mxCell id="boundary" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#cc0000;strokeWidth=2;" edge="1" parent="be">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="20" y="255" as="sourcePoint"/>
+        <mxPoint x="1140" y="255" as="targetPoint"/>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="boundarylabel" value="CI-enforced boundary — kernel never depends on business domains (guard test blocks PRs)" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#cc0000;" vertex="1" parent="be">
+      <mxGeometry x="220" y="232" width="720" height="20" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn" value="Kernel — generic microkernel primitives (zero business vocabulary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontSize=13;fontStyle=1;spacingTop=6;" vertex="1" parent="be">
+      <mxGeometry x="20" y="280" width="1120" height="175" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn1" value="Registry&#10;&#10;Capability discovery&#10;+ lifecycle&#10;(lock-free reads)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="15" y="35" width="170" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn2" value="Pipeline&#10;&#10;Staged execution&#10;retry / backoff&#10;cancellation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="200" y="35" width="170" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn3" value="EventBus&#10;&#10;Topic + scope routing&#10;backpressure&#10;overflow accounting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="385" y="35" width="180" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn4" value="Policy Engine&#10;&#10;Allow / Ask / Deny&#10;prioritized constraints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="580" y="35" width="175" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn5" value="Audit&#10;&#10;Tamper-evident records&#10;digest / redaction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="770" y="35" width="175" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="kn6" value="Observability&#10;&#10;Execution events&#10;trace / span context" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="kn">
+      <mxGeometry x="960" y="35" width="145" height="125" as="geometry"/>
+    </mxCell>
+    <mxCell id="e1" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="fe" target="ipc">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e2" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#d6b656;" edge="1" parent="1" source="ipc" target="be">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="e3" value="depends on" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;fontSize=11;" edge="1" parent="be" source="bd" target="kn">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

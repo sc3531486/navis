@@ -1,0 +1,22 @@
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text-secondary) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-bg-primary) 75%, transparent);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-text-secondary) 58%, transparent);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

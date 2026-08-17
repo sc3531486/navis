@@ -1,0 +1,9 @@
+.navis-workspace-extension-slot {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.navis-workspace-extension-slot.has-builtin {
+  border-top: 1px solid #f0f0f0;
+}
+

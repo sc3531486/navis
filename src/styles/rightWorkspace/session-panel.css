@@ -1,0 +1,84 @@
+.navis-workspace-session {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.navis-workspace-session-count {
+  color: #777777;
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 20px;
+  padding: 0 16px 6px;
+}
+
+.navis-workspace-session-list {
+  padding: 4px 16px 16px;
+}
+
+.navis-workspace-session.is-compact .navis-workspace-session-list {
+  padding: 4px 12px 12px;
+}
+
+.navis-conversation-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.navis-conversation-transcript.is-compact {
+  gap: 8px;
+}
+
+.navis-conversation-transcript .navis-message {
+  max-width: 100%;
+}
+
+.navis-conversation-transcript .navis-message.is-navis {
+  width: 100%;
+}
+
+.navis-conversation-transcript .navis-message-content {
+  max-width: 100%;
+}
+
+.navis-conversation-transcript .navis-message-bubble {
+  border-radius: 14px;
+  padding: 11px 14px;
+}
+
+.navis-conversation-transcript .navis-message-navis {
+  padding: 0;
+}
+
+.navis-conversation-transcript .navis-agent-trace {
+  width: 100%;
+}
+
+.navis-conversation-transcript-empty {
+  color: #bbbbbb;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.navis-workspace-session-raw {
+  background: var(--navis-light-shell);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 7px;
+  color: #252525;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 10.5px;
+  line-height: 1.45;
+  margin: 0;
+  max-height: 180px;
+  overflow: auto;
+  padding: 7px 8px;
+  scrollbar-gutter: stable;
+  white-space: pre;
+}
+

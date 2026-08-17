@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "rightWorkspace",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Project",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "project-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-project"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    }
+  },
+  "author": "navis",
+  "name": "Navis Project",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-project",
+  "description": "Project / Worktree 业务扩展。"
+}

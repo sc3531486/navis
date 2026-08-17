@@ -1,0 +1,36 @@
+// WASM 组件轨契约 — navis:ext 包（design/37 §四、design/36 §10.2）
+//
+// 扩展组件导出接口（生命周期 / 消息），宿主调用。
+// 独立包目录（wit/ext/），`value` / `host-handle` 在此为本地定义副本：
+// WIT 目录解析要求单目录单包，且 ABI 层面 `value`=string、
+// `host-handle`=空记录，两侧 Rust 类型与组件类型名一致，可正常互操作。
+package navis:ext;
+
+/// 本包本地共享类型（与 navis:host/types 同名副本）。
+interface types {
+    /// 通用载荷：payload / 返回值以 JSON 字符串承载。
+    type value = string;
+
+    /// host 句柄：init 时宿主授予；当前为空资源（空记录，ABI 零参数）。
+    record host-handle {}
+}
+
+/// 扩展组件生命周期（enable/激活/失活）。
+interface lifecycle {
+    use types.{host-handle};
+    init:       func(handle: host-handle) -> result<_, string>;
+    activate:   func() -> result<_, string>;
+    deactivate: func() -> result<_, string>;
+}
+
+/// 扩展组件消息处理（宿主 / 其他组件消息）。
+interface message {
+    use types.{value};
+    handle: func(payload: value) -> result<value, string>;
+}
+
+/// 扩展组件世界：组件导出的接口。
+world ext {
+    export lifecycle;
+    export message;
+}

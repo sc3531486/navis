@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="Navis Go 菜单详情" id="navis-ui-gateway-menu-detail">
+    <mxGraphModel dx="1202" dy="815" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Navis Go 菜单详情" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="280" y="28" width="340" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="sidebar" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=3;" parent="1" vertex="1">
+          <mxGeometry x="80" y="120" width="290" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="gatewayButton" value="Navis Go                                      v" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=none;arcSize=12;fontSize=12;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="105" y="535" width="240" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="popup" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;shadow=1;arcSize=4;" parent="1" vertex="1">
+          <mxGeometry x="105" y="180" width="285" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="popupTitle" value="Navis Go" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#8B8B8B;" parent="1" vertex="1">
+          <mxGeometry x="126" y="188" width="140" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item0" value="⚙  Settings" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=4;" parent="1" vertex="1">
+          <mxGeometry x="126" y="216" width="238" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="item1" value="◎  Language  〉 zh-CN / en-US / extensions" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#242424;spacing=4;" parent="1" vertex="1">
+          <mxGeometry x="126" y="250" width="238" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="trigger" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#F26B3A;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="225" y="535" as="sourcePoint" />
+            <mxPoint x="225" y="298" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="由左侧栏底部 Navis Go 按钮触发；按钮左侧为 navis-product-icon.svg，右侧为 gateway-v.svg。当前只保留 Settings、Language。Settings 默认进入 Settings &gt; Gateway；Language 使用二级菜单切换 zh-CN / en-US。UI 语言包扩展契约落地前，不显示 Language extensions..." style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="640" y="200" width="230" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="gatewayTriggerRef" value="点击左侧栏底部 Navis Go 按钮展开此菜单；内部扩展 target 仍为 Gateway。" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#8B8B8B;whiteSpace=wrap;" vertex="1" parent="1" link="navis-ui-left-sidebar.drawio">
+          <mxGeometry x="455" y="486" width="310" height="44" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

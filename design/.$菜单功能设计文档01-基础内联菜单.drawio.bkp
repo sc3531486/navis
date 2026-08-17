@@ -1,0 +1,73 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="基础内联菜单总览" id="navi-menu-functions-01-inline">
+    <mxGraphModel dx="1202" dy="815" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="940" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="菜单功能设计 01：基础内联菜单" style="text;html=1;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#242424;" parent="1" vertex="1">
+          <mxGeometry x="450" y="28" width="500" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="只画常驻在主界面里的入口。点击后才弹出的菜单项，请看菜单功能设计文档 02。" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#666666;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="330" y="72" width="740" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="headerArea" value="界面区域" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=14;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="130" width="210" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="headerInline" value="基础内联入口" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=14;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="330" y="130" width="650" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="headerDoc02" value="只作为触发器" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=14;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="130" width="300" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rowTopArea" value="顶部栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F7FB;strokeColor=#5B8DEF;strokeWidth=1;arcSize=6;fontSize=15;fontStyle=1;fontColor=#24446B;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="200" width="210" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="rowTopInline" value="☰ 菜单按钮    侧栏开关    ⌕ 搜索    ← 后退    → 前进    － 最小化    □ 最大化    × 关闭" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8DEF;strokeWidth=1;arcSize=6;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="330" y="200" width="650" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="rowTopDoc02" value="☰ 和 ⌕ 可能展开全局菜单；具体项待补图后进入 02" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF4FF;strokeColor=#5B8DEF;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#24446B;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="200" width="300" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="rowLeftArea" value="左侧栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=15;fontStyle=1;fontColor=#2E6D52;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="320" width="210" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowLeftInline" value="模式切换：Cowork / Code / Custom&#xa;模式菜单：New task / Projects / Scheduled / Live artifacts / Customize / New session&#xa;Group / 会话列表：Group 标题、会话项、选中态、滚动条、Gateway 固定按钮" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=13;fontColor=#242424;align=left;verticalAlign=middle;spacingLeft=16;" parent="1" vertex="1">
+          <mxGeometry x="330" y="320" width="650" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowLeftDoc02" value="Group 右键、会话右键、Gateway 菜单项进入 02" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7FBF8;strokeColor=#2E9D73;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#2E6D52;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="320" width="300" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowHeaderArea" value="对话标题栏" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9ED;strokeColor=#D99A2B;strokeWidth=1;arcSize=6;fontSize=15;fontStyle=1;fontColor=#7A5720;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="480" width="210" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rowHeaderInline" value="会话类型图标    当前会话标题    标题下拉按钮    右侧面板按钮" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D99A2B;strokeWidth=1;arcSize=6;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="330" y="480" width="650" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rowHeaderDoc02" value="标题下拉菜单、右侧面板菜单进入 02" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9ED;strokeColor=#D99A2B;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#7A5720;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="480" width="300" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rowComposerArea" value="输入区 A / B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=15;fontStyle=1;fontColor=#7A3A26;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="610" width="210" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowComposerInline" value="A 区：输入框本体、发送按钮、自动压缩临时状态&#xa;B 区：权限策略按钮、＋ 按钮、模型状态 / 模型选择、上下文圆环" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=13;fontColor=#242424;align=left;verticalAlign=middle;spacingLeft=16;" parent="1" vertex="1">
+          <mxGeometry x="330" y="610" width="650" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowComposerDoc02" value="＋ 菜单、上下文 tooltip、权限 / 模型展开项进入 02" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF1EA;strokeColor=#F26B3A;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#7A3A26;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="610" width="300" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="rowPanelArea" value="右侧工作区" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#8B8B8B;strokeWidth=1;arcSize=6;fontSize=15;fontStyle=1;fontColor=#555555;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="90" y="770" width="210" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rowPanelInline" value="默认关闭不占宽度；打开后按 1 / 2 / 3 / 4 规则动态分列与上下平分" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8B8B8B;strokeWidth=1;arcSize=6;fontSize=13;fontColor=#242424;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="330" y="770" width="650" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rowPanelDoc02" value="打开入口来自右侧面板菜单，菜单项进入 02" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#8B8B8B;strokeWidth=1;arcSize=6;fontSize=12;fontColor=#555555;align=center;verticalAlign=middle;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="770" width="300" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="rule" value="一句话：01 负责“看得见、一直在”的入口；02 负责“点出来、右键出来、hover 出来”的菜单项。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DADADA;strokeWidth=1;arcSize=6;fontSize=13;fontStyle=1;fontColor=#242424;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="260" y="890" width="880" height="34" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

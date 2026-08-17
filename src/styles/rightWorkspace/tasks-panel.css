@@ -1,0 +1,173 @@
+.navis-workspace-task-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.navis-workspace-task-list {
+  gap: 6px;
+  padding: 4px 14px 12px;
+}
+
+.navis-workspace-task-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.navis-workspace-task-clear,
+.navis-workspace-task-link {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.navis-workspace-task-clear {
+  color: #8a8a8a;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.navis-workspace-task-clear:hover {
+  color: #1f1f1f;
+}
+
+.navis-workspace-task {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 11px 14px 11px 46px;
+  position: relative;
+}
+
+.navis-workspace-task.is-selected {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #d8d8d7;
+}
+
+.navis-workspace-task.is-selected::before {
+  background: #f36f21;
+  border-radius: 999px;
+  bottom: 10px;
+  content: '';
+  left: 8px;
+  position: absolute;
+  top: 10px;
+  width: 3px;
+}
+
+.navis-workspace-task.is-status-active,
+.navis-workspace-task.is-status-queued,
+.navis-workspace-task.is-status-queued,
+.navis-workspace-task.is-status-waiting {
+  padding-right: 46px;
+}
+
+.navis-workspace-task-title-row {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+}
+
+.navis-workspace-task-dot {
+  background: #1a83e8;
+  border-radius: 999px;
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 7px;
+  left: 20px;
+  position: absolute;
+  top: 18px;
+  width: 7px;
+}
+
+.navis-workspace-task.is-status-active .navis-workspace-task-dot,
+.navis-workspace-task.is-status-queued .navis-workspace-task-dot,
+.navis-workspace-task.is-status-queued .navis-workspace-task-dot,
+.navis-workspace-task.is-status-waiting .navis-workspace-task-dot {
+  animation: navis-running-pulse 1.35s ease-in-out infinite;
+}
+
+.navis-workspace-task.is-status-succeeded .navis-workspace-task-dot,
+.navis-workspace-task.is-status-cancelled .navis-workspace-task-dot {
+  background: #8f8f8f;
+}
+
+.navis-workspace-task.is-status-failed .navis-workspace-task-dot {
+  background: #d72d68;
+}
+
+.navis-workspace-task-stop {
+  align-items: center;
+  background: var(--navis-light-surface);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 6px;
+  box-shadow: none;
+  color: #555555;
+  cursor: pointer;
+  display: inline-flex;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 11px;
+  width: 24px;
+}
+
+.navis-workspace-task-stop span {
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  height: 10px;
+  width: 10px;
+}
+
+.navis-workspace-task-stop:not(:disabled):hover {
+  color: #111111;
+}
+
+.navis-workspace-task-title {
+  color: #161616;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.navis-workspace-task-line {
+  align-items: center;
+  color: #777777;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  gap: 8px;
+  line-height: 18px;
+  min-width: 0;
+}
+
+.navis-workspace-task-status.is-status-failed {
+  color: #d72d68;
+}
+
+.navis-workspace-task-link {
+  align-self: flex-start;
+  color: #0078d4;
+  font-size: 13px;
+  line-height: 18px;
+  margin-top: 1px;
+}
+
+.navis-workspace-task-link:hover {
+  color: #005ea8;
+  text-decoration: underline;
+}
+

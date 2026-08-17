@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "contributes": {
+    "views": [
+      {
+        "zone": "rightWorkspace",
+        "entry": "ExtensionUI/index.html",
+        "activation_events": [],
+        "name": "Navis Memory",
+        "config": {},
+        "renderer": "html:sandbox",
+        "id": "memory-shell"
+      }
+    ],
+    "capabilities": {
+      "provides": [
+        "navis-memory"
+      ],
+      "invoke": [
+        "extensions.query",
+        "runtime.operation.list",
+        "storage.get",
+        "storage.set"
+      ]
+    },
+    "memory_providers": [
+      {
+        "id": "navis-memory-store",
+        "name": "Navis 记忆存储",
+        "type": "persistent",
+        "description": "持久化记忆存储，支持会话上下文和长期记忆"
+      }
+    ]
+  },
+  "author": "navis",
+  "name": "Navis Memory",
+  "permissions": {
+    "ipc": [],
+    "events": [],
+    "terminal": [],
+    "network": [],
+    "resources": {
+      "timeout_ms": 30000,
+      "max_cpu_percent": 50.0,
+      "max_memory_mb": 512
+    },
+    "filesystem": []
+  },
+  "id": "navis-memory",
+  "description": "记忆存储扩展：长期记忆、会话上下文持久化。"
+}

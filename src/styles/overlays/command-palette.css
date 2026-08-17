@@ -1,0 +1,154 @@
+.navis-command-palette-content {
+  display: flex;
+  flex-direction: column;
+  max-height: min(520px, calc(100vh - 88px));
+}
+
+.navis-command-search {
+  flex-shrink: 0;
+}
+
+.navis-command-search input {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.navis-command-scope {
+  font-size: 11px;
+  font-weight: 560;
+}
+
+.navis-command-palette-list {
+  flex: 1 1 auto;
+  max-height: calc(min(520px, calc(100vh - 36px)) - 65px);
+  min-height: 0;
+  padding: 8px 10px 12px;
+}
+
+.navis-command-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #8a8781;
+  margin: 0 0 4px 36px;
+}
+
+.navis-command-palette-item {
+  min-height: 44px;
+  border-radius: 8px;
+  margin: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.navis-command-palette-item.is-selected {
+  background: #f3f2ef;
+}
+
+.navis-command-source-mark {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: #282828;
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 520;
+  height: 24px;
+  justify-content: flex-start;
+  line-height: 24px;
+  width: 24px;
+}
+
+.navis-command-label {
+  color: #282828;
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 20px;
+  letter-spacing: 0;
+}
+
+.navis-command-description {
+  color: #8a8781;
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 1px;
+}
+
+.navis-command-source-label {
+  background: #f2f0eb;
+  color: #77736d;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.navis-command-keybinding {
+  border: 0;
+  background: transparent;
+  color: #77736d;
+  font-size: 12px;
+  font-family: inherit;
+  line-height: 18px;
+}
+
+.navis-command-palette-hints {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  line-height: 16px;
+}
+
+.navis-command-palette-overlay[data-expanded] {
+  animation: fade-in 200ms ease-out forwards;
+}
+
+.navis-command-palette-overlay[data-closed] {
+  animation: fade-out 150ms ease-in forwards;
+}
+
+.navis-command-palette-content[data-expanded] {
+  animation: slide-down 200ms ease-out forwards;
+}
+
+.navis-command-palette-content[data-closed] {
+  animation: slide-up 150ms ease-in forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}

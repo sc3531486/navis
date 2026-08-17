@@ -1,0 +1,104 @@
+/**
+ * ============================================================
+ * Navis 主题系统 - CSS 变量定义
+ * ============================================================
+ *
+ * 定义所有 UI 组件共享的设计令牌（Design Tokens）。
+ * 变量分为以下几类：
+ *   - 颜色（color-*）
+ *   - 间距（spacing-*）
+ *   - 字体（font-*）
+ *   - 圆角（radius-*）
+ *   - 阴影（shadow-*）
+ *
+ * 明/暗主题通过覆盖 [data-theme="dark"] 选择器中的颜色变量实现。
+ * 其余变量（间距、字体、圆角等）在两种主题下保持一致。
+ *
+ * 来源：design/22-ui-framework.md 第四章 主题系统
+ * ============================================================
+ */
+
+:root {
+  /* ── 颜色 ────────────────────────────────────────────── */
+  --color-bg-primary: #fdfdfc;
+  --color-bg-secondary: #f3f3f2;
+  --color-bg-elevated: #ffffff;
+  --color-bg-tertiary: #efefee;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #8a8a8a;
+  --color-text-muted: #9a9a9a;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-primary: #242424;
+  --color-border: #e7e7e4;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #22c55e;
+  --color-info: #3b82f6;
+  --color-gateway: #f0883e;
+  --color-bubble-user: #f1f1f0;
+  --color-bubble-agent: #fdfdfc;
+  --color-code-bg: #efefee;
+  --color-code-text: #1f2937;
+  --gateway-icon-color: var(--color-gateway);
+
+  /* ── Navis 浅色工作台表面 ─────────────────────────── */
+  --navis-light-panel: #fdfdfc;
+  --navis-light-surface: #ffffff;
+  --navis-light-cowork-tab: #f1f1f0;
+  --navis-light-cowork-tab-selected: #ffffff;
+  --navis-light-sidebar-selected: #e4e4e3;
+  --navis-light-shell: #efefee;
+  --navis-light-permission: rgb(255 254 255);
+  --navis-light-card: #f3f3f2;
+  --navis-light-hover: #eeeeed;
+  --navis-light-line: #e8e8e5;
+  --navis-light-line-strong: #ddddda;
+
+  /* ── 间距 ────────────────────────────────────────────── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* ── 字体 ────────────────────────────────────────────── */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+
+  /* ── 圆角 ────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── 阴影 ────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* ── 公共弹框：亮色默认 ────────────────────────────── */
+  --navis-dialog-scrim: rgba(0, 0, 0, 0.34);
+  --navis-dialog-surface: #ffffff;
+  --navis-dialog-border: rgba(0, 0, 0, 0.08);
+  --navis-dialog-title: #111111;
+  --navis-dialog-text: #5a5a5a;
+  --navis-dialog-strong: #242424;
+  --navis-dialog-muted: #666666;
+  --navis-dialog-subtle: #f7f7f7;
+  --navis-dialog-line: #dddddd;
+  --navis-dialog-hover: #f2f2f2;
+  --navis-dialog-field-bg: #f7f7f7;
+  --navis-dialog-primary: #242424;
+  --navis-dialog-primary-hover: #000000;
+  --navis-dialog-on-primary: #ffffff;
+  --navis-dialog-danger: #df3f45;
+  --navis-dialog-danger-hover: #ca3338;
+  --navis-dialog-on-danger: #ffffff;
+  --navis-dialog-shadow: 0 18px 42px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --navis-dialog-focus: rgba(17, 17, 17, 0.14);
+}
+

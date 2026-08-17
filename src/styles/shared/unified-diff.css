@@ -1,0 +1,62 @@
+.navis-unified-diff {
+  background: var(--navis-light-shell);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #4d4942;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  min-width: 0;
+  overflow: auto;
+  padding: 8px 0;
+  scrollbar-gutter: stable;
+}
+
+.navis-unified-diff-line {
+  display: grid;
+  grid-template-columns: 46px 46px minmax(0, 1fr);
+  min-height: 18px;
+  min-width: 100%;
+  width: max-content;
+}
+
+.navis-unified-diff-number {
+  color: #aa9f8c;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  padding: 0 8px;
+  text-align: right;
+  user-select: none;
+}
+
+.navis-unified-diff-code {
+  display: block;
+  min-width: 36ch;
+  overflow: visible;
+  padding: 0 10px;
+  white-space: pre;
+}
+
+.navis-unified-diff-line.is-add {
+  background: rgba(37, 162, 84, 0.08);
+}
+
+.navis-unified-diff-line.is-add .navis-unified-diff-code {
+  color: #167a3c;
+}
+
+.navis-unified-diff-line.is-delete {
+  background: rgba(218, 65, 91, 0.08);
+}
+
+.navis-unified-diff-line.is-delete .navis-unified-diff-code {
+  color: #bb2f4f;
+}
+
+.navis-unified-diff-line.is-file .navis-unified-diff-code,
+.navis-unified-diff-line.is-hunk .navis-unified-diff-code,
+.navis-unified-diff-line.is-file .navis-unified-diff-number,
+.navis-unified-diff-line.is-hunk .navis-unified-diff-number {
+  color: #9a927f;
+}
