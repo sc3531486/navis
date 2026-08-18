@@ -191,8 +191,8 @@ pub struct BackupInfo {
 
 #[cfg(test)]
 mod tests {
+    use crate::app::infra::db::Database;
     use super::*;
-    use super::db::Database;
     use std::sync::Mutex;
     use tempfile::tempdir;
 

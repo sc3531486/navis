@@ -1,5 +1,5 @@
 import { Component, For, Show } from 'solid-js';
-import CloseIcon from '../Icon/CloseIcon';
+import CloseIcon from '@/components/Icon/CloseIcon';
 import HostViewRenderer from './HostViewRenderer';
 import {
   activeHostViewForZone,
@@ -8,7 +8,7 @@ import {
   hostViewsForZone,
   isHostViewClosable,
   type HostViewInstance,
-} from '../../stores/app';
+} from '@/stores/host';
 import { getHostViewSurfaceDescriptor } from './registry';
 
 interface HostViewSurfaceProps {

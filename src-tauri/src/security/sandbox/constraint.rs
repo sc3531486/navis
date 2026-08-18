@@ -19,6 +19,8 @@
 //! | `tool.command`  | CommandExecute               |
 //! | `tool.network`  | NetworkRequest               |
 
+use std::ffi::OsString;
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use serde_json::json;
@@ -96,17 +98,88 @@ fn policy_input_from_request(request: &OperationRequest) -> PolicyInput {
     }
 }
 
-/// 从 PolicyInput.target 提取路径和worktree，构造 OperationRequest
-fn build_file_request(input: &PolicyInput, operation: OperationType) -> OperationRequest {
+/// 对路径做不依赖文件系统的词法规范化。
+///
+/// 规范化失败表示路径已经回退到了绝对路径的根目录之外，调用方必须拒绝请求。
+fn normalize_path_lexically(path: &Path) -> Option<PathBuf> {
+    let mut prefix = None::<OsString>;
+    let mut has_root = false;
+    let mut parts = Vec::<OsString>::new();
+
+    for component in path.components() {
+        match component {
+            Component::Prefix(value) => prefix = Some(value.as_os_str().to_os_string()),
+            Component::RootDir => has_root = true,
+            Component::CurDir => {}
+            Component::Normal(value) => parts.push(value.to_os_string()),
+            Component::ParentDir => {
+                if parts.pop().is_none() {
+                    if has_root {
+                        return None;
+                    }
+                    // 相对路径尚未绑定到 worktree 时保留前导 ..，由边界检查统一拒绝。
+                    parts.push(OsString::from(".."));
+                }
+            }
+        }
+    }
+
+    let mut normalized = PathBuf::new();
+    if let Some(prefix) = prefix {
+        normalized.push(prefix);
+    }
+    if has_root {
+        normalized.push(std::path::MAIN_SEPARATOR.to_string());
+    }
+    for part in parts {
+        normalized.push(part);
+    }
+
+    if normalized.as_os_str().is_empty() {
+        normalized.push(".");
+    }
+
+    Some(normalized)
+}
+
+/// 解析文件目标并强制限制在 worktree 内，避免相对路径通过 .. 逃逸。
+fn resolve_file_target(target: &str, worktree: &str) -> Result<PathBuf, String> {
+    let worktree_path = normalize_path_lexically(Path::new(worktree))
+        .ok_or_else(|| "worktree 路径无效，已回退到根目录之外".to_string())?;
+    let target = target.trim();
+    let target_path = Path::new(if target.is_empty() { "." } else { target });
+
+    let candidate = if target_path.is_absolute() || target_path.has_root() {
+        normalize_path_lexically(target_path)
+            .ok_or_else(|| "目标路径无效，已回退到根目录之外".to_string())?
+    } else {
+        normalize_path_lexically(&worktree_path.join(target_path))
+            .ok_or_else(|| "目标路径无效，已回退到根目录之外".to_string())?
+    };
+
+    if !candidate.starts_with(&worktree_path) {
+        return Err(format!("目标路径逃逸 worktree，已拒绝: {}", target));
+    }
+
+    Ok(candidate)
+}
+
+/// 从 PolicyInput.target 提取路径和 worktree，构造已限制在 worktree 内的 OperationRequest。
+fn build_file_request(
+    input: &PolicyInput,
+    operation: OperationType,
+) -> Result<OperationRequest, String> {
     let worktree = input
         .metadata
         .get("worktree_root")
         .and_then(|v| v.as_str())
         .unwrap_or("/");
+    let target = resolve_file_target(&input.target, worktree)?;
 
-    OperationRequest::new(operation, &input.target, &input.subject)
+    let request = OperationRequest::new(operation, target.to_string_lossy(), &input.subject)
         .with_worktree(worktree)
-        .with_session_id(&input.scope)
+        .with_session_id(&input.scope);
+    Ok(request)
 }
 
 /// 从 PolicyInput 提取命令字符串，构造 CommandExecute 请求
@@ -197,7 +270,10 @@ impl Constraint for PathAccessConstraint {
             _ => return None, // 不适用
         };
 
-        let request = build_file_request(input, operation);
+        let request = match build_file_request(input, operation) {
+            Ok(request) => request,
+            Err(reason) => return Some(PolicyDecision::Deny { reason }),
+        };
 
         match self.sandbox.check(&request) {
             Ok(result) => {
@@ -731,105 +807,89 @@ mod tests {
         assert_eq!(net_c.id(), "sandbox.network");
     }
 
-    /// B5: 验证同一个全局 PolicyEngine 同时容纳 Sandbox 约束和 Extension 约束，
-    /// 两种约束都能通过 evaluate() 正确决策。
+    /// 验证全局策略引擎可以组合沙箱约束与通用扩展运行时约束。
     #[test]
-    fn test_global_policy_engine_unifies_sandbox_and_extension_constraints() {
-        use crate::extension::models::{HookAction, HookPhase, HookRegistration};
-        use crate::extension::store::RegisteredHook;
-//         use [REMOVED: domains reference]
-//         use [REMOVED: domains reference]
+    fn global_policy_engine_composes_sandbox_and_host_constraints() {
+        struct HostDefaultAllowConstraint;
 
-        // 创建共享的全局 PolicyEngine（模拟 app/mod.rs 中的单一实例）
+        impl Constraint for HostDefaultAllowConstraint {
+            fn id(&self) -> &str {
+                "host.default-allow"
+            }
+
+            fn priority(&self) -> i32 {
+                100
+            }
+
+            fn evaluate(&self, input: &PolicyInput) -> Option<PolicyDecision> {
+                input.action.starts_with("tool.").then(|| PolicyDecision::Allow {
+                    reason: "通用宿主默认放行未匹配工具动作".to_string(),
+                })
+            }
+        }
+
+        struct ExtensionRuntimeDenyConstraint;
+
+        impl Constraint for ExtensionRuntimeDenyConstraint {
+            fn id(&self) -> &str {
+                "extension.runtime-deny"
+            }
+
+            fn priority(&self) -> i32 {
+                90
+            }
+
+            fn evaluate(&self, input: &PolicyInput) -> Option<PolicyDecision> {
+                (input.action == "extension.runtime.check").then(|| PolicyDecision::Deny {
+                    reason: "扩展运行时策略拒绝该动作".to_string(),
+                })
+            }
+        }
+
         let engine = PolicyEngine::new();
-
-        // 1. 注册 Sandbox 约束（与 app/mod.rs 一致）
         let sandbox = Arc::new(Sandbox::new(test_event_bus()));
-        let ws = std::path::Path::new("/home/user/worktree");
+        let worktree = std::path::Path::new("/home/user/worktree");
         sandbox
-            .set_trust(ws, super::super::worktree_trust::TrustLevel::Trusted)
+            .set_trust(worktree, super::super::worktree_trust::TrustLevel::Trusted)
             .unwrap();
         register_sandbox_constraints(&engine, Arc::clone(&sandbox)).unwrap();
-        assert_eq!(engine.len(), 3, "should have 3 sandbox constraints");
+        assert_eq!(engine.len(), 3);
 
-        // 2. 注册 AgentDefaultAllow 约束（与 app/mod.rs 一致）
-        engine.add(AgentDefaultAllowConstraint).unwrap();
-        assert_eq!(
-            engine.len(),
-            4,
-            "should have 4 constraints after agent default"
-        );
+        engine.add(HostDefaultAllowConstraint).unwrap();
+        engine.add(ExtensionRuntimeDenyConstraint).unwrap();
+        assert_eq!(engine.len(), 5);
 
-        // 3. 注册 ExtensionHook 约束（模拟 pipeline.rs 中的 per-call 注入）
-        let deny_hook = RegisteredHook {
-            extension_id: "test-extension".into(),
-            extension_name: "Test Extension".into(),
-            hook_id: "block-command".into(),
-            runtime_id: "test-extension/block-command".into(),
-            hook: HookRegistration {
-                id: "block-command".into(),
-                name: "Block Command".into(),
-                phase: HookPhase::PreToolUse,
-                priority: None,
-                module: "./block.js".into(),
-                when: Some("permission == terminal.execute".into()),
-                action: HookAction::Deny {
-                    reason: "extension denies terminal".into(),
-                },
-            },
-        };
-        engine
-            .add(ExtensionHookConstraint::new(vec![deny_hook]))
-            .unwrap();
-        assert_eq!(
-            engine.len(),
-            5,
-            "should have 5 constraints after extension hook"
-        );
-
-        // 4. 验证 Sandbox 约束：文件读取在信任worktree内应允许
         let file_input = PolicyInput {
-            subject: "agent".into(),
+            subject: "extension-runtime".into(),
             action: "tool.file.read".into(),
             target: "/home/user/worktree/src/main.rs".into(),
-            scope: "session_001".into(),
+            scope: "global".into(),
             metadata: json!({ "worktree_root": "/home/user/worktree" }),
         };
-        let decision = engine.evaluate(&file_input);
-        assert!(
-            matches!(decision, PolicyDecision::Allow { .. }),
-            "sandbox should allow file read in trusted worktree, got {:?}",
-            decision
-        );
+        assert!(matches!(engine.evaluate(&file_input), PolicyDecision::Allow { .. }));
 
-        // 5. 验证 Extension 约束：extension hook 拒绝 terminal 命令
-        let cmd_input = PolicyInput {
-            subject: "agent".into(),
-            action: "tool.command".into(),
-            target: "ls".into(),
-            scope: "session_001".into(),
-            metadata: json!({ "worktree_root": "/home/user/worktree" }),
-        };
-        let decision = engine.evaluate(&cmd_input);
-        assert!(
-            matches!(decision, PolicyDecision::Deny { ref reason } if reason.contains("extension denies terminal")),
-            "extension hook should deny terminal command, got {:?}",
-            decision
-        );
-
-        // 6. 验证 AgentDefaultAllow：不被 sandbox 或 extension 匹配的 tool.* 动作应允许
-        let unknown_input = PolicyInput {
-            subject: "agent".into(),
-            action: "tool.custom_action".into(),
-            target: "something".into(),
-            scope: "session_001".into(),
+        let runtime_input = PolicyInput {
+            subject: "extension-runtime".into(),
+            action: "extension.runtime.check".into(),
+            target: "extension.example".into(),
+            scope: "global".into(),
             metadata: json!({}),
         };
-        let decision = engine.evaluate(&unknown_input);
-        assert!(
-            matches!(decision, PolicyDecision::Allow { .. }),
-            "agent default allow should permit unmatched tool.* action, got {:?}",
-            decision
-        );
+        assert!(matches!(
+            engine.evaluate(&runtime_input),
+            PolicyDecision::Deny { ref reason } if reason.contains("扩展运行时策略")
+        ));
+
+        let unmatched_tool_input = PolicyInput {
+            subject: "extension-runtime".into(),
+            action: "tool.custom_action".into(),
+            target: "resource".into(),
+            scope: "global".into(),
+            metadata: json!({}),
+        };
+        assert!(matches!(
+            engine.evaluate(&unmatched_tool_input),
+            PolicyDecision::Allow { .. }
+        ));
     }
 }

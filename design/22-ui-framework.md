@@ -10,7 +10,7 @@
 
 ### 1.1 定位
 
-UI Framework 是前端基础框架层，基于 Solid.js + Kobalte + Tailwind，提供组件库、布局系统、主题、路由、状态管理、HostView surface 与扩展视图承接。
+Navis UI Framework 是前端基础框架层，基于 Solid.js + Kobalte + Tailwind，提供通用组件、宿主投影、主题、扩展路由协议、状态基础设施和 HostView surface。产品路由、产品布局和业务状态不属于本层；当前 `src/router/`、`src/layouts/` 中仍有 Navis Code 过渡代码，最终由产品入口迁入 `extensions/navis-code/`。
 
 ### 1.2 职责边界
 
@@ -846,4 +846,5 @@ type UIEvents = {
 单元测试：组件渲染、状态管理、主题切换、右侧面板区布局递推
 集成测试：布局响应式、HostView surface 渲染、右侧动态面板区开关与重排、路由导航
 ```
+
 

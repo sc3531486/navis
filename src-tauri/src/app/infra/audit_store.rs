@@ -83,6 +83,7 @@ impl AuditSink for StorageAuditSink {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::app::infra::Database;
     use crate::kernel::{AuditStatus, KernelContext, KernelScope};
 
     #[test]

@@ -141,47 +141,30 @@ export function executeExtensionPoint(point: UiExtensionPointRegistration): bool
 }
 
 /**
- * inline 扩展点宿主目标，与后端 `format!("{:?}", InlineTarget)` 的 Debug 序列化对齐
- * （PascalCase：Chat / Editor / Terminal，见 src-tauri/src/extension/models.rs InlineTarget）。
+ * inline 扩展点宿主目标。
+ *
+ * 目标由扩展协议声明，宿主不内置任何产品领域枚举。
  */
-export type InlineHostTarget = 'Chat' | 'Editor' | 'Terminal';
+export type InlineHostTarget = string;
 
-export const INLINE_HOST_TARGETS: readonly InlineHostTarget[] = ['Chat', 'Editor', 'Terminal'];
-
-export function isInlineHostTarget(value: string | null | undefined): value is InlineHostTarget {
-  return typeof value === 'string' && (INLINE_HOST_TARGETS as readonly string[]).includes(value);
-}
-
-/** 从扩展点 data 透传字段取字符串（DTO 无顶层 icon/position，icon 仅存于 data）。 */
+/** 从扩展点 data 透传字段取字符串（DTO 无顶层字段时使用 data）。 */
 export function extensionPointDataString(point: UiExtensionPointRegistration, key: string): string | null {
   if (!isRecord(point.data)) return null;
   const value = point.data[key];
   return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
-/** 工具栏/状态栏扩展项 icon（manifest ToolbarItemRegistration.icon 经 data 透传）。 */
+/** 扩展点图标，具体展示位置由产品扩展决定。 */
 export function extensionPointIcon(point: UiExtensionPointRegistration): string | null {
   return extensionPointDataString(point, 'icon');
 }
 
-/** inline 扩展点在宿主目标内的位置（BeforeInput / AfterMessages / Sidebar / Top / Bottom）。 */
+/** inline 扩展点位置，具体位置语义由使用方扩展决定。 */
 export function inlinePointPosition(point: UiExtensionPointRegistration): string | null {
   return extensionPointDataString(point, 'position');
 }
 
-/**
- * 按宿主目标过滤 inline 扩展点。fail-closed：未知 target 一律不匹配。
- * target 语义与后端 InlineTarget Debug 序列化一致（Chat/Editor/Terminal）。
- */
+/** 按扩展声明的宿主目标过滤 inline 扩展点。 */
 export function inlineExtensionPointsFor(target: InlineHostTarget): UiExtensionPointRegistration[] {
   return extensionPointsByKind('inline').filter((point) => point.target === target);
 }
-
-/** Composer 工具栏承接的 inline 扩展点：Chat 目标 + BeforeInput 位置。 */
-export function composerInlineExtensionPoints(): UiExtensionPointRegistration[] {
-  return inlineExtensionPointsFor('Chat').filter((point) => {
-    const position = inlinePointPosition(point);
-    return position === null || position === 'BeforeInput';
-  });
-}
-

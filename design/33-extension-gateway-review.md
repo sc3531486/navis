@@ -1,3 +1,5 @@
+> 归属说明：本文是扩展与 Gateway 的历史复核记录。Gateway 业务归属 `extensions/navis-code/navis-ai-platform/`；文中旧 `src-tauri/src/ai/gateway/` 路径只表示当时审计快照，不是通用框架边界。
+
 # Navis Go 架构复核：Extension × Gateway × HostView
 
 > 复核目标：高内聚、低耦合、符合代码开发规范、高扩展，实现“万物皆可 Extension 接入”。不同模型、不同请求协议、不同响应协议和不同流式返回格式，均应通过新增 Extension 或新增声明式适配配置接入，不修改 Gateway 主流程。
@@ -1033,3 +1035,4 @@ npm run test:stream
 3. 阶段 B：补齐 CustomAdapter request capability validation、下游 usage 可用性消费、Stream 统一路径 HTTP provider fixture 与声明式字段全覆盖测试。
 4. 阶段 C/F：完成剩余 contribution family 宿主接线和 Extension runtime handler execution entry，解除相应 fail-closed。
 5. 清理项：project/knowledge 死模块、foundation↔project 循环、logger P1-1/P1-2、reliability 死配置。
+

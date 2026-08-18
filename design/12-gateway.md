@@ -1,3 +1,5 @@
+> 归属说明：Gateway 是 Navis Code 的 `navis-ai-platform` 扩展能力。本文描述业务扩展合同，不表示 Gateway 实现在通用 Navis 宿主目录。
+
 # 12 - Gateway 模型网关详细设计
 
 > 模块编号：12 | 层级：能力层
@@ -25,7 +27,7 @@ Gateway 不负责 Agent 决策、Prompt 组装、工具选择、Session 持久�
 
 ## 二、代码边界
 
-src-tauri/src/ai/gateway/ 下的职责如下：
+Navis Code 的 `navis-ai-platform/ExtensionBackend/`（历史实现曾位于 `src-tauri/src/ai/gateway/`）职责如下：
 
 - mod.rs：Gateway composition、统一请求入口、Provider 生命周期边界。
 - request.rs：ChatRequest、ApiProtocol、ProviderConfig、ModelConfig。
@@ -165,3 +167,5 @@ UI 不硬编码 chat_completions、responses 或任意 Provider 分支。Provide
 必须覆盖 ApiProtocol round-trip、内建 Adapter Registry resolve、自定义 Adapter owner acquire/release、重复 ID、坏 adapterId、缺失 defaultModel、未知协议、Extension enable 回滚、secret_ref 隔离、SSE/NDJSON/JSON Lines framing、done marker、usage、finish reason、provider error、提前断开、模板/path/header/endpoint/大小限制和动态 catalog。
 
 完成标准：新增模型、Provider 或协议时只新增 Adapter 实现或 Extension manifest；Gateway router、UI Settings 和 Kernel 不修改。所有未知能力 fail-closed，禁用 Extension 后无残留运行时资源。
+
+

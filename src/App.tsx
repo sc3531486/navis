@@ -1,16 +1,13 @@
 /* @refresh reload */
-import { render } from 'solid-js/web';
-import AppRoutes from './router';
-import './theme/variables.css';
-import './theme/light.css';
-import './theme/dark.css';
+import { FrameworkLifecycle } from './bootstrap';
+import { HostViewSurface } from './components/HostView';
 
-const root = document.getElementById('root');
-
-if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
-  throw new Error(
-    'Root element not found. Did you forget to add it to index.html? Maybe the id attribute got misspelled?',
+export default function App() {
+  return (
+    <FrameworkLifecycle>
+      <div class="flex h-screen w-screen items-center justify-center bg-white text-[#242424]">
+        <HostViewSurface zone="main" title="Extensions" />
+      </div>
+    </FrameworkLifecycle>
   );
 }
-
-render(() => <AppRoutes />, root!);

@@ -113,13 +113,13 @@ fn count_block_comment_markers(line: &str) -> (usize, usize) {
 
 /// 检查一行中是否包含完整单词形式的 forbidden 关键词
 fn contains_business_keyword(line: &str) -> Option<&'static str> {
+    // `extension` 是 Navis/Cordis 的通用运行时边界术语，不代表具体产品业务；
+    // crate::extension 反向依赖仍由导入边界测试单独禁止。
     let forbidden = [
         "tool",
         "session",
         "agent",
         "provider",
-        "extension",
-        "extension",
         "mcp",
         "permission",
         "thinking",
@@ -260,8 +260,8 @@ fn kernel_does_not_import_business_modules() {
 /// 误报会自动记录，供开发者确认是否为合理用法后添加到白名单。
 ///
 /// 禁止词汇（全词匹配）：
-/// tool, session, agent, provider, extension, extension, mcp, permission,
-/// thinking, terminal, gateway, sandbox
+/// tool, session, agent, provider, mcp, permission, thinking, terminal,
+/// gateway, sandbox。`extension` 是 Cordis 的通用运行时术语，不属于业务词汇。
 #[test]
 fn kernel_does_not_contain_business_vocabulary() {
     let files = collect_kernel_rs_files();

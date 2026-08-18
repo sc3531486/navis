@@ -61,65 +61,6 @@ pub trait BackendProcessPort: Send + Sync + 'static {
 pub const SERVICE_COMPONENT_REGISTRY: &str = "component_registry";
 /// 全局策略引擎 capability 服务名。
 pub const SERVICE_POLICY_ENGINE: &str = "policy_engine";
-/// Agent 编排循环 capability 服务名（38 §2.5）。
-pub const SERVICE_AGENT_LOOP: &str = "agentLoop";
-
-// ── Agent loop service seam（38 §2.5）────────────────────────────────────────
-//
-// 对标 deepseek 的 `ctx.agentLoop` service seam：容器提供默认实现，扩展可替换。
-// 只定义最小 turn 契约，避免强绑定 `run_agent_tool_loop` 的完整参数面；D4 迁移
-// 编排逻辑时可演进补齐（消息列表、channel、审批上下文等）。
-
-/// agent loop 服务的输入上下文。
-///
-/// 从 `ui::runtime::agent_tool_loop::run_agent_tool_loop` 参数抽取最核心字段
-/// （会话 ID / worktree / 用户消息）；不强行完整，D4 可演进。
-#[derive(Debug, Clone)]
-pub struct AgentLoopContext {
-    /// 会话 ID。
-    pub session_id: String,
-    /// 会话绑定的工作目录根（worktree），可为空。
-    pub worktree: Option<String>,
-    /// 本轮用户输入消息文本。
-    pub message: String,
-}
-
-/// agent loop 服务的输出结果。
-///
-/// 最小枚举，避免强绑定完整 `ChatResponse`；D4 填充真实编排时可演进。
-#[derive(Debug, Clone, PartialEq)]
-pub enum AgentLoopOutcome {
-    /// 直接响应文本（未进入工具循环）。
-    Direct(String),
-    /// 经过工具循环后的最终消息文本列表。
-    FinalMessages(Vec<String>),
-}
-
-/// Agent 编排循环服务缝（38 §2.5）。容器提供默认实现，扩展可替换。
-pub trait AgentLoopPort: Send + Sync + 'static {
-    /// 执行一个完整 turn（消息 → 工具循环 → 最终响应）。
-    fn run_turn(&self, ctx: AgentLoopContext) -> Result<AgentLoopOutcome, String>;
-}
-
-/// agentLoop capability 服务的默认实现（浅占位）。
-///
-/// D4 后续把 `ui::runtime::agent_tool_loop::run_agent_tool_loop` 的编排迁入本
-/// 实现；当前先告警并返回占位错误，确保白板空壳与未迁移状态下 fail-closed。
-/// 默认实现放在 seam 旁（`extension::lifecycle::cordis`）以便容器组合根直接
-/// 引用；`ui::runtime` 对 `app` 模块私有，D4 迁移编排时可随 `run_agent_tool_loop`
-/// 一并落到 `ui::runtime`。
-pub struct DefaultAgentLoopPort;
-
-impl AgentLoopPort for DefaultAgentLoopPort {
-    fn run_turn(&self, ctx: AgentLoopContext) -> Result<AgentLoopOutcome, String> {
-        tracing::warn!(
-            session_id = %ctx.session_id,
-            "agentLoop default implementation pending D4 migration"
-        );
-        Err("agentLoop default impl not wired yet".to_string())
-    }
-}
-
 /// 后端扩展 apply 回调：接收 Cordis 上下文与扩展 manifest。
 pub type CordisExtensionApply = Arc<
     dyn Fn(&Context, &ExtensionManifest) -> anyhow::Result<PluginOutput> + Send + Sync + 'static,
@@ -142,10 +83,7 @@ impl ExtensionCordisPlugin {
     /// 登记到 fiber，fiber 撤销时逆序执行。
     pub fn new<F>(manifest: ExtensionManifest, apply: F) -> Self
     where
-        F: Fn(&Context, &ExtensionManifest) -> anyhow::Result<PluginOutput>
-            + Send
-            + Sync
-            + 'static,
+        F: Fn(&Context, &ExtensionManifest) -> anyhow::Result<PluginOutput> + Send + Sync + 'static,
     {
         Self {
             manifest: Arc::new(manifest),
@@ -191,7 +129,9 @@ impl ExtensionCordisPlugin {
                 // disposer（残余事实保留在 runtime_handles 账本供 retry）。这里
                 // 再 dispose fiber 移除注册表记录，避免 Failed fiber 滞留宿主。
                 let _ = fiber.dispose();
-                Err(anyhow!("extension `{extension_id}` failed to start: {error}"))
+                Err(anyhow!(
+                    "extension `{extension_id}` failed to start: {error}"
+                ))
             }
         }
     }
@@ -202,10 +142,7 @@ impl ExtensionCordisPlugin {
 /// 生产装配时经 `SERVICE_LIFECYCLE` 注入全局生命周期（宿主在组合根注册）；
 /// 缺服务时保持 fail-closed。注册逻辑在 `state::apply_extension_fiber` 内完成，
 /// 副作用经 `ctx.effect` disposer 登记，fiber dispose / apply 失败时逆序撤销。
-pub fn default_apply(
-    ctx: &Context,
-    manifest: &ExtensionManifest,
-) -> anyhow::Result<PluginOutput> {
+pub fn default_apply(ctx: &Context, manifest: &ExtensionManifest) -> anyhow::Result<PluginOutput> {
     let lifecycle: Option<Arc<ExtensionLifecycle>> =
         super::super::context::resolve_capability(ctx, SERVICE_LIFECYCLE)?;
     let lifecycle = lifecycle.ok_or_else(|| {
@@ -249,15 +186,6 @@ mod tests {
         }
     }
 
-    /// 测试用 agent loop 实现：把输入消息作为直接响应回显。
-    struct TestAgentLoopPort;
-
-    impl AgentLoopPort for TestAgentLoopPort {
-        fn run_turn(&self, ctx: AgentLoopContext) -> Result<AgentLoopOutcome, String> {
-            Ok(AgentLoopOutcome::Direct(ctx.message))
-        }
-    }
-
     #[test]
     fn install_plugin_with_default_apply_starts_and_tracks_fiber() {
         let event_bus: Arc<dyn EventBus> = Arc::new(crate::kernel::InMemoryEventBus::new(
@@ -274,8 +202,11 @@ mod tests {
         let lifecycle = ExtensionLifecycle::new(store, skills, event_bus);
 
         let host = HostExtensionContext::new();
-        host.register_capability_service::<ExtensionLifecycle>(SERVICE_LIFECYCLE, Arc::new(lifecycle))
-            .unwrap();
+        host.register_capability_service::<ExtensionLifecycle>(
+            SERVICE_LIFECYCLE,
+            Arc::new(lifecycle),
+        )
+        .unwrap();
 
         let plugin = ExtensionCordisPlugin::new(test_manifest("extension-a"), default_apply);
         let fiber = plugin.install(&host).unwrap();
@@ -293,43 +224,5 @@ mod tests {
         let plugin = ExtensionCordisPlugin::new(test_manifest("extension-b"), default_apply);
         let error = plugin.install(&host).unwrap_err().to_string();
         assert!(error.contains("lifecycle"), "unexpected error: {error}");
-    }
-
-    #[test]
-    fn agent_loop_capability_service_registration_round_trip() {
-        let host = HostExtensionContext::new();
-
-        // 提供前擦除为 `Arc<dyn AgentLoopPort>`，存入 Cordis service。
-        host.register_capability_service::<dyn AgentLoopPort>(
-            SERVICE_AGENT_LOOP,
-            Arc::new(TestAgentLoopPort),
-        )
-        .unwrap();
-
-        let ctx = AgentLoopContext {
-            session_id: "session-test".into(),
-            worktree: Some("D:\\worktree".into()),
-            message: "hello".into(),
-        };
-
-        let provided: Arc<dyn AgentLoopPort> = host
-            .get_capability_service::<dyn AgentLoopPort>(SERVICE_AGENT_LOOP)
-            .unwrap()
-            .expect("agentLoop capability service should be visible after registration");
-        assert_eq!(
-            provided.run_turn(ctx.clone()).unwrap(),
-            AgentLoopOutcome::Direct("hello".into())
-        );
-
-        let required: Arc<dyn AgentLoopPort> = host
-            .require_capability_service::<dyn AgentLoopPort>(SERVICE_AGENT_LOOP)
-            .unwrap();
-        assert!(required.run_turn(ctx).is_ok());
-
-        // 缺省未注册时返回 None（fail-closed）。
-        assert!(host
-            .get_capability_service::<dyn AgentLoopPort>("missing")
-            .unwrap()
-            .is_none());
     }
 }

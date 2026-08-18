@@ -3,6 +3,7 @@
 //! The kernel layer only defines generic infrastructure:
 //! discovery, execution, notification, and authorization.
 
+pub mod cordis;
 pub mod audit;
 pub mod core;
 pub mod event;
@@ -15,6 +16,7 @@ pub mod snapshot;
 #[cfg(test)]
 mod boundary_test;
 
+pub use cordis::{CordisContext, Fiber, FiberManager, FiberState, NamedEntries, ScopedLayers, Service};
 pub use audit::{
     AuditDigest, AuditRecord, AuditRecorder, AuditSink, AuditStats, AuditStatus, BufferedAuditSink,
     FieldMeta, InMemoryAuditSink,

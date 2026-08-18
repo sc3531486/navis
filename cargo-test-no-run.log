@@ -1,0 +1,25 @@
+   Compiling navis v0.1.0 (D:\myworkspace\Navis Go\src-tauri)
+warning: linker stdout: 正在创建库 D:\myworkspace\Navis Go\target\debug\deps\navis-70ca1c87baffd398.lib 和对象 D:\myworkspace\Navis Go\target\debug\deps\navis-70ca1c87baffd398.exp
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `navis` (bin "navis" test) generated 1 warning
+warning: linker stdout: 正在创建库 D:\myworkspace\Navis Go\target\debug\deps\extension_contract-b433d0733229335d.lib 和对象 D:\myworkspace\Navis Go\target\debug\deps\extension_contract-b433d0733229335d.exp
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `navis` (test "extension_contract") generated 1 warning
+warning: linker stdout: 正在创建库 D:\myworkspace\Navis Go\target\debug\deps\navis.lib 和对象 D:\myworkspace\Navis Go\target\debug\deps\navis.exp
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `navis` (bin "navis") generated 1 warning
+warning: linker stdout: 正在创建库 D:\myworkspace\Navis Go\target\debug\deps\navis-c37b5acb546c8b0a.lib 和对象 D:\myworkspace\Navis Go\target\debug\deps\navis-c37b5acb546c8b0a.exp
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `navis` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 25s
+  Executable unittests src\lib.rs (D:\myworkspace\Navis Go\target\debug\deps\navis-c37b5acb546c8b0a.exe)
+  Executable unittests src\main.rs (D:\myworkspace\Navis Go\target\debug\deps\navis-70ca1c87baffd398.exe)
+  Executable tests\extension_contract.rs (D:\myworkspace\Navis Go\target\debug\deps\extension_contract-b433d0733229335d.exe)

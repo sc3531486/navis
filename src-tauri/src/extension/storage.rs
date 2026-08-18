@@ -83,7 +83,10 @@ impl ExtensionStorage {
                 let stored: StoredValue = serde_json::from_slice(&bytes)
                     .map_err(|error| format!("Failed to parse '{}': {error}", path.display()))?;
                 let now = now_millis();
-                if stored.expires_at.is_some_and(|expires_at| expires_at <= now) {
+                if stored
+                    .expires_at
+                    .is_some_and(|expires_at| expires_at <= now)
+                {
                     // 过期即清理：读取时删除并视为不存在。
                     let _ = fs::remove_file(&path);
                     return Ok(None);
@@ -108,7 +111,9 @@ impl ExtensionStorage {
         validate_key(key)?;
         validate_storage_value(value)?;
         if ttl_ms.is_some_and(|ttl| ttl > MAX_STORAGE_TTL_MS) {
-            return Err(format!("Extension storage ttl cannot exceed {MAX_STORAGE_TTL_MS} ms"));
+            return Err(format!(
+                "Extension storage ttl cannot exceed {MAX_STORAGE_TTL_MS} ms"
+            ));
         }
         if *scope == StorageScope::Ephemeral {
             return self.ephemeral_set(extension_id, key, value.clone());
@@ -280,7 +285,11 @@ pub(crate) fn validate_key(key: &str) -> Result<(), String> {
     if key.trim().is_empty() || key.len() > 512 {
         return Err("Extension storage key must be 1..512 bytes".to_string());
     }
-    if key.contains("..") || key.contains('\\') || key.starts_with('/') || key.chars().any(char::is_control) {
+    if key.contains("..")
+        || key.contains('\\')
+        || key.starts_with('/')
+        || key.chars().any(char::is_control)
+    {
         return Err("Extension storage key contains unsafe path-like characters".to_string());
     }
     Ok(())
@@ -313,17 +322,20 @@ fn validate_json_value(value: &Value, depth: usize) -> Result<(), String> {
         }
         _ => {}
     }
-    let encoded = serde_json::to_vec(value).map_err(|error| format!("Invalid JSON storage value: {error}"))?;
+    let encoded = serde_json::to_vec(value)
+        .map_err(|error| format!("Invalid JSON storage value: {error}"))?;
     if encoded.len() > MAX_STORAGE_VALUE_BYTES {
-        return Err(format!("Extension storage value exceeds {MAX_STORAGE_VALUE_BYTES} bytes"));
+        return Err(format!(
+            "Extension storage value exceeds {MAX_STORAGE_VALUE_BYTES} bytes"
+        ));
     }
     Ok(())
 }
 
 /// worktree 标识 → 16 位 hex hash（用作目录名）。worktree scope 必须携带 worktree。
 pub(crate) fn worktree_hash(worktree: Option<&str>) -> Result<String, String> {
-    let worktree =
-        worktree.ok_or_else(|| "worktree storage scope requires a worktree argument".to_string())?;
+    let worktree = worktree
+        .ok_or_else(|| "worktree storage scope requires a worktree argument".to_string())?;
     let mut hasher = DefaultHasher::new();
     worktree.hash(&mut hasher);
     Ok(format!("{:016x}", hasher.finish()))
@@ -370,7 +382,14 @@ mod tests {
         let (storage, _dir) = test_storage();
         let scope = StorageScope::Global;
         storage
-            .set("ext.alpha", &scope, None, "theme", &json!({"mode": "dark", "size": 2}), None)
+            .set(
+                "ext.alpha",
+                &scope,
+                None,
+                "theme",
+                &json!({"mode": "dark", "size": 2}),
+                None,
+            )
             .unwrap();
         assert_eq!(
             storage.get("ext.alpha", &scope, None, "theme").unwrap(),
@@ -380,66 +399,203 @@ mod tests {
         storage
             .set("ext.alpha", &scope, None, "theme", &json!("light"), None)
             .unwrap();
-        assert_eq!(storage.get("ext.alpha", &scope, None, "theme").unwrap(), Some(json!("light")));
+        assert_eq!(
+            storage.get("ext.alpha", &scope, None, "theme").unwrap(),
+            Some(json!("light"))
+        );
     }
 
     #[test]
     fn missing_key_returns_none_and_delete_is_idempotent() {
         let (storage, _dir) = test_storage();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "nope").unwrap(), None);
-        assert!(storage.delete("ext.alpha", &StorageScope::Global, None, "nope").is_ok());
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "nope")
+                .unwrap(),
+            None
+        );
+        assert!(storage
+            .delete("ext.alpha", &StorageScope::Global, None, "nope")
+            .is_ok());
     }
 
     #[test]
     fn worktree_scope_is_isolated_by_worktree_hash() {
         let (storage, _dir) = test_storage();
         let scope = StorageScope::Worktree;
-        storage.set("ext.alpha", &scope, Some("/repo/a"), "key", &json!(1), None).unwrap();
-        storage.set("ext.alpha", &scope, Some("/repo/b"), "key", &json!(2), None).unwrap();
-        assert_eq!(storage.get("ext.alpha", &scope, Some("/repo/a"), "key").unwrap(), Some(json!(1)));
-        assert_eq!(storage.get("ext.alpha", &scope, Some("/repo/b"), "key").unwrap(), Some(json!(2)));
+        storage
+            .set("ext.alpha", &scope, Some("/repo/a"), "key", &json!(1), None)
+            .unwrap();
+        storage
+            .set("ext.alpha", &scope, Some("/repo/b"), "key", &json!(2), None)
+            .unwrap();
+        assert_eq!(
+            storage
+                .get("ext.alpha", &scope, Some("/repo/a"), "key")
+                .unwrap(),
+            Some(json!(1))
+        );
+        assert_eq!(
+            storage
+                .get("ext.alpha", &scope, Some("/repo/b"), "key")
+                .unwrap(),
+            Some(json!(2))
+        );
     }
 
     #[test]
     fn worktree_scope_requires_worktree_argument() {
         let (storage, _dir) = test_storage();
-        assert!(storage.set("ext.alpha", &StorageScope::Worktree, None, "key", &json!(1), None).is_err());
-        assert!(storage.clear("ext.alpha", &StorageScope::Worktree, None).is_err());
+        assert!(storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Worktree,
+                None,
+                "key",
+                &json!(1),
+                None
+            )
+            .is_err());
+        assert!(storage
+            .clear("ext.alpha", &StorageScope::Worktree, None)
+            .is_err());
     }
 
     #[test]
     fn delete_removes_key() {
         let (storage, _dir) = test_storage();
-        storage.set("ext.alpha", &StorageScope::Global, None, "a", &json!(1), None).unwrap();
-        storage.delete("ext.alpha", &StorageScope::Global, None, "a").unwrap();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "a").unwrap(), None);
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "a",
+                &json!(1),
+                None,
+            )
+            .unwrap();
+        storage
+            .delete("ext.alpha", &StorageScope::Global, None, "a")
+            .unwrap();
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "a")
+                .unwrap(),
+            None
+        );
     }
 
     #[test]
     fn clear_removes_only_target_scope() {
         let (storage, _dir) = test_storage();
-        storage.set("ext.alpha", &StorageScope::Global, None, "g", &json!(1), None).unwrap();
-        storage.set("ext.alpha", &StorageScope::Worktree, Some("/w"), "w", &json!(2), None).unwrap();
-        storage.clear("ext.alpha", &StorageScope::Worktree, Some("/w")).unwrap();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Worktree, Some("/w"), "w").unwrap(), None);
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "g",
+                &json!(1),
+                None,
+            )
+            .unwrap();
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Worktree,
+                Some("/w"),
+                "w",
+                &json!(2),
+                None,
+            )
+            .unwrap();
+        storage
+            .clear("ext.alpha", &StorageScope::Worktree, Some("/w"))
+            .unwrap();
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Worktree, Some("/w"), "w")
+                .unwrap(),
+            None
+        );
         // global 不受影响
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "g").unwrap(), Some(json!(1)));
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "g")
+                .unwrap(),
+            Some(json!(1))
+        );
         // 其他 worktree hash 不受影响
-        storage.set("ext.alpha", &StorageScope::Worktree, Some("/w2"), "w", &json!(3), None).unwrap();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Worktree, Some("/w2"), "w").unwrap(), Some(json!(3)));
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Worktree,
+                Some("/w2"),
+                "w",
+                &json!(3),
+                None,
+            )
+            .unwrap();
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Worktree, Some("/w2"), "w")
+                .unwrap(),
+            Some(json!(3))
+        );
     }
 
     #[test]
     fn clear_extension_removes_everything_and_keeps_others() {
         let (storage, _dir) = test_storage();
-        storage.set("ext.alpha", &StorageScope::Global, None, "g", &json!(1), None).unwrap();
-        storage.set("ext.alpha", &StorageScope::Worktree, Some("/w"), "w", &json!(2), None).unwrap();
-        storage.set("ext.beta", &StorageScope::Global, None, "g", &json!(3), None).unwrap();
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "g",
+                &json!(1),
+                None,
+            )
+            .unwrap();
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Worktree,
+                Some("/w"),
+                "w",
+                &json!(2),
+                None,
+            )
+            .unwrap();
+        storage
+            .set(
+                "ext.beta",
+                &StorageScope::Global,
+                None,
+                "g",
+                &json!(3),
+                None,
+            )
+            .unwrap();
         storage.clear_extension("ext.alpha").unwrap();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "g").unwrap(), None);
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Worktree, Some("/w"), "w").unwrap(), None);
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "g")
+                .unwrap(),
+            None
+        );
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Worktree, Some("/w"), "w")
+                .unwrap(),
+            None
+        );
         // 其他扩展不受影响
-        assert_eq!(storage.get("ext.beta", &StorageScope::Global, None, "g").unwrap(), Some(json!(3)));
+        assert_eq!(
+            storage
+                .get("ext.beta", &StorageScope::Global, None, "g")
+                .unwrap(),
+            Some(json!(3))
+        );
         // 幂等
         assert!(storage.clear_extension("ext.alpha").is_ok());
     }
@@ -448,10 +604,22 @@ mod tests {
     fn ttl_expiry_removes_file_and_returns_none() {
         let (storage, dir) = test_storage();
         storage
-            .set("ext.alpha", &StorageScope::Global, None, "k", &json!(1), Some(60_000))
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "k",
+                &json!(1),
+                Some(60_000),
+            )
             .unwrap();
         // 未过期读正常返回
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "k").unwrap(), Some(json!(1)));
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "k")
+                .unwrap(),
+            Some(json!(1))
+        );
         // 手工把 expires_at 改为过去，触发过期清理
         let file = dir
             .path()
@@ -464,7 +632,12 @@ mod tests {
             expires_at: Some(1),
         };
         fs::write(&file, serde_json::to_vec(&expired).unwrap()).unwrap();
-        assert_eq!(storage.get("ext.alpha", &StorageScope::Global, None, "k").unwrap(), None);
+        assert_eq!(
+            storage
+                .get("ext.alpha", &StorageScope::Global, None, "k")
+                .unwrap(),
+            None
+        );
         assert!(!file.exists(), "expired file should be removed on read");
     }
 
@@ -472,7 +645,14 @@ mod tests {
     fn ttl_upper_bound_rejected() {
         let (storage, _dir) = test_storage();
         assert!(storage
-            .set("ext.alpha", &StorageScope::Global, None, "k", &json!(1), Some(MAX_STORAGE_TTL_MS + 1))
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "k",
+                &json!(1),
+                Some(MAX_STORAGE_TTL_MS + 1)
+            )
             .is_err());
     }
 
@@ -481,7 +661,16 @@ mod tests {
         let (storage, _dir) = test_storage();
         for bad in ["..", "a/../b", "a\\b", "/lead", "ctrl\u{0007}"] {
             assert!(
-                storage.set("ext.alpha", &StorageScope::Global, None, bad, &json!(1), None).is_err(),
+                storage
+                    .set(
+                        "ext.alpha",
+                        &StorageScope::Global,
+                        None,
+                        bad,
+                        &json!(1),
+                        None
+                    )
+                    .is_err(),
                 "key should be rejected: {bad:?}"
             );
         }
@@ -492,9 +681,20 @@ mod tests {
         // `:` `?` `/` 等在 Windows 上是文件名非法字符；percent 编码后应可正常读写。
         let (storage, _dir) = test_storage();
         for key in ["a/b", "a:b", "a?b", "space key", "中文键"] {
-            storage.set("ext.alpha", &StorageScope::Global, None, key, &json!(key.to_string()), None).unwrap();
+            storage
+                .set(
+                    "ext.alpha",
+                    &StorageScope::Global,
+                    None,
+                    key,
+                    &json!(key.to_string()),
+                    None,
+                )
+                .unwrap();
             assert_eq!(
-                storage.get("ext.alpha", &StorageScope::Global, None, key).unwrap(),
+                storage
+                    .get("ext.alpha", &StorageScope::Global, None, key)
+                    .unwrap(),
                 Some(json!(key.to_string())),
                 "key roundtrip: {key}"
             );
@@ -504,40 +704,92 @@ mod tests {
     #[test]
     fn invalid_extension_id_rejected() {
         let (storage, _dir) = test_storage();
-        assert!(storage.set("../evil", &StorageScope::Global, None, "k", &json!(1), None).is_err());
+        assert!(storage
+            .set("../evil", &StorageScope::Global, None, "k", &json!(1), None)
+            .is_err());
     }
 
     #[test]
     fn value_validation_depth_and_size() {
         let (storage, _dir) = test_storage();
         let deep = (0..20).fold(json!(1), |acc, _| json!([acc]));
-        assert!(storage.set("ext.alpha", &StorageScope::Global, None, "deep", &deep, None).is_err());
+        assert!(storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "deep",
+                &deep,
+                None
+            )
+            .is_err());
         let big = json!({ "x": "x".repeat(300 * 1024) });
-        assert!(storage.set("ext.alpha", &StorageScope::Global, None, "big", &big, None).is_err());
+        assert!(storage
+            .set("ext.alpha", &StorageScope::Global, None, "big", &big, None)
+            .is_err());
         let bad_object_key = serde_json::from_str::<Value>(r#"{"a\u0000b": 1}"#).unwrap();
-        assert!(storage.set("ext.alpha", &StorageScope::Global, None, "bad", &bad_object_key, None).is_err());
+        assert!(storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "bad",
+                &bad_object_key,
+                None
+            )
+            .is_err());
     }
 
     #[test]
     fn ephemeral_scope_uses_in_memory_map() {
         let (storage, _dir) = test_storage();
         let scope = StorageScope::Ephemeral;
-        storage.set("ext.alpha", &scope, None, "k", &json!(1), None).unwrap();
-        assert_eq!(storage.get("ext.alpha", &scope, None, "k").unwrap(), Some(json!(1)));
+        storage
+            .set("ext.alpha", &scope, None, "k", &json!(1), None)
+            .unwrap();
+        assert_eq!(
+            storage.get("ext.alpha", &scope, None, "k").unwrap(),
+            Some(json!(1))
+        );
         storage.delete("ext.alpha", &scope, None, "k").unwrap();
         assert_eq!(storage.get("ext.alpha", &scope, None, "k").unwrap(), None);
-        storage.set("ext.alpha", &scope, None, "k", &json!(1), None).unwrap();
-        storage.set("ext.beta", &scope, None, "k", &json!(2), None).unwrap();
+        storage
+            .set("ext.alpha", &scope, None, "k", &json!(1), None)
+            .unwrap();
+        storage
+            .set("ext.beta", &scope, None, "k", &json!(2), None)
+            .unwrap();
         storage.clear("ext.alpha", &scope, None).unwrap();
         assert_eq!(storage.get("ext.alpha", &scope, None, "k").unwrap(), None);
-        assert_eq!(storage.get("ext.beta", &scope, None, "k").unwrap(), Some(json!(2)));
+        assert_eq!(
+            storage.get("ext.beta", &scope, None, "k").unwrap(),
+            Some(json!(2))
+        );
     }
 
     #[test]
     fn on_disk_layout_matches_design() {
         let (storage, dir) = test_storage();
-        storage.set("ext.alpha", &StorageScope::Global, None, "theme", &json!({"mode": "dark"}), None).unwrap();
-        storage.set("ext.alpha", &StorageScope::Worktree, Some("/repo/a"), "w", &json!(1), None).unwrap();
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Global,
+                None,
+                "theme",
+                &json!({"mode": "dark"}),
+                None,
+            )
+            .unwrap();
+        storage
+            .set(
+                "ext.alpha",
+                &StorageScope::Worktree,
+                Some("/repo/a"),
+                "w",
+                &json!(1),
+                None,
+            )
+            .unwrap();
         let base = dir.path().join("ext.alpha").join("storage");
         // global 文件直接落在 `storage/global/{key}.json`
         assert!(base.join("global").join("theme.json").is_file());

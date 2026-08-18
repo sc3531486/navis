@@ -267,10 +267,10 @@ impl Sandbox {
         let resolved_target = if target_path.is_absolute() {
             crate::extension::types::PathManager::normalize(target_path)
         } else {
-            crate::extension::types::PathManager::resolve(worktree_path, target_path)
+            crate::extension::types::PathManager::normalize(&crate::extension::types::PathManager::resolve(worktree_path, target_path))
         };
 
-        self.check_path(&resolved_target, &request.operation, worktree_path)
+        self.check_path(std::path::Path::new(&resolved_target), &request.operation, worktree_path)
     }
 
     // ======================================================================

@@ -400,7 +400,6 @@ pub fn ui_operation_register(
 pub async fn ui_operation_execute(
     extension_store: State<'_, Arc<ExtensionStore>>,
     operation_store: State<'_, Arc<OperationRegistry>>,
-//     mcp: State<'_, Arc<[REMOVED: MCP reference]
     mcp: State<'_, Arc<MCP>>,
     request: OperationExecuteRequest,
 ) -> Result<Value, String> {

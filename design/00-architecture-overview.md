@@ -1,5 +1,7 @@
 # Navis Go 架构总览
 
+> 本文描述 Navis 通用宿主与 Navis Code 产品扩展的边界。领域模块名称表示扩展能力，不表示它们属于宿主源码目录。
+
 > 本文档描述当前代码的分层、事实源和扩展边界。模块编号仅用于检索，具体合同以各模块设计文档和实际代码为准。
 
 ---
@@ -102,21 +104,22 @@ Extension view 通过 views、commands、menus 等声明接入 HostView。placem
 
 ```text
 src-tauri/src/
-├── app/         # composition root、状态装配、命令注册
-├── ai/          # Gateway、Agent、Context
-├── extension/   # Cordis 扩展基座、Extension manifest、loader、store、lifecycle、skills
-├── project/     # Project、Worktree、Session、Knowledge
-├── tool/        # MCP、Agent tools、LSP、文件、编辑、Git、终端等
-├── foundation/  # Config、Storage、Stream、Logger、IPC 基础件
+├── app/         # Tauri composition root 与通用基础设施装配
+├── extension/   # Cordis 扩展基座、manifest、loader、lifecycle、skills
+├── foundation/  # Config、Storage、Stream、Logger、IPC 基础能力
 ├── security/    # Auth、Sandbox、权限和审计约束
 ├── kernel/      # Registry、Pipeline、EventBus、Policy
-└── ui/          # Tauri commands、DTO、projection、events
+└── ui/          # 通用 Tauri commands、DTO、HostView projection、events
+
+extensions/navis-code/<extension-id>/
+├── ExtensionUI/       # Navis Code 业务前端扩展点
+└── ExtensionBackend/  # Navis Code 业务后端扩展点
 ```
 
 扩展代码固定目录：
 
-- 前端扩展点：`extensions/{id}/ExtensionUI/`
-- 后端扩展点：`extensions/{id}/ExtensionBackend/`
+- 前端扩展点：`extensions/<product>/<extension-id>/ExtensionUI/`
+- 后端扩展点：`extensions/<product>/<extension-id>/ExtensionBackend/`
 
 ---
 
@@ -143,3 +146,6 @@ Extension 禁用、卸载和回滚后，不能残留 Registry entry、Provider�
 - Registry 重复注册、未知协议和 schema 未知字段 fail-closed。
 - Gateway catalog、MCP tool catalog、LSP language projection 和 UI HostView projection 都由后端事实源生成。
 - cargo fmt --check、cargo check、cargo test、npm run build 通过。
+
+
+

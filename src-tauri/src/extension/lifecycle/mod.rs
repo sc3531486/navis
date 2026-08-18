@@ -38,7 +38,7 @@ use super::component::ComponentRegistry;
 
 use contributions::UiContributionRegistrar;
 pub(crate) use event::{
-    EventSubscriptionPort, ExtensionSubscriptionLedger, KernelEventSubscriptionAdapter,
+    EventSubscriptionPort, ExtensionSubscriptionLedger,
 };
 use families::{install_builtin_handlers, ContributionFamilyRegistry};
 
@@ -501,8 +501,8 @@ mod tests {
     use super::*;
     use crate::extension::models::*;
     use crate::extension::skills::Skills;
+    use crate::extension::types::MCP;
     use crate::foundation::config::Config;
-//     use [REMOVED: MCP reference]
     use std::path::PathBuf;
     use std::sync::OnceLock;
     use tokio::runtime::Runtime;
@@ -1519,7 +1519,7 @@ mod tests {
 
         let manifest = ExtensionManifest {
             id: "extension-mcp-override".into(),
-            name: "Extension MCP Override".into(),
+            name: "Extension Tool Override".into(),
             version: "1.0.0".into(),
             description: "test".into(),
             author: "test".into(),
@@ -1527,7 +1527,7 @@ mod tests {
             contributes: ExtensionContributes {
                 mcp_tool_overrides: Some(vec![McpToolOverride {
                     server: "builtin".into(),
-                    tool: "fs.read_file".into(),
+                    tool: "host.resource.read".into(),
                     model_name: Some("read_doc".into()),
                     user_visible: Some(true),
                     display_name: Some("Read documentation".into()),
@@ -1556,14 +1556,16 @@ mod tests {
             ExtensionLifecycle::new(Arc::clone(&store), skills, event_bus).with_mcp(mcp.clone());
         lifecycle.enable("extension-mcp-override").unwrap();
 
-        let tool = mcp.get_tool("fs.read_file").unwrap();
+        let tool = mcp.get_tool("host.resource.read").unwrap();
         assert_eq!(tool.model_name.as_deref(), Some("read_doc"));
         assert!(tool.user_visible);
-        assert_eq!(tool.ui_hint.unwrap().title, "Read documentation");
-        assert_eq!(tool.description, "Read a documentation file");
-        let renderer_hint = tool.renderer_hint.unwrap();
-        assert_eq!(renderer_hint.renderer, "docs.read");
-        assert_eq!(renderer_hint.detail_view.as_deref(), Some("markdown"));
+        assert!(matches!(tool.ui_hint, Some(crate::extension::types::ToolUiHint::Block)));
+        assert_eq!(tool.description.as_deref(), Some("Read a documentation file"));
+        assert!(matches!(
+            tool.renderer_hint,
+            Some(crate::extension::types::ToolRendererHint::Terminal)
+        ));
+        assert_eq!(tool.declared_risk, Some(crate::extension::types::ToolRiskLevel::Read));
     }
 
     #[test]
@@ -1586,7 +1588,7 @@ mod tests {
         );
         state.manifest.contributes.mcp_tool_overrides = Some(vec![McpToolOverride {
             server: "builtin".into(),
-            tool: "missing.tool".into(),
+            tool: "missing.resource".into(),
             model_name: Some("missing_tool".into()),
             user_visible: Some(true),
             display_name: None,

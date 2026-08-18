@@ -1,3 +1,7 @@
+# 历史审计快照
+
+> 本文记录 2026-08-17 之前的重构盘点，文中的旧路径仅用于解释当时的迁移来源，不代表当前目录结构或待办状态。当前架构以根目录 `ARCHITECTURE_REVIEW.md`、`MIGRATION-PLAN.md` 和 `AGENTS.md` 为准。
+
 # Context
 
 用户要求对全项目状态模型进行一次性全面治理：能统一的统一、能提取的提取为公共模块，并删除已验证不再使用的代码或文件，目标是高内聚、低耦合。此前已完成 Agent Timeline 的运行态动画和三份前端验证脚本修复，后续重构不得回退这些结果。用户明确要求暂不处理 Gateway SSRF/API Key 外泄；该项不纳入本计划。
@@ -178,3 +182,4 @@
 - Frontend: pure state presentation/polling/channel-run tests plus the three existing scripts and production build。
 - Runtime: execute every visible lifecycle path and verify label/tone/motion/ARIA, multiple panel subscriptions, session switching, terminal reconnect, extensions and stream cancellation.
 - Removal gates: global reference search before deletion and all build/test checks after deletion.
+

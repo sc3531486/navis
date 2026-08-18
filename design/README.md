@@ -1,10 +1,16 @@
 # Navis Go 设计文档总目录
 
-> Navis Go - AI 驱动的桌面开发工具 - 总体架构设计
+> Navis Go - 通用桌面应用白板与扩展运行时；Navis Code 是其第一个产品套件。
 > 技术栈：Solid.js + Kobalte + Tailwind CSS + Rust (Tauri)
-> 最后更新：2026-08-17
+> 最后更新：2026-08-18
 
 ---
+
+## 阅读边界
+
+本目录同时包含 Navis 通用框架设计和 Navis Code 业务设计。领域模块名称表示扩展能力，不表示它们属于 `src/` 或 `src-tauri/src/` 宿主源码目录。`08`-`21`、`26` 等领域文档描述 Navis Code 扩展；`01`-`07`、`22`-`27`、`34`-`38` 主要描述宿主、扩展和 UI 基础设施。
+
+当前 `src/router/`、`src/layouts/` 和部分宿主 store 仍是 Navis Code 产品壳的迁移过渡区。引用这些路径时必须明确写成“当前过渡代码”，不能称为通用框架业务能力。
 
 ## 文档结构
 
@@ -76,7 +82,7 @@ design/
 
 ### 大域结构
 
-当前 Rust 运行时按 `src-tauri/src/` 下九个业务域组织：`ai`、`app`、`extension`、`foundation`、`kernel`、`security`、`tool`、`ui`、`project`。设计文档编号用于检索，不再表示旧的运行时目录层级。
+当前 Rust 运行时的通用宿主位于 `src-tauri/src/` 的 `app`、`extension`、`foundation`、`kernel`、`security`、`ui` 等目录；Agent、会话、项目、工具等领域文档描述的是 `extensions/navis-code/` 下的业务扩展，不是宿主目录。设计文档编号用于检索，不表示运行时目录层级。
 
 EventBus 只有 `crate::kernel::EventBus` 一套。Tauri event 是 UI 侧只读事件出口，不叫 bridge，不保存事实，也不能作为后端业务事件源。
 
@@ -281,3 +287,6 @@ Extension（07）基于 Cordis 承载扩展组合与服务生命周期。`manife
 | **OpenCode** | Go channel 任务通信、轻量设计、配置驱动 |
 | **Hermes** | 工具生命周期、审批队列、危险操作分级、Session 恢复 |
 | **VS Code** | 扩展系统（contributes/views/commands）、Command Palette、分屏布局 |
+
+
+

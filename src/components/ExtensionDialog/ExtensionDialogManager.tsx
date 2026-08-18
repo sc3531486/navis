@@ -1,5 +1,5 @@
 import { Component, For, Show } from 'solid-js';
-import CloseIcon from '../Icon/CloseIcon';
+import CloseIcon from '@/components/Icon/CloseIcon';
 import HostViewRenderer from '../HostView/HostViewRenderer';
 import {
   closeExtensionDialog,

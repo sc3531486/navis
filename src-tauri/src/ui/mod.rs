@@ -11,7 +11,6 @@
 //! - host_view: 宿主视图
 //! - menus: 菜单系统
 //! - tauri_events: Tauri 事件
-//! - permissions: 权限管理
 //!
 //! 业务层模块已移到各自扩展：
 //! - gateway/lsp → navis-ai-platform
@@ -30,7 +29,6 @@ pub mod extension_storage;
 pub mod extension_stream;
 pub mod extensions;
 pub(crate) mod host_view;
-mod permissions;
 pub mod menus;
 pub mod tauri_events;
 

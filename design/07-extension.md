@@ -1,5 +1,7 @@
 # 07 - Cordis Extension 基座与清单 详细设计
 
+> 边界说明：本文描述通用 Navis 扩展运行时。Gateway、Agent、Session 等名称表示扩展贡献或能力合同，不表示这些业务属于 `src-tauri/src/`；Navis Code 业务位于 `extensions/navis-code/`。
+
 > 模块编号：07 | 层级：extension 大域
 > 依赖：Cordis（Rust：cordis-rs；前端宿主：@cordisjs/core）, 01-Logger, 02-IPC, 02b-Stream, kernel::EventBus, 06-Sandbox, 03-Config, 04-Storage
 > 被依赖：22-UI-Framework, 23-Command-Palette, 27-Hotkey, 12-Gateway, 13-MCP, 16-Agent
@@ -1997,3 +1999,4 @@ type ExtensionEvents = {
 单元测试：manifest 解析（含 eventSubscriptions）、未知字段拒绝、ExtensionEventDto 序列化（包括 `created_at` / `scopeKey` 字段名）、权限校验、生命周期状态转换、事件 subscription ledger、触发器前缀冲突检测、MenuTarget / host view renderer 映射校验
 集成测试：扩展安装/卸载、沙箱隔离、资源限制、事件订阅 fail-closed 与 cleanup 重试、触发器注册/注销/搜索/注入流程、工具栏/状态栏/内嵌组件注册与渲染
 ```
+

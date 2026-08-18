@@ -1032,7 +1032,7 @@ mod tests {
     use crate::foundation::config::Config;
     use crate::kernel::{SubscriptionId, Topic};
     use crate::extension::types::{
-        MCPServerConfig as HostMcpServerConfig, ToolDefinition, ToolDefinitionOverride,
+        MCP, MCPServerConfig as HostMcpServerConfig, ToolDefinition, ToolDefinitionOverride,
     };
 //     use [REMOVED: MCP reference]
     use std::path::PathBuf;

@@ -1,5 +1,7 @@
 # 36 — 扩展开发手册（Extension Development Guide）
 
+> 目录事实同步（2026-08-18）：仓库开发期扩展路径为 `extensions/<product>/<extension-id>/`，Navis Code 扩展位于 `extensions/navis-code/<extension-id>/`；运行时安装路径为 `<app_data>/extensions/<extension-id>/`。`src/` 和 `src-tauri/src/` 只允许通用宿主能力。
+
 > 状态：开发指南（权威、需反哺）
 > 日期：2026-08-16（v2：反哺 37 详设，目录规范归一 ExtensionUI/ExtensionBackend，新增组件轨）
 > 日期：2026-08-17（v3：扩展开发模型统一为 Cordis plugin；manifest 是插件元数据，contributes 是能力声明，loader 将固定目录中的扩展点装载为 Cordis plugin/service）
@@ -53,7 +55,7 @@ loader 的职责：读取 `extension.json` → 校验 `contributes` → 把 `Ext
 
 ### 扩展开发顺序
 
-1. 在 `extensions/{id}/` 下创建 manifest，目录名等于 `id`。
+1. 在 `extensions/<product>/<extension-id>/` 下创建 manifest，目录名等于 `id`。
 2. 前端代码放入 `ExtensionUI/`，后端扩展点放入 `ExtensionBackend/`。
 3. 在 `contributes` 中声明能力；loader 会将每条声明映射为 Cordis service 或宿主 projection。
 4. 逻辑优先使用 `components`（WASM 组件轨），仅纯前端胶水使用 `scripts`（Web Worker）。
@@ -495,7 +497,7 @@ extensions/my-extension/             # 仓库统一扩展根（目录名 = exten
 
 ### 安装 / 启用 / 禁用 / 卸载
 
-- 安装：复制到 `<app_data>/extensions/{id}/`（容器校验 manifest）。
+- 安装：复制到 `<app_data>/extensions/<product>/<extension-id>/`（容器校验 manifest）。
 - 启用：容器校验全部 contributes → 注册 projection → fail-closed 处理不支持项。
 - 禁用：清理 ephemeral 存储、回收 worker、关闭弹框、移除视图投影。
 - 卸载：删除扩展目录（含其存储目录）。
@@ -526,3 +528,5 @@ extensions/my-extension/             # 仓库统一扩展根（目录名 = exten
 > - manifest 新增 `components` 字段（`ComponentRegistration`，camelCase wire），loader 校验 entry 位于 ExtensionUI / ExtensionBackend 下。
 > - `backendServices` wire key 修正（原示例 snake_case 被 serde 静默忽略，C0-1 已修）。
 > - 新增 WASM 组件轨（§十），Worker 脚本降为前端胶水（可选）。
+
+

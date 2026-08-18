@@ -1,8 +1,8 @@
 import { createStore } from 'solid-js/store';
 import { invoke } from '@tauri-apps/api/core';
 import { canDispatchDeclarativeMenuAction } from './menu-actions';
-import type { UiExtensionView } from '../lib/extension-ui';
-import { evaluateMenuWhen } from '../lib/menu-when';
+import type { UiExtensionView } from '@/lib/extension-ui';
+import { evaluateMenuWhen } from '@/lib/menu-when';
 
 export type MenuTarget = string;
 

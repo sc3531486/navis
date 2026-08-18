@@ -416,16 +416,6 @@ pub struct UiExternalEditorConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UiToolPermissionRule {
-    pub permission: String,
-    pub pattern: String,
-    pub suggest: String,
-    pub auto_edit: String,
-    pub full_auto: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct UiEditorSettings {
     pub font_size: u32,
     pub tab_size: u32,
@@ -434,7 +424,6 @@ pub struct UiEditorSettings {
     pub format_on_save: bool,
     pub external_editors: Vec<UiExternalEditorConfig>,
     pub default_external_editor_id: Option<String>,
-    pub tool_permissions: Vec<UiToolPermissionRule>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1066,4 +1055,3 @@ mod tests {
         assert_eq!(decoded.view, extension_view.view);
     }
 }
-

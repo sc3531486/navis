@@ -1,0 +1,334 @@
+.navis-chat-messages {
+  background: var(--navis-light-panel);
+  overflow-y: scroll;
+  padding: 20px 28px 20px 18px;
+  scrollbar-gutter: stable both-edges;
+}
+
+.navis-chat-list {
+  gap: 16px;
+  margin-left: 12px;
+  margin-right: auto;
+  max-width: min(760px, calc(100% - 12px));
+}
+
+.navis-chat-list > .navis-conversation-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+.navis-chat-messages.is-compact {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.navis-chat-messages.is-compact .navis-chat-list {
+  margin-left: 8px;
+  max-width: min(760px, calc(100% - 8px));
+}
+
+.navis-chat-messages.is-compact .navis-chat-list {
+  gap: 8px;
+}
+
+.navis-chat-messages.is-compact .navis-message-role {
+  margin-bottom: 2px;
+}
+
+.navis-chat-messages.is-compact .navis-message-content {
+  padding-bottom: 4px;
+  padding-top: 4px;
+  line-height: 1.45;
+}
+
+.navis-chat-messages.is-raw .navis-chat-list {
+  gap: 10px;
+}
+
+.navis-message-role {
+  margin-bottom: 4px;
+}
+
+.navis-message {
+  max-width: min(760px, 100%);
+}
+
+.navis-message.is-user {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: min(760px, 100%);
+}
+
+.navis-message.is-navis {
+  max-width: min(760px, 100%);
+  width: min(760px, 100%);
+}
+
+.navis-message.is-working {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.navis-message-content {
+  color: #242424;
+  line-height: 1.58;
+  max-width: min(760px, 100%);
+  overflow-wrap: anywhere;
+  width: 100%;
+}
+
+.navis-message-paragraph {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.navis-message-paragraph + .navis-message-paragraph,
+.navis-message-paragraph + .navis-message-code-block,
+.navis-message-code-block + .navis-message-paragraph {
+  margin-top: 10px;
+}
+
+.navis-message-code-block {
+  background: var(--navis-light-shell);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 12px;
+  color: #252525;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 10px 0 0;
+  max-width: min(760px, 100%);
+  overflow: auto;
+  padding: 11px 13px;
+  position: relative;
+  scrollbar-gutter: stable;
+  white-space: pre;
+}
+
+.navis-message-code-block code {
+  display: block;
+  white-space: pre;
+}
+
+.navis-message-code-language {
+  color: #7b7b7b;
+  display: block;
+  font-family: "Aptos", "Segoe UI", sans-serif;
+  font-size: 11px;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-transform: lowercase;
+}
+
+.navis-message-bubble {
+  background: var(--navis-light-cowork-tab);
+  border: 0;
+  border-radius: 16px;
+  color: #111111;
+  padding: 13px 18px;
+}
+
+.navis-message-navis {
+  background: transparent;
+  border: 0;
+  padding: 2px 0;
+  width: 100%;
+}
+
+.navis-message-pending {
+  background: var(--navis-light-cowork-tab);
+  opacity: 0.78;
+}
+
+.navis-message-attachments {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  max-width: min(520px, 100%);
+}
+
+.navis-message-attachments.is-pending {
+  opacity: 0.86;
+}
+
+.navis-message-attachment {
+  align-items: center;
+  background: var(--navis-light-card);
+  border: 0;
+  border-radius: 12px;
+  display: inline-flex;
+  gap: 9px;
+  max-width: min(280px, 100%);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.navis-message-attachment.is-image {
+  background: transparent;
+  border-radius: 14px;
+}
+
+.navis-message-attachment-image {
+  background: var(--navis-light-shell);
+  border-radius: 14px;
+  display: block;
+  max-height: 180px;
+  max-width: min(280px, 100%);
+  object-fit: cover;
+}
+
+.navis-message-attachment-file-icon {
+  align-items: center;
+  background: var(--navis-light-shell);
+  color: #666666;
+  display: flex;
+  flex: 0 0 auto;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.navis-message-attachment-file-icon svg {
+  height: 17px;
+  width: 17px;
+}
+
+.navis-message-attachment-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 7px 10px 7px 0;
+}
+
+.navis-message-attachment-name {
+  color: #252525;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navis-message-attachment-kind {
+  color: #777777;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.navis-message-thinking {
+  align-items: center;
+  color: #666666;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 9px;
+  line-height: 20px;
+  margin-top: 4px;
+  padding: 8px 2px;
+}
+
+.navis-message-thinking-copy {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.navis-message-thinking-duration {
+  color: #a0a0a0;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.navis-chat-loading-older {
+  align-self: center;
+  color: #8a8a8a;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 2px 0 4px;
+}
+
+.navis-guided-conversation-note {
+  color: #a0a0a0;
+  font-size: 13px;
+  line-height: 20px;
+  margin: 0 0 8px;
+}
+
+.navis-thinking-mark {
+  animation: navis-running-spin 1.4s linear infinite;
+  background: currentColor;
+  display: inline-block;
+  height: 22px;
+  mask: url('../../assets/thinking.svg') center / contain no-repeat;
+  -webkit-mask: url('../../assets/thinking.svg') center / contain no-repeat;
+  width: 22px;
+}
+
+.navis-agent-message-text {
+  color: #242424;
+  font-size: 14px;
+  line-height: 1.58;
+  max-width: min(760px, 100%);
+  overflow-wrap: anywhere;
+  padding: 4px 0;
+}
+
+.navis-agent-message-text .navis-message-paragraph + .navis-message-paragraph,
+.navis-agent-message-text .navis-message-paragraph + .navis-message-code-block,
+.navis-agent-message-text .navis-message-code-block + .navis-message-paragraph {
+  margin-top: 10px;
+}
+
+.navis-chat-jump-latest {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 999px;
+  bottom: 16px;
+  box-shadow: none;
+  color: #111111;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  position: sticky;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+  width: 32px;
+  z-index: 6;
+}
+
+.navis-chat-jump-latest:hover {
+  background: var(--navis-light-surface);
+  border-color: var(--navis-light-line-strong);
+  transform: translateY(-1px);
+}
+
+.navis-message-raw {
+  background: var(--navis-light-shell);
+  border: 1px solid var(--navis-light-line);
+  border-radius: 12px;
+  color: #252525;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: min(760px, 100%);
+  overflow: auto;
+  padding: 11px 13px;
+  scrollbar-gutter: stable;
+  white-space: pre;
+}
+
+.navis-result-table {
+  margin-top: 12px;
+}
+
+.navis-result-cell {
+  padding: 8px 12px;
+}
+

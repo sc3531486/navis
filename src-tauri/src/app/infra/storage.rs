@@ -10,7 +10,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::kernel::{AuditRecorder, EventBus, EventEnvelope, KernelContext, KernelScope};
 
-use super::{AppState, Database, Encryption, audit_store, kv};
+use super::{audit_store, kv, AppState, Database, Encryption};
 use crate::extension::types::MemoryStore;
 
 /// 存储管理器
@@ -91,7 +91,7 @@ impl Storage {
     /// 业务 facade（MemoryStore）：承载 memories 业务 schema 访问，
     /// 属业务域概念，渐进迁出到业务域；本模块暂保留连接宿主能力。
     pub fn memory_store(&self) -> MemoryStore {
-        MemoryStore::new(self.conn.clone())
+        MemoryStore::new()
     }
 
     /// 获取加密模块
@@ -109,10 +109,12 @@ impl Storage {
         self.audit_recorder.clone()
     }
 
-
     /// 读取通用 KV 值。领域 facade 应负责 key 命名空间隔离；这里仅暴露 Storage 统一入口。
     pub fn kv_get(&self, key: &str) -> Result<Option<serde_json::Value>> {
-        let conn = self.conn.lock().map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
         kv::kv_get(&conn, &self.encryption, key)
     }
 
@@ -123,19 +125,28 @@ impl Storage {
         value: &serde_json::Value,
         ttl: Option<std::time::Duration>,
     ) -> Result<()> {
-        let conn = self.conn.lock().map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
         kv::kv_set(&conn, &self.encryption, key, value, ttl)
     }
 
     /// 删除通用 KV 值。
     pub fn kv_delete(&self, key: &str) -> Result<()> {
-        let conn = self.conn.lock().map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
         kv::kv_delete(&conn, key)
     }
 
     /// 按前缀列出通用 KV 值。
     pub fn kv_list(&self, prefix: &str) -> Result<Vec<(String, serde_json::Value)>> {
-        let conn = self.conn.lock().map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|_| anyhow::anyhow!("storage connection mutex poisoned"))?;
         kv::kv_list(&conn, &self.encryption, prefix)
     }
 
@@ -250,7 +261,7 @@ mod tests {
         let conn = storage.connection();
 
         // 测试连接可用
-        let result: Result<i32, _> = conn.query_row("SELECT 1", [], |row| row.get(0));
+        let result: Result<i32, _> = conn.lock().unwrap().query_row("SELECT 1", [], |row| row.get(0));
         match result {
             Ok(val) => assert_eq!(val, 1),
             Err(e) => panic!("Connection test failed: {:?}", e),

@@ -27,17 +27,8 @@ fn all_repo_extensions_follow_fixed_directory_contract() {
     );
 
     let loader = ExtensionLoader::new();
-    let mut extension_dirs = std::fs::read_dir(&root)
-        .expect("read extensions root")
-        .filter_map(Result::ok)
-        .filter(|entry| {
-            entry
-                .file_type()
-                .map(|file_type| file_type.is_dir())
-                .unwrap_or(false)
-        })
-        .map(|entry| entry.path())
-        .collect::<Vec<_>>();
+    let mut extension_dirs = Vec::new();
+    collect_extension_dirs(&root, &mut extension_dirs);
     extension_dirs.sort();
     assert!(
         !extension_dirs.is_empty(),
@@ -141,6 +132,82 @@ fn all_repo_extensions_follow_fixed_directory_contract() {
                     dir.display()
                 );
             }
+        }
+    }
+}
+
+/// 递归收集扩展目录，允许产品扩展以套件目录组织多个业务扩展。
+fn collect_extension_dirs(root: &Path, output: &mut Vec<PathBuf>) {
+    let Ok(entries) = std::fs::read_dir(root) else {
+        return;
+    };
+
+    for entry in entries.filter_map(Result::ok) {
+        let path = entry.path();
+        let Ok(file_type) = entry.file_type() else {
+            continue;
+        };
+        if !file_type.is_dir() {
+            continue;
+        }
+
+        if path.join("extension.json").is_file() {
+            output.push(path);
+        } else {
+            collect_extension_dirs(&path, output);
+        }
+    }
+}
+
+/// 扩展后端源码不得反向依赖已移除的宿主业务命名空间。
+#[test]
+fn extension_backend_sources_are_physically_decoupled_from_host_business() {
+    let root = repo_extensions_root();
+    let mut extension_dirs = Vec::new();
+    collect_extension_dirs(&root, &mut extension_dirs);
+
+    let forbidden = [
+        "crate::domains::",
+        "crate::ai::",
+        "crate::tool::",
+        "crate::project::",
+        "crate::business::",
+        "src-tauri/src/",
+    ];
+
+    for extension_dir in extension_dirs {
+        let backend_root = extension_dir.join("ExtensionBackend");
+        let mut source_files = Vec::new();
+        collect_rust_sources(&backend_root, &mut source_files);
+        for source_file in source_files {
+            let content = std::fs::read_to_string(&source_file).unwrap_or_else(|error| {
+                panic!("无法读取扩展后端源码 {}: {error}", source_file.display())
+            });
+            for prefix in forbidden {
+                assert!(
+                    !content.contains(prefix),
+                    "扩展后端不得反向依赖宿主业务命名空间 {prefix}: {}",
+                    source_file.display()
+                );
+            }
+        }
+    }
+}
+
+fn collect_rust_sources(root: &Path, output: &mut Vec<PathBuf>) {
+    let Ok(entries) = std::fs::read_dir(root) else {
+        return;
+    };
+
+    for entry in entries.filter_map(Result::ok) {
+        let path = entry.path();
+        let Ok(file_type) = entry.file_type() else {
+            continue;
+        };
+        if file_type.is_dir() {
+            collect_rust_sources(&path, output);
+        } else if file_type.is_file() && path.extension().and_then(|value| value.to_str()) == Some("rs") {
+            output.push(path);
         }
     }
 }

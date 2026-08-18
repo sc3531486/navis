@@ -172,8 +172,8 @@ fn cleanup_lru_if_needed(
 
 #[cfg(test)]
 mod tests {
+    use crate::app::infra::db::Database;
     use super::*;
-    use super::db::Database;
     use std::sync::Mutex;
 
     #[test]

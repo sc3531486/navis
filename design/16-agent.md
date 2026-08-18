@@ -1,3 +1,5 @@
+> 归属说明：Agent 决策与编排属于 Navis Code 的 `navis-agent-core` 扩展。本文中的旧 Rust 路径是迁移前定位，当前实现和新增代码应放在 `extensions/navis-code/navis-agent-core/`。
+
 # 16 - Agent 决策引擎 详细设计
 
 > 模块编号：16 | 层级：AI 核心层
@@ -111,7 +113,7 @@ Stop/Cancel 必须同时取消流和关闭 Turn Timeline 事实。`ui_cancel_str
 
 #### ToolGuardrail
 
-`ToolGuardrail` 位于 `src-tauri/src/tool/agent/guardrail.rs`，是 `tool/agent` 的执行前保护规则，不是 Kernel 新原语。它的执行落点必须是 Agent Tool Pipeline 的 `ToolGuardrailStage`，不能在 `tool/agent` runtime 中提前返回，也不能绕过后续观察、EventBus 和 Audit。
+`ToolGuardrail` 属于 `extensions/navis-code/navis-agent-core/ExtensionBackend/` 的 Agent Tool 执行前保护规则（历史实现曾位于 `src-tauri/src/tool/agent/guardrail.rs`），不是 Kernel 新原语。它的执行落点必须是 Agent Tool Pipeline 的 `ToolGuardrailStage`，不能在 `tool/agent` runtime 中提前返回，也不能绕过后续观察、EventBus 和 Audit。
 
 参考 Hermes 的工具循环 guardrail，Navis Go 在调用具体 MCP tool 之前检查最近 transcript：
 
@@ -1172,3 +1174,5 @@ ThinkingConfig {
 并行任务测试：多任务并发执行、Worktree 隔离与合并、单任务取消不影响其他任务
 Extended Thinking 测试：深度推理开关、Token 预算控制、思考过程流式输出
 ```
+
+

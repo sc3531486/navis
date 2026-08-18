@@ -1,112 +1,63 @@
-# Navis Go 业务迁移执行计划
+# Navis Go 架构迁移计划
 
-> 日期：2026-08-17
-> 目标：把所有业务代码从框架层物理迁移到 extensions/ 下的对应扩展目录，实现万物皆扩展。
+> 更新日期：2026-08-18
+> 状态：迁移进行中。本文只记录当前代码已经具备的能力，不把桩实现描述为完整业务实现。
 
----
+## 一、不可变边界
 
-## 一、现状
+1. `src/` 与 `src-tauri/src/` 只保留 Navis 通用宿主能力：窗口、白板、扩展发现与生命周期、Cordis/Kernel 原语、能力注册、事件、权限、存储、IPC、流和 UI 投影。
+2. Agent、Gateway、MCP、LSP、会话、项目、任务、编辑器、终端、设置、知识库、记忆，以及柜面系统、双录系统等全部是扩展业务。
+3. 新产品必须新增 `extensions/<product>/`，通过产品清单和产品入口组合扩展；新增产品不得修改 `src/` 或 `src-tauri/src/`。
+4. 扩展只能依赖 Navis 稳定能力契约和其他扩展的公开能力，不得依赖宿主业务模块或其他扩展的内部 store。
 
-### 已完成（C0-C1 + D1-D4）
-- extension/ 已创建 11 个扩展骨架（navis-ai-platform, navis-agent-core, navis-session 等）
-- Cordis 装配接线已落地（capability port → Cordis service、WASM 组件轨、事件订阅）
+## 二、当前已落地
 
-### 未完成（业务代码仍在框架层）
+- Navis 宿主前端已收敛到 `src/` 的白板、扩展视图投影、通用状态、主题、菜单、快捷键和桥接能力。
+- Navis 宿主后端已收敛到 `src-tauri/src/{kernel,extension,foundation,security,app,ui}`。
+- Navis Code 扩展套件已物理放入 `extensions/navis-code/<extension-id>/`，每个扩展具备 `extension.json`、`ExtensionUI/`、`ExtensionBackend/` 固定目录。
+- 开发期扩展扫描支持 `extensions/<product>/<extension>/extension.json`，运行时安装仍使用 `<app_data>/extensions/<extension-id>/`。
+- 根入口已经改为通用产品加载器：扫描 `extensions/*/product.json`，按请求产品、默认产品或首个产品选择入口；无产品时显示纯 Navis 白板。
+- 扩展后端的历史 `crate::domains::*`、`crate::ai::*`、`crate::tool::*` 等宿主反向引用已移除，后端源码由对应扩展目录自持有。
+- Cordis Context、Service、Fiber、Scope、扩展生命周期、能力服务、组件轨和事件订阅已接入通用宿主装配链路。
 
-**Rust 后端 src-tauri/src/ 中需迁出的业务模块：**
+## 三、当前真实未完成项
 
-| 模块 | 目标扩展 | 说明 |
-|------|---------|------|
-| ai/agent/ | navis-agent-core | Agent 决策引擎 |
-| ai/context/ | navis-agent-core | 上下文组装 |
-| ai/gateway/ | navis-ai-platform | 模型网关 |
-| tool/mcp/ | navis-ai-platform | MCP 工具协议引擎 |
-| tool/lsp/ | navis-ai-platform | LSP 语言服务协议 |
-| tool/terminal/ | navis-terminal | 终端管理 |
-| tool/file/ | navis-editor | 文件系统操作 |
-| tool/git/ | navis-editor | 版本控制 |
-| tool/clipboard/ | navis-editor | 剪贴板 |
-| tool/memory/ | navis-memory | Agent 记忆工具 |
-| tool/agent/ | navis-agent-core | Agent 工具运行链 |
-| tool/backend/ | navis-editor | 后端扩展进程管理 |
-| project/session/ | navis-session | 会话管理 |
-| project/catalog/ | navis-project | 项目目录 |
-| project/knowledge/ | navis-knowledge | 知识库 RAG |
-| project/memory/ | navis-memory | 项目记忆 |
-| application/ | navis-agent-core | Agent 运行时控制 |
-| ui/ 业务命令 | 各对应扩展 | IPC 命令定义 |
+### 3.1 扩展后端实现完整化
 
-**前端 src/ 中需迁出的业务组件：**
+当前部分 `ExtensionBackend/src` 文件仍是迁移适配层或最小桩，目录归属已经正确，但尚未全部恢复为可独立编译的完整业务 crate。后续必须：
 
-| 组件/Store | 目标扩展 |
-|-----------|---------|
-| components/Chat/ | navis-session |
-| components/Composer/ | navis-agent-core |
-| components/Editor/ | navis-editor |
-| components/Terminal/ | navis-terminal |
-| components/Settings/ | navis-settings |
-| components/Plan/ | navis-task |
-| components/AgentTimeline/ | navis-agent-core |
-| components/WorkspacePanel/ | navis-task |
-| stores/chat* | navis-session |
-| stores/composer* | navis-agent-core |
-| stores/agent* | navis-agent-core |
-| stores/gateway* | navis-ai-platform |
-| stores/session* | navis-session |
-| stores/project* | navis-project |
+- 为需要 native Rust 的扩展建立独立构建入口和 Navis SDK 依赖；
+- 恢复真实 Agent、Gateway、Session、Project、Terminal 等业务实现；
+- 通过能力端口、事件、IPC 和 stream 与宿主通信；
+- 禁止把实现搬回 `src-tauri/src`。
 
----
+### 3.2 前端产品壳继续收敛
 
-## 二、执行策略
+`extensions/navis-code/ExtensionUI/` 是 Navis Code 产品壳，不是通用宿主。`src/components/HostView`、`src/stores` 中只允许保留通用投影和桥接；发现新的产品业务后应继续迁入 Navis Code 产品壳或具体扩展。
 
-### 物理迁移 + re-export 保编译
+### 3.3 构建期扩展资源隔离
 
-1. 在 extensions/*/ExtensionBackend/src/ 创建 Rust 模块
-2. 先建 re-export 桥（旧路径 → 新位置），保持编译通过
-3. 物理搬迁源文件到扩展目录
-4. 框架层（app/business.rs、ui/mod.rs、lib.rs）精简为纯框架
+扩展资源必须位于所属扩展的 `ExtensionUI/assets` 或 `ExtensionUI/src/assets`。跨扩展引用应通过稳定资源协议、公开资源入口或复制到使用方扩展，禁止指向宿主 `src/assets`。
 
-### 并行分工（4 个 Agent）
+## 四、目录契约
 
-| Agent | 范围 |
-|-------|------|
-| Agent-A | Rust AI 域：ai/ + tool/agent/ + application/ → navis-agent-core + navis-ai-platform |
-| Agent-B | Rust Tool 域：tool/mcp + lsp + terminal + file + git + clipboard + memory + backend → 各工具扩展 |
-| Agent-C | Rust Project 域 + UI 命令 + 框架清理 |
-| Agent-D | 前端组件 + stores 迁移到 ExtensionUI |
+```text
+extensions/<product>/<extension-id>/
+├── extension.json
+├── ExtensionUI/
+└── ExtensionBackend/
 
----
-
-## 三、框架层最终结构（src-tauri/src/）
-
-```
-src-tauri/src/
-├── lib.rs              # 只声明框架域：kernel, extension, foundation, security, app, ui
-├── kernel/             # 不变 — 四原语
-├── extension/          # 不变 — 扩展系统本体
-├── foundation/         # 不变 — 能力缝
-├── security/           # 不变 — 安全边界
-├── app/                # Tauri bootstrap（移除业务装配）
-└── ui/                 # 框架宿主面（只保留 extension_bridge/network/router/storage/stream/host_view/events/dto/permissions）
+extensions/<product>/
+├── product.json                 # 产品组合清单
+├── <product>-ui.tsx             # 产品入口，组合宿主与扩展
+└── <extension-id>/              # 业务扩展
 ```
 
-## 四、前端框架层最终结构（src/）
+`product.json` 至少声明 `id`、`name`、`version`、`entry`；默认产品使用 `default: true`。产品入口导出通用 `ProductDefinition`，宿主不写任何产品 ID 特判。
 
-```
-src/
-├── router/             # 框架路由（HostView + ExtensionDialog 入口）
-├── components/HostView/ # 扩展视图投影
-├── components/ExtensionDialog/
-├── components/ExtensionInline/
-├── components/CommandPalette/
-├── components/Dialog/
-├── components/ui/      # 通用原子组件
-├── lib/stream/         # 宿主流
-├── lib/hotkey/         # 快捷键
-├── stores/app.ts       # AppState
-├── stores/extension*   # 扩展宿主状态
-├── styles/             # 基础样式
-├── theme/              # 主题
-├── i18n/               # 国际化
-└── layouts/            # 框架布局
-```
+## 五、验收标准
+
+- 新增柜面系统或双录系统时，只新增产品目录、产品清单、产品入口和扩展，不修改 Navis 底层源码。
+- `src/` 与 `src-tauri/src/` 不出现业务实现、业务 store、产品入口或产品 ID 特判。
+- 扩展契约测试覆盖嵌套开发目录、manifest、固定目录、入口路径和后端反向依赖审计。
+- `npm run build`、`cargo fmt --check`、`cargo check`、`cargo test` 全部通过。

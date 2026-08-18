@@ -1,5 +1,7 @@
 # 35 — 白板容器与万物皆扩展（Whiteboard Container & Everything-as-Extension）
 
+> 当前事实同步（2026-08-18）：Navis Code 业务已迁入 `extensions/navis-code/`，但前端 `src/router/`、`src/layouts/`、部分 `src/stores/` 和 HostView 内置投影仍有产品组合代码。本文中的“容器纯业务无关”是目标态；除非表格明确标为已完成，不得将该目标当作当前事实。
+
 > 状态：设计基线（终局架构）—— C0 地基 + C1 最小骨架**已落地**
 > 日期：2026-08-16（v3 修订：新增目录规范；C0/C1 状态标注）
 > 日期：2026-08-16（v4 修订：对齐 37 详设——组件轨执行基座 + 目录归一 ExtensionUI/ExtensionBackend + backendServices wire key 修正）
@@ -156,9 +158,9 @@ Navis Go/
 │   ├── security/                      #   Sandbox / 权限 / 审计
 │   ├── extension/                     #   扩展系统（lifecycle/loader/models/store）
 │   ├── ui/                            #   IPC 命令（含 extension_*、operation_runtime、stream）
-│   ├── ai/                            #   ★ AI 业务域（渐进迁至扩展）
-│   ├── project/                       #   ★ 业务域（渐进迁至扩展）
-│   ├── tool/                          #   ★ 工具域（渐进迁至扩展）
+│   ├── extension/                     #   扩展系统（业务由扩展承载）
+│   ├── foundation/                    #   平台基础能力
+│   ├── security/                      #   安全边界
 │   └── lib.rs
 ```
 
@@ -178,13 +180,13 @@ Navis Go/
 
 | 分域 | 目录 | 归属 | 运行位置 |
 |------|------|------|---------|
-| 前端扩展 UI | `extensions/*/ExtensionUI/`（index.html、assets、locales） | 扩展作者 | 容器 WebView iframe（html:sandbox） |
-| 前端逻辑组件 | `extensions/*/ExtensionUI/scripts/*.wasm` | 扩展作者 | 容器内组件轨（wasmtime） |
-| 后端逻辑组件 | `extensions/*/ExtensionBackend/logic/*.wasm` | 扩展作者 | 容器内组件轨（wasmtime） |
-| 后端 native 逃生舱 | `extensions/*/ExtensionBackend/native/` | 扩展作者 | 独立进程（容器 spawn，协议通信） |
+| 前端扩展 UI | `extensions/<product>/<extension-id>/ExtensionUI/`（index.html、assets、locales） | 扩展作者 | 容器 WebView iframe（html:sandbox） |
+| 前端逻辑组件 | `extensions/<product>/<extension-id>/ExtensionUI/scripts/*.wasm` | 扩展作者 | 容器内组件轨（wasmtime） |
+| 后端逻辑组件 | `extensions/<product>/<extension-id>/ExtensionBackend/logic/*.wasm` | 扩展作者 | 容器内组件轨（wasmtime） |
+| 后端 native 逃生舱 | `extensions/<product>/<extension-id>/ExtensionBackend/native/` | 扩展作者 | 独立进程（容器 spawn，协议通信） |
 | 宿主前端 | `src/` | 容器 | 容器 WebView |
 | 宿主后端 | `src-tauri/src/`（app/kernel/foundation/security/extension/ui） | 容器 | 容器 Rust |
-| 业务域（渐进迁出） | `src-tauri/src/{ai,project,tool}` | 业务扩展（C3/C4 迁入 `extensions/`） | — |
+| Navis Code 业务扩展 | `extensions/navis-code/<extension-id>/` | 已完成主要物理迁移；前端产品壳仍在迁移 | — |
 
 ### 3.4 后端扩展（ExtensionBackend：逻辑组件 + native 逃生舱）
 
@@ -413,7 +415,7 @@ Agent 引擎是 AI 业务扩展，WASM 组件轨承载编排（详见 37 详设�
 
 ### 阶段 C3：AI 业务扩展化迁移
 
-> 状态：C3-1 前端接线已完成（D5）；C3-7 已确定全量试点（前后端物理迁出，见 Step1）。**本阶段迁移形态**：业务代码**物理迁入** `extensions/{id}/ExtensionBackend/`（Cargo workspace crate，依赖 navis-core 框架层）与 `ExtensionUI/`（前端 monorepo 导入），容器经扩展清单 + seam 装配，不再是"容器内 manage"。见 §2.5 边界铁律。
+> 状态：C3-1 前端接线已完成（D5）；C3-7 已确定全量试点（前后端物理迁出，见 Step1）。**本阶段迁移形态**：业务代码**物理迁入** `extensions/<product>/<extension-id>/ExtensionBackend/`（Cargo workspace crate，依赖 navis-core 框架层）与 `ExtensionUI/`（前端 monorepo 导入），容器经扩展清单 + seam 装配，不再是"容器内 manage"。见 §2.5 边界铁律。
 
 | # | 业务 | 扩展包 | 复用现有 | 状态 |
 |---|------|--------|----------|------|
@@ -485,3 +487,7 @@ Agent 引擎是 AI 业务扩展，WASM 组件轨承载编排（详见 37 详设�
   - v5（2026-08-17）：容器层扩展装配统一由 Cordis `Context/Plugin/Service/Inject/Fiber` 承接；Agent 编排从 worker 轨改为 `ExtensionBackend/logic/*.wasm` 组件轨；WASM 是隔离逻辑执行 adapter，不自研扩展壳。
   - v6（2026-08-17）：C0-1 进一步落地——容器壳不再直接调用单体 business::assemble，改为经 BusinessAssembly / builtin_business_assemblies 注册边界装配内建业务扩展；NAVIS_WHITEBOARD=1 可跳过业务装配白板启动；ExtensionLifecycle 支持 new_without_skills（无业务 Skills 主机时 fail-closed）。
   - v7（2026-08-17）：新增**阶段 D：Cordis 装配接线**——事实核查发现 `HostExtensionContext` 已创建未接线（死代码）、`ExtensionLifecycle` 与 Cordis 双轨、WASM 组件轨 `ComponentRegistry` 未接执行链路；D1-D3 把 Cordis 提升为唯一装配底座（capability port→Cordis service、lifecycle→Cordis fiber、组件轨→host function 门禁、事件订阅落地），对齐 37/38。
+
+
+
+

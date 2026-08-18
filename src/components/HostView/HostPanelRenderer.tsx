@@ -1,7 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { Component, For, Show, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
-import { openSettingsDialog } from '../Settings/openSettingsDialog';
 import type { HostViewRendererProps } from './types';
 
 interface HostPanelDataSource {
@@ -135,7 +134,7 @@ const HostPanelRenderer: Component<HostViewRendererProps> = (props) => {
       <section class="navis-host-view-section">
         <div class="navis-host-view-section-title">{props.view.name}</div>
         <p>{props.view.extensionDescription || `${props.view.extensionName} contributes this Navis Go host panel.`}</p>
-        <button type="button" class="navis-host-view-inline-action" onClick={() => void openSettingsDialog('extensions')}>
+        <button type="button" class="navis-host-view-inline-action" onClick={() => window.dispatchEvent(new CustomEvent('navis:open-extension-management'))}>
           Manage extension
         </button>
       </section>

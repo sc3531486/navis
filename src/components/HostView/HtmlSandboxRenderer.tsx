@@ -1,8 +1,8 @@
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { invoke } from '@tauri-apps/api/core';
 import { Component, createMemo, createResource, onCleanup, Show } from 'solid-js';
-import { appState } from '../../stores/app';
-import { mountExtensionBridge, NAVIS_SHIM_SOURCE, type BridgeContextSnapshot } from '../../stores/bridge';
+import { getHostViewContext } from '@/stores/host';
+import { mountExtensionBridge, NAVIS_SHIM_SOURCE, type BridgeContextSnapshot } from '@/stores/bridge';
 import type { HostViewRendererProps } from './types';
 
 function resolveResourceSrc(resourcePath: string | null): string | null {
@@ -52,10 +52,7 @@ const HtmlSandboxRenderer: Component<HostViewRendererProps> = (props) => {
 
   const attachBridge = () => {
     if (!iframeRef?.contentWindow) return;
-    const snapshot: BridgeContextSnapshot = {
-      session: { sessionId: appState.activeSessionId },
-      activeProject: { projectId: appState.activeProjectId },
-    };
+    const snapshot: BridgeContextSnapshot = getHostViewContext(props.view);
     unmountBridge = mountExtensionBridge(iframeRef, props.view.extensionId, snapshot);
   };
 

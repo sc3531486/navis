@@ -11,7 +11,7 @@ use crate::extension::types::{ApiProtocol, ModelConfig, ProviderConfig};
 use crate::extension::models::{
     ExtensionContributes, ExtensionPermissionConstraint, GatewayAdapterRegistration,
     GatewayContributions, GatewayProviderRegistration, LSPServerConfig, LanguageRegistration,
-    LanguageSource, McpToolOverride, ProviderAuthProfile, ProviderCapabilities, ToolRegistration,
+    LanguageSource, McpToolOverride, ProviderCapabilities, ToolRegistration,
 };
 use crate::extension::provider_validation::{
     ExtensionProviderValidationPort, ExtensionProviderValidationRequest,
@@ -331,9 +331,11 @@ fn gateway_adapter_plan(adapter: &GatewayAdapterRegistration) -> Result<GatewayA
                     protocol_id
                 ));
             }
-            let protocol = ApiProtocol::from_str(protocol_id);
+            // 未知协议必须保留原始标识，不能被宿主的默认协议吞掉。
+            let protocol = ApiProtocol::Custom(protocol_id.to_string());
             let config =
-                CustomProtocolConfig::from_manifest(protocol.as_str(), adapter.config.clone())?;
+                CustomProtocolConfig::from_manifest(protocol.as_str(), adapter.config.clone())
+            .map_err(|e| anyhow::anyhow!(e))?;
             Ok(GatewayAdapterPlan {
                 adapter_id: adapter.id.clone(),
                 protocol,
@@ -404,12 +406,13 @@ fn extension_provider_config(
         id: provider_id.clone(),
         provider_type: provider_id,
         name: provider.name.clone(),
+        api_key: None,
         base_url: provider.base_url.clone(),
         secret_ref: provider.auth.secret_ref.clone(),
-        auth_profile: Some(ProviderAuthProfile::from_manifest(
-            &provider.auth.scheme,
-            &provider.auth.header,
-        )?),
+        auth_profile: Some(serde_json::json!({
+            "scheme": provider.auth.scheme,
+            "header": provider.auth.header,
+        })),
         models,
         default_model: provider.default_model.clone(),
     };
@@ -432,14 +435,17 @@ pub(crate) fn extension_tool_definition(
         server_id,
     );
     definition.user_visible = registration.user_visible;
-    definition.declared_risk = registration
+    let declared_risk = registration
         .declared_risk
         .as_deref()
         .map(parse_tool_risk)
-        .transpose()?;
-    definition.effective_risk = definition.declared_risk.unwrap_or_default().max(
-        crate::extension::types::platform_risk_override(&definition.name).unwrap_or_default(),
-    );
+        .transpose()?
+        .unwrap_or_default();
+    let platform_risk = crate::extension::types::platform_risk_override(&definition.name)
+        .unwrap_or_default();
+    definition.declared_risk = declared_risk;
+    definition.effective_risk = definition.declared_risk.clone().max(platform_risk);
+
     Ok(definition)
 }
 
@@ -453,19 +459,70 @@ pub(crate) fn extension_mcp_server_config(
             declaration.name
         )
     })?;
-    object.insert(
-        "id".to_string(),
-        Value::String(super::extension_mcp_server_id(
-            extension_id,
-            &declaration.name,
-        )),
-    );
-    object.insert("name".to_string(), Value::String(declaration.name.clone()));
-    serde_json::from_value(Value::Object(object)).with_context(|| {
-        format!(
-            "Invalid MCP server declaration '{}' for extension '{}'",
-            declaration.name, extension_id
-        )
+
+    // Manifest 使用 transport 描述声明语义，宿主当前只承载 stdio 进程。
+    if let Some(transport) = object.remove("transport") {
+        let transport = transport.as_str().ok_or_else(|| {
+            anyhow::anyhow!("MCP server '{}' transport must be a string", declaration.name)
+        })?;
+        if transport != "stdio" {
+            return Err(anyhow::anyhow!(
+                "MCP server '{}' uses unsupported transport '{}'",
+                declaration.name,
+                transport
+            ));
+        }
+    }
+
+    let command = object
+        .remove("command")
+        .and_then(|value| value.as_str().map(str::to_owned))
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "MCP server '{}' must declare a non-empty command",
+                declaration.name
+            )
+        })?;
+
+    let args = match object.remove("args") {
+        None => Vec::new(),
+        Some(Value::Array(values)) => values
+            .into_iter()
+            .map(|value| {
+                value.as_str().map(str::to_owned).ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "MCP server '{}' args must contain only strings",
+                        declaration.name
+                    )
+                })
+            })
+            .collect::<Result<Vec<_>>>()?,
+        Some(_) => {
+            return Err(anyhow::anyhow!(
+                "MCP server '{}' args must be an array",
+                declaration.name
+            ));
+        }
+    };
+
+    let auto_start = match object.remove("auto_start") {
+        None => false,
+        Some(Value::Bool(value)) => value,
+        Some(_) => {
+            return Err(anyhow::anyhow!(
+                "MCP server '{}' auto_start must be a boolean",
+                declaration.name
+            ));
+        }
+    };
+
+    Ok(MCPServerConfig {
+        id: super::extension_mcp_server_id(extension_id, &declaration.name),
+        name: Some(declaration.name.clone()),
+        command,
+        args,
+        auto_start,
     })
 }
 
@@ -524,17 +581,6 @@ impl ExtensionLifecycle {
                 "Extension permission constraint was not present during unregister"
             );
         }
-    }
-
-    pub(crate) fn unregister_ui_contributions(&self, extension_id: &str) -> Result<()> {
-        let mut registrar = self.ui_contributions.lock().map_err(|error| {
-            anyhow::anyhow!(
-                "Failed to lock UI contribution registrar during unregister: {}",
-                error
-            )
-        })?;
-        registrar.unregister_extension(extension_id);
-        Ok(())
     }
 
     pub(crate) fn register_enabled_hook_declarations(
@@ -612,8 +658,10 @@ fn tool_definition_override(override_: &McpToolOverride) -> Result<ToolDefinitio
         hint
     });
     Ok(ToolDefinitionOverride {
+        name: override_.tool.clone(),
+        enabled: true,
         model_name: override_.model_name.clone(),
-        user_visible: override_.user_visible,
+        user_visible: override_.user_visible.unwrap_or(true),
         ui_hint,
         description: override_.description.clone(),
         renderer_hint,
@@ -625,7 +673,7 @@ fn tool_definition_override(override_: &McpToolOverride) -> Result<ToolDefinitio
     })
 }
 
-fn parse_tool_risk(value: &str) -> Result<ToolRiskLevel> {
+fn parse_tool_risk(value: &str) -> anyhow::Result<ToolRiskLevel> {
     match value.trim().to_ascii_lowercase().as_str() {
         "none" => Ok(ToolRiskLevel::None),
         "read" => Ok(ToolRiskLevel::Read),

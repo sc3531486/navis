@@ -1,6 +1,7 @@
 # Dependencies and generated build output
 node_modules/
 dist/
+target/
 src-tauri/target/
 src-tauri/target-test-session/
 src-tauri/test_rb_size/
@@ -9,6 +10,7 @@ src-tauri/test_rb_source/
 # Local tooling and temporary files
 .tmp/
 .playwright-mcp/
+fix_types*.py
 
 # Local environment and credentials
 .env

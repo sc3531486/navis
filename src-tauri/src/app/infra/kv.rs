@@ -216,8 +216,8 @@ pub fn kv_list(
 
 #[cfg(test)]
 mod tests {
+    use crate::app::infra::db::Database;
     use super::*;
-    use super::db::Database;
     use serde_json::json;
     use std::sync::Mutex;
 

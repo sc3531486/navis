@@ -6,8 +6,8 @@
  * 宿主通过 class 传入各自的样式。
  */
 import { Component } from 'solid-js';
-import type { UiExtensionPointRegistration } from '../../lib/extension-ui';
-import { executeExtensionPoint } from '../../stores/extension-points';
+import type { UiExtensionPointRegistration } from '@/lib/extension-ui';
+import { executeExtensionPoint } from '@/stores/extension-points';
 
 interface InlineExtensionPointProps {
   point: UiExtensionPointRegistration;

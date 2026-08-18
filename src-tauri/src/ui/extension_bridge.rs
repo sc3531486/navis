@@ -12,18 +12,15 @@
 /// 桥响应。
 /// 桥支持的受限命令注册表。只有这里列出的命令可被桥派发；
 /// 且仍须同时满足 capabilities.invoke 白名单与 Sandbox 门禁。
-/// Event subscriptions are deliberately narrower than invoke capabilities.
-/// A declaration may grant an exact topic or a prefix wildcard such as
-/// `session.*`; a requested wildcard can never broaden that declaration.
-/// Agent/terminal/task are high-frequency streams and must use the stream
-/// channel instead of the low-frequency EventBus/Tauri event bridge.
+/// 事件订阅能力必须严格窄于 invoke 能力。
+/// 声明可以授予精确主题或 `session.*` 这类前缀通配符；请求通配符不得扩大声明范围。
+/// 高频扩展事件必须使用流通道，不能绕过能力校验使用低频 EventBus/Tauri 事件桥。
 /// 构造扩展 actor 的 Sandbox 操作请求。
 /// 校验 Sandbox 门禁结果；需要确认的操作直接拒绝（扩展桥不弹确认）。
-/// Authorize a low-frequency Tauri/Kernel event subscription for the extension bridge.
+/// 为扩展桥授权低频 Tauri/Kernel 事件订阅。
 ///
-/// The browser side performs the actual `listen()` call only after this command
-/// succeeds. This keeps event authorization in Rust and prevents an iframe from
-/// using the generic frontend event API as a capability bypass.
+/// 浏览器端只有在此命令成功后才执行实际的 `listen()` 调用，确保事件授权
+/// 在 Rust 侧完成，防止 iframe 绕过能力校验直接使用通用前端事件 API。
 /// 读取 worktree 文本文件。只读、受 path_manager 归一化 + Sandbox FileRead 门禁。
 /// 读取当前 session 快照（只读投影）。
 /// 白名单桥派发入口（iframe / Worker）。
@@ -31,20 +28,12 @@
 /// 流程：校验 Enabled → 查 `capabilities.invoke` 白名单 → 受限命令分发 →
 /// 构造 `OperationRequest{actor:"extension:{id}"}` 过 Sandbox 门禁 → 派发。
 /// 未声明能力或门禁拒绝 → fail-closed 返回错误并审计。
-//     mcp: State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
 /// 受控操作注册桥派发（`runtime.operation.register`）。
 ///
 /// args 内的 `extensionId` 必须与桥调用方扩展一致，防止跨扩展冒名注册。
 /// 受控操作执行桥派发（`runtime.operation.execute`）。
 ///
 /// args 内的 `extensionId` 必须与桥调用方扩展一致，防止跨扩展冒名执行。
-//     mcp: &State<'_, Arc<[REMOVED: MCP reference]
 /// 受控操作列表桥派发（`runtime.operation.list`）。
 
 use crate::extension::types::MCP;
@@ -660,17 +649,17 @@ pub async fn ui_extension_bridge_invoke(
 
         "extensions.query" => bridge_extension_discovery_query(&extension_store, &lifecycle, &request.args),
 
-        "route.call" => bridge_extension_route_call(&extension_store, &mcp, &request.args),
+        "route.call" => bridge_extension_route_call(&extension_store, mcp.clone(), &request.args),
 
-        "storage.get" => bridge_storage_get(&extension_store, &mcp, &storage, &ephemeral, &request.args),
+        "storage.get" => bridge_storage_get(&extension_store, &storage, &ephemeral, mcp.clone(), &request.args),
 
-        "storage.set" => bridge_storage_set(&extension_store, &mcp, &storage, &ephemeral, &request.args),
+        "storage.set" => bridge_storage_set(&extension_store, &storage, &ephemeral, mcp.clone(), &request.args),
 
-        "storage.delete" => bridge_storage_delete(&extension_store, &mcp, &storage, &ephemeral, &request.args),
+        "storage.delete" => bridge_storage_delete(&extension_store, &storage, &ephemeral, mcp.clone(), &request.args),
 
-        "storage.clear" => bridge_storage_clear(&extension_store, &mcp, &storage, &ephemeral, &request.args),
+        "storage.clear" => bridge_storage_clear(&extension_store, &storage, &ephemeral, mcp.clone(), &request.args),
 
-        "network.fetch" => bridge_network_fetch(&extension_store, &mcp, &request.args).await,
+        "network.fetch" => bridge_network_fetch(&extension_store, mcp.clone(), &request.args).await,
 
         "runtime.operation.execute" => {
 
@@ -754,8 +743,7 @@ fn bridge_extension_route_call(
 
     extension_store: &State<'_, Arc<ExtensionStore>>,
 
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -764,7 +752,7 @@ fn bridge_extension_route_call(
 
         .map_err(|error| format!("Invalid route.call args: {error}"))?;
 
-    let response = ui_extension_route_call(extension_store.clone(), mcp.clone(), request)
+    let response = ui_extension_route_call(extension_store.clone(), mcp, request)
 
         .map_err(|error| format!("Extension route call failed: {error}"))?;
 
@@ -782,8 +770,7 @@ fn bridge_storage_get(
     storage: &State<'_, Arc<Storage>>,
 
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -794,7 +781,7 @@ fn bridge_storage_get(
 
     let response =
 
-        ui_extension_storage_get(extension_store.clone(), mcp.clone(), storage.clone(), ephemeral.clone(), request)
+        ui_extension_storage_get(extension_store.clone(), mcp, storage.clone(), ephemeral.clone(), request)
 
             .map_err(|error| format!("Storage get failed: {error}"))?;
 
@@ -812,8 +799,7 @@ fn bridge_storage_set(
     storage: &State<'_, Arc<Storage>>,
 
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -822,7 +808,7 @@ fn bridge_storage_set(
 
         .map_err(|error| format!("Invalid storage.set args: {error}"))?;
 
-    ui_extension_storage_set(extension_store.clone(), mcp.clone(), storage.clone(), ephemeral.clone(), request)
+    ui_extension_storage_set(extension_store.clone(), mcp, storage.clone(), ephemeral.clone(), request)
 
         .map_err(|error| format!("Storage set failed: {error}"))?;
 
@@ -840,8 +826,7 @@ fn bridge_storage_delete(
     storage: &State<'_, Arc<Storage>>,
 
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -850,7 +835,7 @@ fn bridge_storage_delete(
 
         .map_err(|error| format!("Invalid storage.delete args: {error}"))?;
 
-    ui_extension_storage_delete(extension_store.clone(), mcp.clone(), storage.clone(), ephemeral.clone(), request)
+    ui_extension_storage_delete(extension_store.clone(), mcp, storage.clone(), ephemeral.clone(), request)
 
         .map_err(|error| format!("Storage delete failed: {error}"))?;
 
@@ -868,8 +853,7 @@ fn bridge_storage_clear(
     storage: &State<'_, Arc<Storage>>,
 
     ephemeral: &State<'_, Arc<ExtensionEphemeralStorage>>,
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -878,7 +862,7 @@ fn bridge_storage_clear(
 
         .map_err(|error| format!("Invalid storage.clear args: {error}"))?;
 
-    ui_extension_storage_clear(extension_store.clone(), mcp.clone(), storage.clone(), ephemeral.clone(), request)
+    ui_extension_storage_clear(extension_store.clone(), mcp, storage.clone(), ephemeral.clone(), request)
 
         .map_err(|error| format!("Storage clear failed: {error}"))?;
 
@@ -892,8 +876,7 @@ async fn bridge_network_fetch(
 
     extension_store: &State<'_, Arc<ExtensionStore>>,
 
-
-    mcp: &MCP,
+    mcp: State<'_, Arc<MCP>>,
     args: &Value,
 
 ) -> Result<Value, String> {
@@ -902,7 +885,7 @@ async fn bridge_network_fetch(
 
         .map_err(|error| format!("Invalid network.fetch args: {error}"))?;
 
-    let response = ui_extension_network_proxy(extension_store.clone(), mcp.clone(), request)
+    let response = ui_extension_network_proxy(extension_store.clone(), mcp, request)
 
         .await
 
@@ -1000,7 +983,7 @@ async fn bridge_operation_execute(
 
         operation_store.inner().as_ref(),
 
-        mcp.inner().as_ref(),
+        mcp.inner(),
 
         request,
 

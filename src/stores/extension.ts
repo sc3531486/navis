@@ -1,12 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import { createStore } from 'solid-js/store';
-import type { StatusPresentation } from '../lib/status';
-import { viewZone, type UiExtensionContributionCounts, type UiExtensionView } from '../lib/extension-ui';
+import type { StatusPresentation } from '@/lib/status';
+import { viewZone, type UiExtensionContributionCounts, type UiExtensionView } from '@/lib/extension-ui';
 import { loadMenus } from './menu';
-import { loadGatewayCatalog } from './gateway';
 import { loadExtensionCommands } from './extension-commands';
 import { loadExtensionKeybindings } from './extension-keybindings';
-import { loadSlashCommands } from './slash-commands';
 import {
   hostViewInstanceId,
   isHostViewOpen,
@@ -14,7 +12,7 @@ import {
   openHostView,
   openRightWorkspacePanel,
   removeHostViewsForExtension,
-} from './app';
+} from './host';
 
 export interface WorkModeModelPreferences {
   temperature?: number;
@@ -169,7 +167,7 @@ export async function loadExtensions(): Promise<void> {
       loadWorkModes(),
     ]);
     applyExtensionData(extensions, views, workModes);
-    await Promise.all([loadMenus(), loadExtensionCommands(), loadExtensionKeybindings(), loadSlashCommands()]);
+    await Promise.all([loadMenus(), loadExtensionCommands(), loadExtensionKeybindings()]);
     projectDefaultVisibleExtensionViews();
   } catch (error) {
     setExtensionState('loading', false);
@@ -193,10 +191,8 @@ export async function setExtensionEnabled(extensionId: string, enabled: boolean)
     }
     await Promise.all([
       loadMenus(),
-      loadGatewayCatalog(),
       loadExtensionCommands(),
       loadExtensionKeybindings(),
-      loadSlashCommands(),
     ]);
     projectDefaultVisibleExtensionViews();
   } catch (error) {
@@ -217,10 +213,8 @@ export async function installExtension(sourcePath: string): Promise<void> {
     applyExtensionData(extensions, views, workModes);
     await Promise.all([
       loadMenus(),
-      loadGatewayCatalog(),
       loadExtensionCommands(),
       loadExtensionKeybindings(),
-      loadSlashCommands(),
     ]);
     projectDefaultVisibleExtensionViews();
   } catch (error) {
@@ -242,10 +236,8 @@ export async function uninstallExtension(extensionId: string): Promise<void> {
     removeHostViewsForExtension(extensionId);
     await Promise.all([
       loadMenus(),
-      loadGatewayCatalog(),
       loadExtensionCommands(),
       loadExtensionKeybindings(),
-      loadSlashCommands(),
     ]);
     projectDefaultVisibleExtensionViews();
   } catch (error) {

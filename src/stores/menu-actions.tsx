@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/core';
-import { openSettingsDialog } from '../components/Settings/openSettingsDialog';
 import { openExtensionDialog, extensionDialogForView, closeExtensionDialog, parseExtensionDialogOptions } from '../components/ExtensionDialog/store';
 import { spawnExtensionScriptWorker } from './extension-workers';
 import {
@@ -8,7 +7,7 @@ import {
   type HostViewSurfaceKind,
 } from '../components/HostView/registry';
 import {
-  appState,
+  hostState,
   closeHostView,
   closeRightWorkspacePanel,
   focusHostView,
@@ -16,9 +15,9 @@ import {
   isHostViewOpen,
   openHostView,
   openRightWorkspacePanel,
-} from './app';
+} from './host';
 import { extensionState } from './extension';
-import { viewZone, type UiExtensionScript, type UiExtensionView } from '../lib/extension-ui';
+import { viewZone, type UiExtensionScript, type UiExtensionView } from '@/lib/extension-ui';
 import type { MenuActionItem, MenuBuiltinAction } from './menu';
 
 interface HostViewSurfaceOperations {
@@ -77,7 +76,7 @@ function openRightWorkspaceHostView(item: MenuActionItem): boolean {
 function rightWorkspaceHostViewIsOpen(item: MenuActionItem): boolean {
   const instanceId = hostViewItemId(item);
   if (!instanceId) return false;
-  return appState.rightWorkspaceColumns.some((column) =>
+  return hostState.rightWorkspaceColumns.some((column) =>
     column.panels.some((panel) => panel.id === instanceId),
   );
 }
@@ -113,7 +112,7 @@ function inlineHostSurfaceIsOpen(item: MenuActionItem): boolean {
 
 function openSettingsHostSurface(item: MenuActionItem): boolean {
   if (!openInlineHostSurface(item)) return false;
-  void openSettingsDialog('extensions');
+  window.dispatchEvent(new CustomEvent('navis:open-extension-management'));
   return true;
 }
 

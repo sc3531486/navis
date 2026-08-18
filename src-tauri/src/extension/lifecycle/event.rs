@@ -144,6 +144,7 @@ pub struct ExtensionSubscriptionLedger {
 }
 
 impl ExtensionSubscriptionLedger {
+    #[cfg(test)]
     pub fn record_many(
         &mut self,
         extension_id: &str,

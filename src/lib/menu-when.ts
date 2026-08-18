@@ -1,18 +1,29 @@
-import { appState } from '@/stores/app';
+import { hostState } from '@/stores/host';
 
+/**
+ * 宿主可识别的菜单上下文。
+ *
+ * 这里只保留桌面白板的通用投影信息；产品领域变量由产品通过提供器按需注入。
+ */
 export interface MenuWhenContext {
-  activeSession: boolean;
-  activeProject: boolean;
-  activeSessionId: string | null;
-  activeProjectId: string | null;
   activeView: string;
   sidebarVisible: boolean;
   rightWorkspaceVisible: boolean;
   platform: string;
-  /** 扩展上下文变量：当前菜单/命令所属扩展 ID。未提供时 fail-closed（`{extensionId}` 求值隐藏）。 */
+  /** 当前菜单/命令所属扩展标识。 */
   extensionId?: string | null;
-  /** 扩展上下文变量：当前 worktree ID。未提供时 fail-closed（`{worktreeId}` 求值隐藏）。 */
-  worktreeId?: string | null;
+  /** 产品提供的附加上下文，未知变量保持 fail-closed。 */
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+/** 产品注册菜单表达式所需的领域上下文，宿主不解释具体字段。 */
+export type MenuWhenContextProvider = () => Record<string, string | number | boolean | null | undefined>;
+
+let menuWhenContextProvider: MenuWhenContextProvider | undefined;
+
+/** 注册当前产品的菜单领域上下文提供器。 */
+export function registerMenuWhenContextProvider(provider: MenuWhenContextProvider): void {
+  menuWhenContextProvider = provider;
 }
 
 type Token =
@@ -22,19 +33,7 @@ type Token =
   | { kind: 'rparen' };
 
 function contextValue(name: string, context: MenuWhenContext): string | number | boolean | null | undefined {
-  switch (name.replace(/^\{|\}$/g, '')) {
-    case 'activeSession': return context.activeSession;
-    case 'activeProject': return context.activeProject;
-    case 'activeSessionId': return context.activeSessionId;
-    case 'activeProjectId': return context.activeProjectId;
-    case 'activeView': return context.activeView;
-    case 'sidebarVisible': return context.sidebarVisible;
-case 'rightWorkspaceVisible': return context.rightWorkspaceVisible;
-    case 'platform': return context.platform;
-    case 'extensionId': return context.extensionId;
-    case 'worktreeId': return context.worktreeId;
-    default: return undefined;
-  }
+  return context[name.replace(/^\{|\}$/g, '')];
 }
 
 function tokenize(input: string): Token[] | null {
@@ -183,13 +182,10 @@ class Parser {
 
 export function getMenuWhenContext(): MenuWhenContext {
   return {
-    activeSession: Boolean(appState.activeSessionId),
-    activeProject: Boolean(appState.activeProjectId),
-    activeSessionId: appState.activeSessionId,
-    activeProjectId: appState.activeProjectId,
-    activeView: appState.activeView,
-    sidebarVisible: appState.sidebarVisible,
-    rightWorkspaceVisible: appState.rightWorkspaceVisible,
+    ...menuWhenContextProvider?.(),
+    activeView: hostState.activeView,
+    sidebarVisible: hostState.sidebarVisible,
+    rightWorkspaceVisible: hostState.rightWorkspaceVisible,
     platform: typeof navigator === 'undefined' ? 'unknown' : navigator.platform,
   };
 }

@@ -181,4 +181,4 @@ export type SessionMessageStreamChunk =
 /** Extension 自定义流数据（泛型，由扩展定义 Schema） */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExtensionStreamChunk = Record<string, any>;
-import type { StatusPresentation } from '../status';
+import type { StatusPresentation } from '@/lib/status';

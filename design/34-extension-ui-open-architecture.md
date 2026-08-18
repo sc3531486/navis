@@ -1,5 +1,7 @@
 # 34 - 扩展 UI 开放架构 + 全系统改造基线 详细设计
 
+> 边界说明：本文的 UI Framework 指通用 Navis 宿主能力。Navis Code 的路由、布局和业务视图属于 `extensions/navis-code/` 产品组合；文中出现 `src/router/`、`src/layouts/` 时，若未特别注明，均应理解为当前迁移过渡区而非通用框架业务层。
+
 > 模块编号：34 | 层级：UI 层 × Extension 层（cross-cutting）× 全系统改造基线
 > 依赖：07-Extension、Cordis（前端宿主 @cordisjs/core；后端 cordis-rs）、22-UI-Framework、24-Dialog、02-IPC、02b-Stream、06-Sandbox（门禁+网络策略）、04-Storage
 > 被依赖：25-Notification（渠道扩展）、27-Hotkey（keybinding 复用）、26-Editor（编辑器域贡献）、33-extension-gateway-review（Gateway 接线）
@@ -937,3 +939,5 @@ Auth secret_ref 零明文、Sandbox/Policy 约束链、kernel-backed registry fa
 | 前端模糊搜索 | `flexsearch` | 手写 fuzzy 匹配 | CommandPalette 规模增长时 | 前端 |
 
 > 注意：Agent 流、Store 投影同步、iframe 生命周期均为架构手段，**不**引入节流依赖（用户裁决实时性优先）。
+
+

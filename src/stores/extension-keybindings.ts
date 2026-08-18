@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
-import { getHotkeyManager, HotkeyScope } from '../lib/hotkey';
-import type { HotkeyBinding } from '../lib/hotkey';
+import { getHotkeyManager, HotkeyScope } from '@/lib/hotkey';
+import type { HotkeyBinding } from '@/lib/hotkey';
 import { executeDeclarativeMenuAction } from './menu-actions';
 import type { MenuBuiltinAction } from './menu';
 

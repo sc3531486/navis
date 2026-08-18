@@ -1,0 +1,65 @@
+.navis-chat-header {
+  background: var(--navis-light-panel);
+  border-bottom: 0;
+  color: #242424;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.navis-chat-header-icon {
+  background: var(--navis-light-card);
+  border: 0;
+  color: #555555;
+  margin-right: 10px;
+}
+
+.navis-chat-title-button {
+  color: #555555;
+  margin-left: 6px;
+  opacity: 0;
+  transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.navis-chat-header [data-menu-anchor='chat-title']:hover .navis-chat-title-button,
+.navis-chat-title-button:focus-visible,
+.navis-chat-title-button[aria-expanded='true'] {
+  opacity: 1;
+}
+
+.navis-chat-title-button:hover,
+.navis-chat-panel-button:hover {
+  background: var(--navis-light-hover);
+  color: #242424;
+}
+
+.navis-chat-title-chevron {
+  background-color: currentColor;
+  display: block;
+  height: 10px;
+  mask-image: var(--navis-chevron-url);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  transform: rotate(-90deg);
+  transition: transform 140ms ease;
+  width: 10px;
+  -webkit-mask-image: var(--navis-chevron-url);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.navis-chat-title-chevron.is-open {
+  transform: rotate(0deg);
+}
+
+.navis-chat-panel-button {
+  background: var(--navis-light-surface);
+  border: 1px solid var(--navis-light-line);
+  color: #555555;
+  gap: 4px;
+  margin-left: 12px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+

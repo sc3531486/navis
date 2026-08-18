@@ -62,6 +62,7 @@ pub fn initialize_root_schema(conn: &Connection) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::app::infra::Database;
     use std::sync::Mutex;
 
     #[test]
