@@ -1,7 +1,10 @@
+use crate::kernel::manifest::ExtensionManifest;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use tauri::AppHandle;
+
+pub mod manifest;
 
 pub type DynamicRpcHandler = Arc<dyn Fn(&AppHandle, Value) -> Result<Value, String> + Send + Sync>;
 
@@ -31,9 +34,43 @@ impl ExtensionRegistry {
             Err(format!("[Navis Kernel] Route '{}' not found in registry", route))
         }
     }
+
+    pub fn list_routes(&self) -> Vec<String> {
+        let map = self.routes.read().unwrap();
+        map.keys().cloned().collect()
+    }
 }
 
 pub trait NavisBackendPlugin: Send + Sync {
     fn name(&self) -> &str;
     fn activate(&self, app: &AppHandle, registry: &ExtensionRegistry) -> Result<(), String>;
+}
+
+/// 扫描扩展目录并返回所有清单
+pub fn scan_extensions(app_data_dir: &std::path::Path) -> Vec<ExtensionManifest> {
+    let extensions_dir = app_data_dir.join("extensions");
+    ExtensionManifest::load_from_dir(&extensions_dir)
+}
+
+/// 后端扩展激活入口
+pub fn activate_extensions(
+    _app: &AppHandle,
+    registry: &ExtensionRegistry,
+    manifests: &[ExtensionManifest],
+) {
+    for manifest in manifests {
+        println!("[Navis Kernel] Extension '{}' v{} found", manifest.name, manifest.version);
+        // 注册扩展声明的命令为 RPC 路由
+        for cmd in &manifest.contributes.commands {
+            let route = format!("{}:{}", manifest.name, cmd.id);
+            let cmd_name = cmd.title.clone();
+            registry.register_route(
+                &route,
+                Arc::new(move |_app, _payload| {
+                    println!("[Navis Kernel] Command '{}' invoked", cmd_name);
+                    Ok(serde_json::json!({"status": "ok", "command": cmd_name}))
+                }),
+            );
+        }
+    }
 }
