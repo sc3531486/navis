@@ -127,7 +127,8 @@ pub fn run() {
         sandbox.grant_from_manifest(&plugin_id, &manifest.permissions);
     }
 
-    tauri::Builder::default()
+    let setup_transport = transport.clone();
+    let app_result = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(registry)
         .manage(manifests.clone())
@@ -149,7 +150,7 @@ pub fn run() {
                 if let Some(main) = &manifest.main {
                     let plugin_id = manifest.plugin_id();
                     let cwd = manifest_dir_for(&plugin_id, &ext_dirs);
-                    if let Err(e) = transport.ensure_plugin_process(&plugin_id, main, cwd.as_deref()) {
+                    if let Err(e) = setup_transport.ensure_plugin_process(&plugin_id, main, cwd.as_deref()) {
                         println!("[Navis Kernel] failed to start backend for '{plugin_id}': {e}");
                     }
                 }
@@ -160,8 +161,11 @@ pub fn run() {
             );
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running navis core app");
+        .run(tauri::generate_context!());
+    app_result.expect("error while running navis core app");
+
+    // 宿主退出：回收全部插件进程
+    tauri::async_runtime::block_on(transport.shutdown());
 }
 
 /// 定位扩展目录：优先开发目录（仓库 extensions/），否则运行期安装目录
