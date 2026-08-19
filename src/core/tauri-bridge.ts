@@ -63,3 +63,54 @@ export async function listRoutes(): Promise<string[]> {
     return [];
   }
 }
+
+/** 直接调用后端进程内动态 RPC 路由（命令桥底层） */
+export async function callRemote(route: string, payload?: any): Promise<any> {
+  const invokeFn = await getInvoke();
+  return invokeFn('navis_dispatch_rpc', { route, payload: payload ?? {} });
+}
+
+/** 通用 IPC 路由：同步请求路由到插件进程 */
+export async function coreRouteIpc(
+  pluginId: string,
+  method: string,
+  params: any,
+): Promise<any> {
+  const invokeFn = await getInvoke();
+  return invokeFn('core_route_ipc', { pluginId, method, params });
+}
+
+/** 通用 IPC 路由：流式请求路由到插件进程，事件经 Channel 推送 */
+export async function coreRouteStream(
+  pluginId: string,
+  method: string,
+  params: any,
+  onEvent: (event: any) => void,
+): Promise<void> {
+  const invokeFn = await getInvoke();
+  const tauri = await import('@tauri-apps/api/core');
+  const { Channel } = tauri;
+  const channel = new Channel<any>();
+  channel.onmessage = onEvent;
+  await invokeFn('core_route_stream', { pluginId, method, params, onEvent: channel });
+}
+
+/** 运行中的插件进程清单 */
+export async function listProcesses(): Promise<string[]> {
+  try {
+    const invokeFn = await getInvoke();
+    return await invokeFn('navis_list_processes');
+  } catch (_) {
+    return [];
+  }
+}
+
+/** 沙箱权限审计日志 */
+export async function auditLog(): Promise<any[]> {
+  try {
+    const invokeFn = await getInvoke();
+    return await invokeFn('navis_audit_log');
+  } catch (_) {
+    return [];
+  }
+}

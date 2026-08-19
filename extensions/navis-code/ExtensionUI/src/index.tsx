@@ -1,5 +1,6 @@
-import { NavisContext, NavisPlugin } from '../../../../src/core/context';
-import { SlotRenderer } from '../../../../src/core/SlotRenderer';
+import type { NavisContext, NavisPlugin } from '../../../../src/core/context';
+import { DynamicSlot } from '../../../../src/core/slots/DynamicSlot';
+import { componentRegistry } from '../../../../src/core/components/ComponentRegistry';
 
 // 占位组件（后续替换为实际业务组件）
 const SidebarPlaceholder = () => (
@@ -26,66 +27,61 @@ const StatusbarPlaceholder = () => (
   </div>
 );
 
+// 产品级布局：嵌套 DynamicSlot 树，为其他扩展提供可挂载的子插槽
+const StudioLayout = (props: { ctx: NavisContext }) => {
+  void props.ctx;
+  return (
+    <div class="navis-code-studio-root">
+      <div class="navis-code-body-grid">
+        <DynamicSlot name="navis-code.sidebar.left" class="navis-code-sidebar-container" />
+        <DynamicSlot name="navis-code.viewport.main" class="navis-code-main-container" />
+      </div>
+      <DynamicSlot name="navis-code.statusbar" class="navis-code-statusbar-container" />
+    </div>
+  );
+};
+
+const DialogHost = () => <div class="navis-dialog-host" />;
+
 export const NavisCodeExtension: NavisPlugin = {
   name: 'navis-code',
   apply: async (ctx: NavisContext) => {
-    console.info('[navis-code] Registering Studio layout into root slot...');
+    console.info('[navis-code] Binding studio layout components...');
 
-    // 1. root 插槽：多栏子插槽树
-    ctx.registerSlot('root', {
-      id: 'navis-code.layout.root',
-      priority: 10,
-      component: () => (
-        <div class="navis-code-studio-root">
-          <div class="navis-code-body-grid">
-            <SlotRenderer
-              ctx={ctx}
-              target="navis-code.sidebar.left"
-              class="navis-code-sidebar-container"
-            />
-            <SlotRenderer
-              ctx={ctx}
-              target="navis-code.viewport.main"
-              class="navis-code-main-container"
-            />
-          </div>
-          <SlotRenderer
-            ctx={ctx}
-            target="navis-code.statusbar"
-            class="navis-code-statusbar-container"
-          />
-        </div>
-      )
+    // 绑定清单 slots 引用的具名组件（root/overlay 插槽由贡献分发阶段注册）
+    componentRegistry.bind('navis-code', {
+      StudioLayout: () => <StudioLayout ctx={ctx} />,
+      DialogHost: () => <DialogHost />,
     });
 
-    // 2. 注入子插槽组件
+    // 注册产品自身提供的子插槽内容（动态创建的子插槽）
     ctx.registerSlot('navis-code.sidebar.left', {
       id: 'navis-code.sidebar',
+      pluginId: 'navis-code',
       priority: 10,
-      component: () => <SidebarPlaceholder />
+      component: () => <SidebarPlaceholder />,
     });
-
     ctx.registerSlot('navis-code.viewport.main', {
       id: 'navis-code.main',
+      pluginId: 'navis-code',
       priority: 10,
-      component: () => <MainPlaceholder />
+      component: () => <MainPlaceholder />,
     });
-
     ctx.registerSlot('navis-code.statusbar', {
       id: 'navis-code.statusbar',
+      pluginId: 'navis-code',
       priority: 10,
-      component: () => <StatusbarPlaceholder />
+      component: () => <StatusbarPlaceholder />,
     });
 
-    // 3. 注册命令
-    ctx.registerCommand('navis-code.new-session', () => {
+    // 命令（冒号命名与清单 commandId 对齐）
+    ctx.registerCommand('navis-code:new-session', () => {
       ctx.emit('session:create', { timestamp: Date.now() });
     });
-
-    ctx.registerCommand('navis-code.open-settings', () => {
+    ctx.registerCommand('navis-code:open-settings', () => {
       ctx.emit('settings:open', {});
     });
-  }
+  },
 };
 
 export default NavisCodeExtension;

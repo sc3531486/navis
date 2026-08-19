@@ -1,9 +1,11 @@
 import type { JSX } from 'solid-js';
+import { slotStore, type SlotContribution } from './slots/SlotStore';
 
 export type EventHandler<T = any> = (payload: T) => void | Promise<void>;
 
 export interface SlotItem {
   id: string;
+  pluginId?: string;
   priority?: number;
   component: () => JSX.Element;
 }
@@ -16,7 +18,6 @@ export interface NavisPlugin {
 export class NavisContext {
   private services = new Map<string, any>();
   private listeners = new Map<string, Set<EventHandler>>();
-  private slotRegistry = new Map<string, SlotItem[]>();
   private commands = new Map<string, (args?: any) => void | Promise<void>>();
 
   provide<T>(name: string, service: T): void {
@@ -60,25 +61,21 @@ export class NavisContext {
   }
 
   registerSlot(target: string, item: SlotItem): () => void {
-    if (!this.slotRegistry.has(target)) {
-      this.slotRegistry.set(target, []);
-    }
-    const list = this.slotRegistry.get(target)!;
-    list.push({ ...item, priority: item.priority ?? 100 });
-    list.sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
-    this.emit(`slot:${target}:updated`, list);
-
+    const unsub = slotStore.register(target, {
+      id: item.id,
+      pluginId: item.pluginId ?? 'host',
+      priority: item.priority ?? 100,
+      component: item.component as () => unknown,
+    });
+    this.emit(`slot:${target}:updated`, this.getSlotItems(target));
     return () => {
-      const idx = list.findIndex((s) => s.id === item.id);
-      if (idx !== -1) {
-        list.splice(idx, 1);
-        this.emit(`slot:${target}:updated`, list);
-      }
+      unsub();
+      this.emit(`slot:${target}:updated`, this.getSlotItems(target));
     };
   }
 
   getSlotItems(target: string): SlotItem[] {
-    return this.slotRegistry.get(target) || [];
+    return slotStore.getContributions(target) as unknown as SlotItem[];
   }
 
   registerCommand(id: string, handler: (args?: any) => void | Promise<void>): () => void {

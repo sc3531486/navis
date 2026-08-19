@@ -1,6 +1,6 @@
 import { Component, type JSX } from 'solid-js';
 import { NavisContext } from '../core/context';
-import { SlotRenderer } from '../core/SlotRenderer';
+import { DynamicSlot } from '../core/slots/DynamicSlot';
 import './WhiteboardShell.css';
 
 interface WhiteboardShellProps {
@@ -15,9 +15,8 @@ export const WhiteboardShell: Component<WhiteboardShellProps> = (props) => {
 
   return (
     <div class="navis-whiteboard-shell">
-      <SlotRenderer
-        ctx={props.ctx}
-        target="root"
+      <DynamicSlot
+        name="root"
         class="navis-root-viewport"
         fallback={
           <div class="navis-empty-canvas">
@@ -34,7 +33,7 @@ export const WhiteboardShell: Component<WhiteboardShellProps> = (props) => {
           </div>
         }
       />
-      <SlotRenderer ctx={props.ctx} target="overlay" class="navis-overlay-layer" />
+      <DynamicSlot name="overlay" class="navis-overlay-layer" />
     </div>
   );
 };

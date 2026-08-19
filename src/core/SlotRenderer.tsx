@@ -1,5 +1,8 @@
-import { Component, createSignal, onCleanup, onMount, For, Show, type JSX } from 'solid-js';
-import { NavisContext } from './context';
+// 兼容别名：SlotRenderer 已并入 DynamicSlot（读取全局 slotStore）。
+// 保留旧签名以兼容早期调用方；ctx 参数仅用于历史兼容，不再依赖。
+import { Component, type JSX } from 'solid-js';
+import type { NavisContext } from './context';
+import { DynamicSlot } from './slots/DynamicSlot';
 
 export interface SlotRendererProps {
   ctx: NavisContext;
@@ -9,24 +12,8 @@ export interface SlotRendererProps {
 }
 
 export const SlotRenderer: Component<SlotRendererProps> = (props) => {
-  const [tick, setTick] = createSignal(0);
-
-  onMount(() => {
-    const unsub = props.ctx.on(`slot:${props.target}:updated`, () => {
-      setTick((t) => t + 1);
-    });
-    onCleanup(unsub);
-  });
-
-  const items = () => props.ctx.getSlotItems(props.target);
-
-  return (
-    <Show when={items().length > 0} fallback={props.fallback}>
-      <div class={props.class} data-navis-slot={props.target}>
-        <For each={items()}>
-          {(item) => <>{item.component()}</>}
-        </For>
-      </div>
-    </Show>
-  );
+  void props.ctx;
+  return <DynamicSlot name={props.target} class={props.class} fallback={props.fallback} />;
 };
+
+export default SlotRenderer;
