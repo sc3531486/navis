@@ -1,0 +1,17 @@
+{
+  "name": "navis-code",
+  "version": "1.0.0",
+  "displayName": "Navis Code Agent Studio",
+  "publisher": "navis",
+  "description": "Full-lifecycle Agent, Timeline, Editor, Terminal and AI Platform Extension for Navis.",
+  "contributes": {
+    "slots": [
+      { "id": "navis-code.layout.studio", "target": "root", "priority": 10 },
+      { "id": "navis-code.overlay.dialogs", "target": "overlay", "priority": 10 }
+    ],
+    "commands": [
+      { "id": "navis-code.new-session", "title": "New Agent Session" },
+      { "id": "navis-code.open-settings", "title": "Settings" }
+    ]
+  }
+}

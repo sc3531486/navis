@@ -1,46 +1,39 @@
-//! Navis kernel primitives.
-//!
-//! The kernel layer only defines generic infrastructure:
-//! discovery, execution, notification, and authorization.
+use serde_json::Value;
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
+use tauri::AppHandle;
 
-pub mod cordis;
-pub mod audit;
-pub mod core;
-pub mod event;
-pub mod observability;
-pub mod pipeline;
-pub mod policy;
-pub mod registry;
-pub mod snapshot;
+pub type DynamicRpcHandler = Arc<dyn Fn(&AppHandle, Value) -> Result<Value, String> + Send + Sync>;
 
-#[cfg(test)]
-mod boundary_test;
+#[derive(Default, Clone)]
+pub struct ExtensionRegistry {
+    routes: Arc<RwLock<HashMap<String, DynamicRpcHandler>>>,
+}
 
-pub use cordis::{CordisContext, Fiber, FiberManager, FiberState, NamedEntries, ScopedLayers, Service};
-pub use audit::{
-    AuditDigest, AuditRecord, AuditRecorder, AuditSink, AuditStats, AuditStatus, BufferedAuditSink,
-    FieldMeta, InMemoryAuditSink,
-};
-pub use core::{
-    CapabilityId, KernelContext, KernelError, KernelErrorKind, KernelObjectInfo, KernelObjectState,
-    KernelResource, KernelResult, KernelScope, PolicyErrorKind, PolicyId, ResourceLease,
-    SchemaVersion, ShutdownMode, SpanId, StageId, SubscriptionId, Topic, TraceId,
-};
-pub use event::{
-    AsyncEventHandler, EventBus, EventBusStats, EventEnvelope, EventHandler, EventSubscription,
-    InMemoryEventBus, SharedEventEnvelope,
-};
-pub use observability::{
-    ExecutionEvent, ExecutionEventKind, ExecutionObservationSink, ExecutionObserver,
-    SharedExecutionEvent,
-};
-pub use pipeline::{Next, Pipeline, PipelineContext, PipelineRetryPolicy, PipelineStats, Stage};
-pub use policy::{
-    Constraint, ConstraintInfo, PolicyCheckpoint, PolicyDecision, PolicyEngine, PolicyInput,
-    PolicyStats,
-};
-pub use registry::{
-    AsyncRegistry, Capability, CapabilityInfo, CapabilityLifecycle, InMemoryRegistry,
-    LifecycleAction, LifecycleState, Registry, RegistryEntry, RegistryLoader, RegistryStats,
-};
-pub use snapshot::KernelSnapshot;
+impl ExtensionRegistry {
+    pub fn new() -> Self {
+        Self {
+            routes: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    pub fn register_route(&self, route: &str, handler: DynamicRpcHandler) {
+        let mut map = self.routes.write().unwrap();
+        map.insert(route.to_string(), handler);
+        println!("[Navis Kernel] Dynamic route registered: {}", route);
+    }
+
+    pub fn dispatch(&self, app: &AppHandle, route: &str, payload: Value) -> Result<Value, String> {
+        let map = self.routes.read().unwrap();
+        if let Some(handler) = map.get(route) {
+            handler(app, payload)
+        } else {
+            Err(format!("[Navis Kernel] Route '{}' not found in registry", route))
+        }
+    }
+}
+
+pub trait NavisBackendPlugin: Send + Sync {
+    fn name(&self) -> &str;
+    fn activate(&self, app: &AppHandle, registry: &ExtensionRegistry) -> Result<(), String>;
+}
