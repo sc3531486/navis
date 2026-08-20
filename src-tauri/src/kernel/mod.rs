@@ -5,6 +5,7 @@ use std::sync::{Arc, RwLock};
 use tauri::AppHandle;
 
 pub mod manifest;
+pub mod product;
 
 pub type DynamicRpcHandler = Arc<dyn Fn(&AppHandle, Value) -> Result<Value, String> + Send + Sync>;
 
@@ -38,6 +39,10 @@ impl ExtensionRegistry {
     pub fn list_routes(&self) -> Vec<String> {
         let map = self.routes.read().unwrap();
         map.keys().cloned().collect()
+    }
+
+    pub fn has_route(&self, route: &str) -> bool {
+        self.routes.read().unwrap().contains_key(route)
     }
 }
 

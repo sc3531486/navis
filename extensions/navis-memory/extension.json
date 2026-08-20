@@ -1,0 +1,27 @@
+{
+  "id": "navis-memory",
+  "name": "Navis Memory",
+  "version": "0.1.0",
+  "displayName": "Memory",
+  "publisher": "navis",
+  "description": "记忆扩展（骨架）：项目记忆与工具调用记忆的持久化。",
+  "permissions": {
+    "fs.read": true,
+    "fs.write": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-memory.panel", "target": "navis-code.sidebar.left", "component": "MemoryPanel", "priority": 50 }
+    ],
+    "providesSlots": [
+      "navis-memory.panel"
+    ],
+    "tools": [
+      { "name": "memory.get", "description": "读取记忆条目", "parameters": { "type": "object" } },
+      { "name": "memory.set", "description": "写入记忆条目", "parameters": { "type": "object" } }
+    ],
+    "pipelineHooks": [
+      { "hook": "assembleContext", "handler": "injectMemory" }
+    ]
+  }
+}

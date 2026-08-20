@@ -1,0 +1,19 @@
+{
+  "id": "navis-code",
+  "name": "Navis Code",
+  "shell": "navis-code",
+  "description": "Navis Code 产品组装清单：在通用 Navis 框架上组合的 Agent IDE 形态。navis-demo 为开发期验证扩展。",
+  "extensions": [
+    "navis-agent-core",
+    "navis-ai-platform",
+    "navis-editor",
+    "navis-knowledge",
+    "navis-memory",
+    "navis-project",
+    "navis-session",
+    "navis-settings",
+    "navis-task",
+    "navis-terminal",
+    "navis-demo"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "navis-project",
+  "name": "Navis Project",
+  "version": "0.1.0",
+  "displayName": "Project",
+  "publisher": "navis",
+  "description": "项目与工作树扩展（骨架）：项目目录、工作树、文件系统访问。",
+  "permissions": {
+    "fs.read": true,
+    "fs.write": true,
+    "shell.exec": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-project.tree", "target": "navis-code.sidebar.left", "component": "ProjectTree", "priority": 10 }
+    ],
+    "providesSlots": [
+      "navis-project.overview"
+    ],
+    "tools": [
+      { "name": "project.open", "description": "打开项目目录", "parameters": { "type": "object" } },
+      { "name": "project.worktree", "description": "查询工作树状态", "parameters": { "type": "object" } }
+    ]
+  }
+}

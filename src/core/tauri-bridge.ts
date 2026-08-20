@@ -70,6 +70,26 @@ export async function callRemote(route: string, payload?: any): Promise<any> {
   return invokeFn('navis_dispatch_rpc', { route, payload: payload ?? {} });
 }
 
+/** 统一通信协议：{ extension, action, data }，宿主按目标扩展自动路由 */
+export async function navisDispatch(
+  extension: string,
+  action: string,
+  data?: any,
+): Promise<any> {
+  const invokeFn = await getInvoke();
+  return invokeFn('navis_dispatch', { extension, action, data: data ?? {} });
+}
+
+/** 当前激活的产品配置 */
+export async function activeProduct(): Promise<any> {
+  try {
+    const invokeFn = await getInvoke();
+    return await invokeFn('navis_active_product');
+  } catch (_) {
+    return null;
+  }
+}
+
 /** 通用 IPC 路由：同步请求路由到插件进程 */
 export async function coreRouteIpc(
   pluginId: string,

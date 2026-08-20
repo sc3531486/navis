@@ -1,23 +1,21 @@
-# Navis Code 扩展套件
+# navis-code（产品壳扩展）
 
-Navis Code 是基于通用 Navis 框架组合的 Agent IDE 产品。
+Navis Code 产品壳：在通用 Navis 框架上组合 Agent IDE 形态。
 
-本目录包含 Navis Code 的产品入口、产品组合层和业务扩展。`src/` 与 `src-tauri/src/` 是通用 Navis 宿主；当前仍有少量历史产品壳位于宿主前端目录，详见根目录 `ARCHITECTURE_REVIEW.md`，不得继续扩展该过渡区。
+本扩展不再作为业务扩展的物理父目录（目录已展平，业务扩展全部位于 `extensions/` 根下）。产品装配清单见根目录 `navis-code.json`。
 
-产品入口为 `navis-code-ui.tsx`。除产品入口和组合层外，每个子目录都是独立扩展包，拥有自己的 `extension.json`、`ExtensionUI/` 与 `ExtensionBackend/`。
+## 角色
+
+- 注册产品级布局：`StudioLayout`（root 插槽）与 `DialogHost`（overlay 插槽）
+- 发布子插槽：`navis-code.sidebar.left`、`navis-code.viewport.main`、`navis-code.statusbar`，供业务扩展挂载
+
+## 结构
 
 ```text
-extensions/navis-code/
-├── navis-code-ui.tsx
-├── ExtensionUI/                  # 产品组合层和产品级 UI 资源
-├── navis-agent-core/
-├── navis-ai-platform/
-├── navis-session/
-├── navis-project/
-├── navis-task/
-├── navis-editor/
-├── navis-terminal/
-├── navis-settings/
-├── navis-knowledge/
-└── navis-memory/
+ExtensionUI/src/index.tsx   # NavisPlugin：绑定具名组件 + 注册子插槽内容
+extension.json              # 清单（声明 slots/providesSlots）
 ```
+
+## 装配
+
+由根目录 `navis-code.json` 声明本产品包含的扩展清单，宿主按配置装载。

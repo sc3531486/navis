@@ -1,0 +1,21 @@
+{
+  "id": "navis-settings",
+  "name": "Navis Settings",
+  "version": "0.1.0",
+  "displayName": "Settings",
+  "publisher": "navis",
+  "description": "设置扩展（骨架）：全局与扩展配置管理。",
+  "permissions": {
+    "fs.read": true,
+    "fs.write": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-settings.dialog", "target": "overlay", "component": "SettingsDialog", "priority": 20 }
+    ],
+    "tools": [
+      { "name": "settings.get", "description": "读取配置", "parameters": { "type": "object" } },
+      { "name": "settings.set", "description": "写入配置", "parameters": { "type": "object" } }
+    ]
+  }
+}

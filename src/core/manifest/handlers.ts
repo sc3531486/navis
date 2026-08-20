@@ -9,7 +9,7 @@ import type {
 import { componentRegistry } from '../components/ComponentRegistry';
 import { toolRegistry } from '../tools/ToolRegistry';
 import { globalAgentPipeline, type PipelineHookName } from '../pipeline/AgentPipeline';
-import { callRemote, coreRouteIpc } from '../tauri-bridge';
+import { navisDispatch } from '../tauri-bridge';
 import type { NavisContext } from '../context';
 
 export function installDefaultHandlers(ctx: NavisContext): void {
@@ -35,21 +35,13 @@ export function installDefaultHandlers(ctx: NavisContext): void {
     console.info(`[Navis] Plugin '${pluginId}' provides slots: ${slots.join(', ')}`);
   });
 
-  // commands：注册命令桩。
-  // 有后端进程的插件 -> 路由 core_route_ipc 到进程（method = 命令 id）；
-  // 无后端进程的插件 -> 路由 navis_dispatch_rpc 进程内 RPC。
+  // commands：注册命令桩，执行统一走 navis_dispatch（宿主自动路由到进程内或插件进程）
   contributionRegistry.registerHandler('commands', (data, context) => {
     for (const cmd of (data as CommandContribution[]) ?? []) {
       const commandId = `${context.pluginId}:${cmd.id}`;
-      if (context.manifest?.main) {
-        ctx.registerCommand(commandId, async (args?: any) => {
-          return coreRouteIpc(context.pluginId, cmd.id, args ?? {});
-        });
-      } else {
-        ctx.registerCommand(commandId, async (args?: any) => {
-          return callRemote(commandId, args ?? {});
-        });
-      }
+      ctx.registerCommand(commandId, async (args?: any) => {
+        return navisDispatch(context.pluginId, cmd.id, args ?? {});
+      });
     }
   });
 

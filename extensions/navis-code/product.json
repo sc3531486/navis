@@ -1,7 +1,0 @@
-{
-  "id": "navis-code",
-  "name": "Navis Code",
-  "version": "0.1.0",
-  "entry": "./navis-code-ui.tsx",
-  "default": true
-}

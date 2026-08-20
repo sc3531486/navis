@@ -16,36 +16,18 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@navis-code/*": ["extensions/navis-code/ExtensionUI/src/*"],
-      "@agent-core/*": ["extensions/navis-code/navis-agent-core/ExtensionUI/src/*"],
-      "@ai-platform/*": ["extensions/navis-code/navis-ai-platform/ExtensionUI/src/*"],
-      "@session/*": ["extensions/navis-code/navis-session/ExtensionUI/src/*"],
-      "@editor-ext/*": ["extensions/navis-code/navis-editor/ExtensionUI/src/*"],
-      "@terminal-ext/*": ["extensions/navis-code/navis-terminal/ExtensionUI/src/*"],
-      "@settings-ext/*": ["extensions/navis-code/navis-settings/ExtensionUI/src/*"],
-      "@project-ext/*": ["extensions/navis-code/navis-project/ExtensionUI/src/*"],
-      "@task-ext/*": ["extensions/navis-code/navis-task/ExtensionUI/src/*"],
-      "@knowledge/*": ["extensions/navis-code/navis-knowledge/ExtensionUI/src/*"],
-      "@memory/*": ["extensions/navis-code/navis-memory/ExtensionUI/src/*"]
+      "@extensions/*": ["extensions/*"]
     }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "extensions/*/*-ui.tsx",
-    "extensions/navis-code/ExtensionUI/src/**/*.ts",
-    "extensions/navis-code/ExtensionUI/src/**/*.tsx",
-    "extensions/navis-code/*/ExtensionUI/src/**/*.ts",
-    "extensions/navis-code/*/ExtensionUI/src/**/*.tsx",
-    "extensions/navis-demo/ExtensionUI/src/**/*.ts",
-    "extensions/navis-demo/ExtensionUI/src/**/*.tsx"
+    "extensions/*/ExtensionUI/src/**/*.ts",
+    "extensions/*/ExtensionUI/src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "src-tauri",
-    "extensions/navis-code/ExtensionUI/src/stores/index.ts"
+    "src-tauri"
   ]
 }
-
-

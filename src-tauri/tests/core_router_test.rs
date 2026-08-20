@@ -1,7 +1,8 @@
-// 核心机制集成测试：进程管理器 + IPC 网关 + 沙箱 + 清单解析闭环。
+// 核心机制集成测试：进程管理器 + IPC 网关 + 沙箱 + 清单解析 + 产品装配闭环。
 use navis_lib::core::ipc_bridge::TransportRouter;
 use navis_lib::core::sandbox::{Capability, PermissionToken, Sandbox};
 use navis_lib::kernel::manifest::ExtensionManifest;
+use navis_lib::kernel::product::ProductConfig;
 use serde_json::json;
 use std::path::PathBuf;
 
@@ -35,6 +36,32 @@ fn manifest_parses_new_protocol() {
     assert_eq!(json["id"].as_str().unwrap(), "navis-demo");
     assert!(json["contributes"]["tools"].as_array().is_some());
     assert_eq!(json["contributes"]["pipelineHooks"].as_array().unwrap().len(), 1);
+
+    // 展平后的业务扩展清单也应能被新协议解析（navis-editor）
+    let editor = manifests
+        .iter()
+        .find(|m| m.plugin_id() == "navis-editor")
+        .expect("navis-editor manifest not found");
+    assert_eq!(editor.contributes.tools.len(), 4);
+    assert_eq!(editor.contributes.slots.len(), 1);
+    assert_eq!(editor.contributes.provides_slots.len(), 2);
+}
+
+#[test]
+fn product_config_parses() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let cfg = ProductConfig::load_from_file(&root.join("navis-code.json")).unwrap();
+    assert_eq!(cfg.id, "navis-code");
+    assert_eq!(cfg.shell.as_deref(), Some("navis-code"));
+    let active = cfg.active_extension_ids();
+    assert!(active.contains(&"navis-code".to_string()));
+    assert!(active.contains(&"navis-agent-core".to_string()));
+    assert!(active.contains(&"navis-demo".to_string()));
+
+    // teller-system 示例：新产品只需一个配置 + extensions/ 下新增扩展，宿主零改动
+    let teller = ProductConfig::load_from_file(&root.join("teller-system.json")).unwrap();
+    assert_eq!(teller.id, "teller-system");
+    assert_eq!(teller.active_extension_ids(), vec!["teller-system-shell".to_string()]);
 }
 
 #[test]

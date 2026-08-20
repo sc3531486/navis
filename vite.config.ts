@@ -11,18 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      // 扩展前端代码别名
-      '@navis-code': path.resolve(__dirname, 'extensions/navis-code/ExtensionUI/src'),
-      '@agent-core': path.resolve(__dirname, 'extensions/navis-code/navis-agent-core/ExtensionUI/src'),
-      '@ai-platform': path.resolve(__dirname, 'extensions/navis-code/navis-ai-platform/ExtensionUI/src'),
-      '@session': path.resolve(__dirname, 'extensions/navis-code/navis-session/ExtensionUI/src'),
-      '@editor-ext': path.resolve(__dirname, 'extensions/navis-code/navis-editor/ExtensionUI/src'),
-      '@terminal-ext': path.resolve(__dirname, 'extensions/navis-code/navis-terminal/ExtensionUI/src'),
-      '@settings-ext': path.resolve(__dirname, 'extensions/navis-code/navis-settings/ExtensionUI/src'),
-      '@project-ext': path.resolve(__dirname, 'extensions/navis-code/navis-project/ExtensionUI/src'),
-      '@task-ext': path.resolve(__dirname, 'extensions/navis-code/navis-task/ExtensionUI/src'),
-      '@knowledge': path.resolve(__dirname, 'extensions/navis-code/navis-knowledge/ExtensionUI/src'),
-      '@memory': path.resolve(__dirname, 'extensions/navis-code/navis-memory/ExtensionUI/src'),
+      '@extensions': path.resolve(__dirname, 'extensions'),
     },
   },
   server: {

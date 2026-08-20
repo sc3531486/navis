@@ -1,0 +1,24 @@
+{
+  "id": "navis-ai-platform",
+  "name": "Navis AI Platform",
+  "version": "0.1.0",
+  "displayName": "AI Platform",
+  "publisher": "navis",
+  "description": "AI 平台扩展（骨架）：大模型网关、MCP Server、LSP 客户端。",
+  "permissions": {
+    "network": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-ai-platform.gateway-panel", "target": "navis-code.statusbar", "component": "GatewayStatus", "priority": 20 }
+    ],
+    "providesSlots": [
+      "navis-ai.gateway-panel"
+    ],
+    "tools": [
+      { "name": "gateway.chat", "description": "通过网关发起模型对话", "parameters": { "type": "object" } },
+      { "name": "gateway.list-models", "description": "列出可用模型", "parameters": { "type": "object" } },
+      { "name": "mcp.call", "description": "调用 MCP 工具", "parameters": { "type": "object" } }
+    ]
+  }
+}
