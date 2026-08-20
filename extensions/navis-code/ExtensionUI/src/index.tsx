@@ -55,19 +55,19 @@ export const NavisCodeExtension: NavisPlugin = {
     });
 
     // 注册产品自身提供的子插槽内容（动态创建的子插槽）
-    ctx.registerSlot('navis-code.sidebar.left', {
+    ctx.views.register('navis-code.sidebar.left', {
       id: 'navis-code.sidebar',
       pluginId: 'navis-code',
       priority: 10,
       component: () => <SidebarPlaceholder />,
     });
-    ctx.registerSlot('navis-code.viewport.main', {
+    ctx.views.register('navis-code.viewport.main', {
       id: 'navis-code.main',
       pluginId: 'navis-code',
       priority: 10,
       component: () => <MainPlaceholder />,
     });
-    ctx.registerSlot('navis-code.statusbar', {
+    ctx.views.register('navis-code.statusbar', {
       id: 'navis-code.statusbar',
       pluginId: 'navis-code',
       priority: 10,
@@ -75,11 +75,11 @@ export const NavisCodeExtension: NavisPlugin = {
     });
 
     // 命令（冒号命名与清单 commandId 对齐）
-    ctx.registerCommand('navis-code:new-session', () => {
-      ctx.emit('session:create', { timestamp: Date.now() });
+    ctx.commands.register('navis-code:new-session', () => {
+      ctx.events.emit('session:create', { timestamp: Date.now() });
     });
-    ctx.registerCommand('navis-code:open-settings', () => {
-      ctx.emit('settings:open', {});
+    ctx.commands.register('navis-code:open-settings', () => {
+      ctx.events.emit('settings:open', {});
     });
   },
 };

@@ -16,17 +16,17 @@ export interface NavisPlugin {
 }
 
 export class NavisContext {
-  private services = new Map<string, any>();
+  private servicesMap = new Map<string, any>();
   private listeners = new Map<string, Set<EventHandler>>();
-  private commands = new Map<string, (args?: any) => void | Promise<void>>();
+  private commandsMap = new Map<string, (args?: any) => void | Promise<void>>();
 
   provide<T>(name: string, service: T): void {
-    this.services.set(name, service);
+    this.servicesMap.set(name, service);
     this.emit(`service:${name}:ready`, service);
   }
 
   use<T>(name: string): T {
-    const service = this.services.get(name);
+    const service = this.servicesMap.get(name);
     if (!service) {
       throw new Error(`[Navis Context] Service "${name}" is not registered.`);
     }
@@ -34,7 +34,7 @@ export class NavisContext {
   }
 
   has(name: string): boolean {
-    return this.services.has(name);
+    return this.servicesMap.has(name);
   }
 
   on(event: string, handler: EventHandler): () => void {
@@ -79,16 +79,16 @@ export class NavisContext {
   }
 
   registerCommand(id: string, handler: (args?: any) => void | Promise<void>): () => void {
-    this.commands.set(id, handler);
+    this.commandsMap.set(id, handler);
     this.emit('command:registered', id);
     return () => {
-      this.commands.delete(id);
+      this.commandsMap.delete(id);
       this.emit('command:unregistered', id);
     };
   }
 
   executeCommand(id: string, args?: any): Promise<void> | void {
-    const cmd = this.commands.get(id);
+    const cmd = this.commandsMap.get(id);
     if (cmd) {
       return cmd(args);
     }
@@ -100,6 +100,31 @@ export class NavisContext {
     await plugin.apply(this);
     this.emit(`plugin:${plugin.name}:mounted`);
   }
+
+  // 命名空间别名：对齐「前端 Context DI」契约（views.register / events.on）。
+  // 扩展统一通过 ctx.views / ctx.commands / ctx.events / ctx.services 编程；
+  // 上层扁平方法保留作为宿主内部与历史兼容入口。
+  readonly views = {
+    register: (target: string, item: SlotItem) => this.registerSlot(target, item),
+    items: (target: string) => this.getSlotItems(target),
+  };
+
+  readonly commands = {
+    register: (id: string, handler: (args?: any) => void | Promise<void>) =>
+      this.registerCommand(id, handler),
+    execute: (id: string, args?: any) => this.executeCommand(id, args),
+  };
+
+  readonly events = {
+    on: (event: string, handler: EventHandler) => this.on(event, handler),
+    emit: (event: string, payload?: any) => this.emit(event, payload),
+  };
+
+  readonly services = {
+    provide: <T>(name: string, service: T) => this.provide(name, service),
+    use: <T>(name: string) => this.use<T>(name),
+    has: (name: string) => this.has(name),
+  };
 }
 
 export const rootContext = new NavisContext();

@@ -93,7 +93,7 @@ export const NavisDemoExtension: NavisPlugin = {
     });
 
     // 注册扩展自身提供的子插槽内容
-    ctx.registerSlot('navis-demo.controls', {
+    ctx.views.register('navis-demo.controls', {
       id: 'navis-demo.controls',
       pluginId: 'navis-demo',
       priority: 10,
