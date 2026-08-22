@@ -51,65 +51,65 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
 
   return (
     <div style="display: flex; flex-direction: row; height: 100%; width: 100%; background: #ffffff; overflow: hidden;">
-      {/* 中央主视口 (当打开文件/交付件时渲染 DiffViewer，否则展示对话视口与底部 Composer) */}
-      <Show
-        when={activeDiffFile()}
-        fallback={
-          <div style="flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; background: #ffffff;">
-            {/* 1. 顶部面包屑与标题栏 */}
-            <div
-              style="height: 42px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; user-select: none; background: #ffffff; flex-shrink: 0;"
-            >
-              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569;">
-                <span style="font-weight: 500; color: #1e293b;">Navis Go</span>
-                <span style="color: #94a3b8;">/</span>
-                <span style="color: #64748b;">{sessionTitle()}</span>
-              </div>
-
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button
-                  onClick={() => toast.info('Navis IDE 集成套件已就绪')}
-                  style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = '#f8fafc')}
-                >
-                  <span>🚀</span>
-                  <span>安装 IDE</span>
-                </button>
-                <button
-                  onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
-                  style="background: transparent; border: none; color: #64748b; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 14px;"
-                  title="更多选项"
-                >
-                  ⋮
-                </button>
-              </div>
-            </div>
-
-            {/* 2. 消息流滚动视口 */}
-            <div
-              id="timeline-scroll-container"
-              style="flex: 1; overflow-y: auto; min-height: 0; padding: 20px 28px 12px; display: flex; flex-direction: column; align-items: center; overscroll-behavior: contain;"
-            >
-              <Timeline ctx={props.ctx} />
-            </div>
-
-            {/* 3. 底部固定 Composer 输入控制栏 (绝不沉底遮挡，始终完整展示) */}
-            <div style="width: 100%; padding: 4px 28px 16px; flex-shrink: 0; display: flex; justify-content: center; background: #ffffff;">
-              <Composer ctx={props.ctx} />
-            </div>
+      {/* 1. 中央主视口 (始终保留对话视口与底部 Composer，不被侵占) */}
+      <div style="flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; background: #ffffff;">
+        {/* 顶部面包屑与标题栏 */}
+        <div
+          style="height: 42px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; user-select: none; background: #ffffff; flex-shrink: 0;"
+        >
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569;">
+            <span style="font-weight: 500; color: #1e293b;">Navis Go</span>
+            <span style="color: #94a3b8;">/</span>
+            <span style="color: #64748b;">{sessionTitle()}</span>
           </div>
-        }
-      >
-        <DiffViewer
-          ctx={props.ctx}
-          file={activeDiffFile()!}
-          onClose={() => setActiveDiffFile(null)}
-        />
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button
+              onClick={() => toast.info('Navis IDE 集成套件已就绪')}
+              style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#f8fafc')}
+            >
+              <span>🚀</span>
+              <span>安装 IDE</span>
+            </button>
+            <button
+              onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
+              style="background: transparent; border: none; color: #64748b; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 14px;"
+              title="更多选项"
+            >
+              ⋮
+            </button>
+          </div>
+        </div>
+
+        {/* 消息流滚动视口 */}
+        <div
+          id="timeline-scroll-container"
+          style="flex: 1; overflow-y: auto; min-height: 0; padding: 20px 28px 12px; display: flex; flex-direction: column; align-items: center; overscroll-behavior: contain;"
+        >
+          <Timeline ctx={props.ctx} />
+        </div>
+
+        {/* 底部固定 Composer 输入控制栏 */}
+        <div style="width: 100%; padding: 4px 28px 16px; flex-shrink: 0; display: flex; justify-content: center; background: #ffffff;">
+          <Composer ctx={props.ctx} />
+        </div>
+      </div>
+
+      {/* 2. 右侧区域 (在右侧打开源码/Diff查看器 / 目标编辑器 / 默认上下文抽屉) */}
+      <Show when={activeDiffFile()}>
+        <div style="width: 50%; min-width: 480px; max-width: 720px; height: 100%; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; background: #ffffff; z-index: 10;">
+          <DiffViewer
+            ctx={props.ctx}
+            file={activeDiffFile()!}
+            onClose={() => setActiveDiffFile(null)}
+          />
+        </div>
       </Show>
 
-      {/* 4. 活跃目标编辑右侧区域 (1:1 像素级复刻参考图) */}
-      <Show when={goalEditorOpen()}>
+      {/* 3. 活跃目标编辑右侧区域 (1:1 像素级复刻参考图) */}
+      <Show when={!activeDiffFile() && goalEditorOpen()}>
         <GoalEditorDrawer
           ctx={props.ctx}
           open={goalEditorOpen()}
@@ -122,8 +122,8 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
         />
       </Show>
 
-      {/* 5. 默认右侧上下文与交付件抽屉 (当目标编辑打开时平滑让位) */}
-      <Show when={!goalEditorOpen()}>
+      {/* 4. 默认右侧上下文与交付件抽屉 */}
+      <Show when={!activeDiffFile() && !goalEditorOpen()}>
         <ContextDrawer ctx={props.ctx} />
       </Show>
     </div>

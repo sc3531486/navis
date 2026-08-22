@@ -32,29 +32,67 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
   const [artifactsExpanded, setArtifactsExpanded] = createSignal(false);
   const [uploadsExpanded, setUploadsExpanded] = createSignal(false);
 
+  // 真实工作区物理文件清单（支持直接在右侧打开真实源码/Diff）
   const changedFiles = [
-    'AGENTS.md',
-    'MIGRATION-PLAN.md',
-    'ARCHITECTURE_REVIEW.md',
-    'README.md',
-    'CLAUDE.md',
+    {
+      name: 'SessionList.tsx',
+      path: 'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
+      breadcrumb: 's-session > ExtensionUI > src > components > 📄 SessionList.tsx',
+      type: 'code' as const,
+    },
+    {
+      name: 'AGENTS.md',
+      path: 'AGENTS.md',
+      breadcrumb: 'Navis Go > 📄 AGENTS.md',
+      type: 'diff' as const,
+    },
+    {
+      name: 'CLAUDE.md',
+      path: 'CLAUDE.md',
+      breadcrumb: 'Navis Go > 📄 CLAUDE.md',
+      type: 'code' as const,
+    },
+    {
+      name: 'README.md',
+      path: 'README.md',
+      breadcrumb: 'Navis Go > 📄 README.md',
+      type: 'code' as const,
+    },
+    {
+      name: '迁移计划.md',
+      path: '迁移计划.md',
+      breadcrumb: 'Navis Go > 📄 迁移计划.md',
+      type: 'doc' as const,
+    },
+    {
+      name: '架构审查.md',
+      path: '架构审查.md',
+      breadcrumb: 'Navis Go > 📄 架构审查.md',
+      type: 'doc' as const,
+    },
   ];
 
   const artifactsList = [
-    { title: 'Media (Today 10:31 AM)', type: 'image' },
-    { title: 'Agent Turn Live 03...', type: 'doc' },
-    { title: 'Verify Agent Promp...', type: 'script' },
-    { title: 'Media (Today 10:31 AM)', type: 'image' },
+    { title: 'Media (Today 10:31 AM)', type: 'image' as const },
+    { title: 'Agent Turn Live 03...', type: 'doc' as const },
+    { title: 'Verify Agent Promp...', type: 'script' as const },
+    { title: 'Media (Today 10:31 AM)', type: 'image' as const },
   ];
 
   const uploadsList = [
-    { title: 'Media (Today 10:21 AM)', type: 'image' },
-    { title: 'Media (Today 10:17 AM)', type: 'image' },
-    { title: 'Media (Today 10:10 AM)', type: 'image' },
+    { title: 'Media (Today 10:21 AM)', type: 'image' as const },
+    { title: 'Media (Today 10:17 AM)', type: 'image' as const },
+    { title: 'Media (Today 10:10 AM)', type: 'image' as const },
   ];
 
-  const openDiffViewer = (name = 'AGENTS.md', type = 'diff', imageUrl?: string) => {
-    props.ctx.events.emit('diff:open', { name, type, imageUrl });
+  const openFileViewer = (
+    name = 'SessionList.tsx',
+    type: 'diff' | 'code' | 'doc' | 'image' = 'code',
+    path = 'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
+    breadcrumb = 's-session > ExtensionUI > src > components > 📄 SessionList.tsx',
+    imageUrl?: string
+  ) => {
+    props.ctx.events.emit('diff:open', { name, type, path, breadcrumb, imageUrl });
   };
 
   return (
@@ -100,13 +138,18 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           <IconChevronRight size={13} color="#a1a1aa" />
         </div>
 
-        {/* 2. 文件已更改 107 > (点击展开文件，点击文件打开图四 Diff 视图) */}
+        {/* 2. 文件已更改 107 > (点击在右侧打开真实文件与代码/Diff 视图) */}
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div
             id="context-drawer-files-changed-item"
             onClick={() => {
               setFilesExpanded(!filesExpanded());
-              openDiffViewer('AGENTS.md', 'diff');
+              openFileViewer(
+                'SessionList.tsx',
+                'code',
+                'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
+                's-session > ExtensionUI > src > components > 📄 SessionList.tsx'
+              );
             }}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
@@ -126,21 +169,28 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           <Show when={filesExpanded()}>
             <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
               <For each={changedFiles}>
-                {(file) => (
+                {(f) => (
                   <div
-                    id={`file-item-${file}`}
-                    onClick={() => openDiffViewer(file, 'diff')}
+                    id={`file-item-${f.name}`}
+                    onClick={() => openFileViewer(f.name, f.type, f.path, f.breadcrumb)}
                     style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
                     <span style="font-size: 11px;">📄</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{file}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{f.name}</span>
                   </div>
                 )}
               </For>
               <div
-                onClick={() => openDiffViewer('AGENTS.md', 'diff')}
+                onClick={() =>
+                  openFileViewer(
+                    'SessionList.tsx',
+                    'code',
+                    'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
+                    's-session > ExtensionUI > src > components > 📄 SessionList.tsx'
+                  )
+                }
                 style="font-size: 11px; color: #9ca3af; padding: 2px 6px; cursor: pointer;"
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
@@ -151,13 +201,13 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           </Show>
         </div>
 
-        {/* 3. 交付件列表(Artifacts) 278 > (支持查看并放大图片) */}
+        {/* 3. 交付件列表(Artifacts) 278 > (支持查看并在右侧放大图片) */}
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div
             id="context-drawer-artifacts-item"
             onClick={() => {
               setArtifactsExpanded(!artifactsExpanded());
-              openDiffViewer('Media (Today 10:31 AM)', 'image');
+              openFileViewer('Media (Today 10:31 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:31 AM)');
             }}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
@@ -180,7 +230,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
                 {(art) => (
                   <div
                     id={`artifact-item-${art.title.replace(/[^a-zA-Z0-9]/g, '')}`}
-                    onClick={() => openDiffViewer(art.title, art.type as any)}
+                    onClick={() => openFileViewer(art.title, art.type as any, undefined, `Navis Go > ${art.title}`)}
                     style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -191,7 +241,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
                 )}
               </For>
               <div
-                onClick={() => openDiffViewer('Media (Today 10:31 AM)', 'image')}
+                onClick={() => openFileViewer('Media (Today 10:31 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:31 AM)')}
                 style="font-size: 11px; color: #9ca3af; padding: 2px 6px; cursor: pointer;"
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
@@ -207,7 +257,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           <div
             onClick={() => {
               setUploadsExpanded(!uploadsExpanded());
-              openDiffViewer('Media (Today 10:21 AM)', 'image');
+              openFileViewer('Media (Today 10:21 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:21 AM)');
             }}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
@@ -229,7 +279,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
               <For each={uploadsList}>
                 {(upload) => (
                   <div
-                    onClick={() => openDiffViewer(upload.title, 'image')}
+                    onClick={() => openFileViewer(upload.title, 'image', undefined, `Navis Go > 🖼️ ${upload.title}`)}
                     style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}

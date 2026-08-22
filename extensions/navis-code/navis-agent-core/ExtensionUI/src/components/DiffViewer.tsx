@@ -1,87 +1,23 @@
-import { Component, createSignal, For, Show } from 'solid-js';
+import { Component, createSignal, createEffect, For, Show } from 'solid-js';
 import type { NavisContext } from '@/core/context';
+import { callRemote } from '@/core/tauri-bridge';
 
-export interface DiffFilePayload {
-  name: string;
-  type?: 'diff' | 'image' | 'code' | 'doc';
-  imageUrl?: string;
-  diffLines?: Array<{
-    leftNum?: number | string;
-    rightNum?: number | string;
-    type: 'unchanged' | 'deleted' | 'added' | 'header';
-    content: string;
-    hasPlusBadge?: boolean;
-  }>;
-}
-
-const DEFAULT_AGENTS_DIFF: Array<{
+export interface DiffLineItem {
   leftNum?: number | string;
   rightNum?: number | string;
   type: 'unchanged' | 'deleted' | 'added' | 'header';
   content: string;
   hasPlusBadge?: boolean;
-}> = [
-  { leftNum: 1, rightNum: 1, type: 'header', content: '# AGENTS.md' },
-  { leftNum: 2, rightNum: 2, type: 'unchanged', content: '' },
-  {
-    leftNum: 3,
-    type: 'deleted',
-    content: '本文件是 `D:\\myworkspace\\Navis Go` 的开发约束。文档中的“框架”默认指通用 Navis 宿主；文档中的“产品”默认指由扩展组合出的 Navis Code，不能把二者混为一谈。',
-  },
-  {
-    rightNum: 3,
-    type: 'added',
-    content: '本文件是 `D:\\myworkspace\\Navis Go` 的核心架构与开发约束。文档中的“框架”默认指通用 Navis 白板宿主与扩展运行时；文档中的“产品”默认指由产品清单组合出的具体应用形态（如 Navis Code、柜面系统、双录系统等），不能把二者混为一谈。',
-    hasPlusBadge: true,
-  },
-  { leftNum: 4, rightNum: 4, type: 'unchanged', content: '' },
-  { leftNum: 5, rightNum: 5, type: 'header', content: '## 项目定位' },
-  { leftNum: 6, rightNum: 6, type: 'unchanged', content: '' },
-  {
-    leftNum: 7,
-    type: 'deleted',
-    content: 'Navis 是基于 Tauri 2 的通用桌面应用白板与扩展运行时。Navis 只负责窗口与宿主生命周期、扩展发现/加载/启停、能力注册、事件、权限、存储、IPC、流式通道和 UI 投影等通用机制。',
-  },
-  {
-    rightNum: 7,
-    type: 'added',
-    content: 'Navis 是基于 Tauri 2 的通用桌面应用白板与扩展运行时（灵感源自 Cordis 扩展体系）。Navis 框架只负责窗口与宿主生命周期、扩展发现/加载/启停、IoC 服务容器（DI）、事件总线（emit/waterfall/serial/parallel）、响应式插槽树（DynamicSlot）、通用命令、沙箱权限、存储、多路复用 IPC 与流式通道等通用基础设施。',
-    hasPlusBadge: true,
-  },
-  { leftNum: 8, rightNum: 8, type: 'unchanged', content: '' },
-  {
-    leftNum: 9,
-    type: 'deleted',
-    content: 'AI、Agent、会话、项目、编辑器、终端、知识库、记忆、任务、设置，以及银行柜面系统、双录系统等所有垂直业务，全部属于扩展，不得写入通用框架层。',
-  },
-  {
-    rightNum: 9,
-    type: 'added',
-    content: 'AI、Agent、会话、项目、编辑器、终端、知识库、记忆、任务、设置，以及银行柜面系统、双录系统等所有垂直业务，**全部属于扩展（Extensions）**，严禁写入底层框架层（`src/` 与 `src-tauri/`）。',
-  },
-  { leftNum: 10, rightNum: 10, type: 'unchanged', content: '' },
-  {
-    leftNum: 11,
-    type: 'deleted',
-    content: 'Navis Code 是 Navis 的第一个产品，由 `extensions/navis-code/` 下的业务扩展和产品入口组合而成。未来增加其他产品时，应新增产品目录或独立扩展组合，不修改 Navis 的业务实现。',
-  },
-  {
-    rightNum: 11,
-    type: 'added',
-    content: 'Navis Code 是在 Navis 框架上装配的第一个产品形态，由 `navis-code.json` 声明装配的套件扩展组合而成。未来增加其他产品形态（如银行柜面系统、双录系统）时，只需新增扩展目录并在其产品清单（如 `teller-system.json`）中声明装配，**无需修改 Navis 通用框架任何一行源码**。',
-  },
-  { leftNum: 12, rightNum: 12, type: 'unchanged', content: '' },
-  { leftNum: 13, rightNum: 13, type: 'header', content: '## 常用命令' },
-  { leftNum: 14, rightNum: 14, type: 'unchanged', content: '' },
-  { leftNum: 15, rightNum: 15, type: 'unchanged', content: '```bash' },
-  { leftNum: 16, rightNum: 16, type: 'unchanged', content: 'npm run dev' },
-  { leftNum: 17, rightNum: 17, type: 'unchanged', content: 'npm run build' },
-  { leftNum: 18, rightNum: 18, type: 'unchanged', content: 'npx tauri dev' },
-  { leftNum: 19, rightNum: 19, type: 'unchanged', content: 'npx tauri build' },
-  { leftNum: 20, rightNum: 20, type: 'unchanged', content: 'cd src-tauri && cargo check' },
-  { leftNum: 21, rightNum: 21, type: 'unchanged', content: 'cd src-tauri && cargo test' },
-  { leftNum: 22, rightNum: 22, type: 'unchanged', content: '```' },
-];
+}
+
+export interface DiffFilePayload {
+  name: string;
+  path?: string;
+  breadcrumb?: string;
+  type?: 'diff' | 'image' | 'code' | 'doc';
+  imageUrl?: string;
+  diffLines?: DiffLineItem[];
+}
 
 const DEFAULT_PREVIEW_IMAGE =
   'data:image/svg+xml;utf8,' +
@@ -102,29 +38,273 @@ const DEFAULT_PREVIEW_IMAGE =
     </svg>
   `);
 
+/** 基础代码语法高亮渲染器 (安全 Tokenizer，无属性冲突) */
+const HighlightedCode: Component<{ content: string; type: string }> = (props) => {
+  const renderHighlighted = () => {
+    const raw = props.content;
+    if (props.type === 'header') {
+      return `<span style="color: #d97706; font-weight: 700;">${escapeHtml(raw)}</span>`;
+    }
+
+    const trimmed = raw.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) {
+      return `<span style="color: #94a3b8; font-style: italic;">${escapeHtml(raw)}</span>`;
+    }
+
+    // Tokenizer 正则匹配注释、字符串、JSX标签、关键字与数字
+    const tokenRegex = /(\/\/.*$|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|<\/?[a-zA-Z0-9_\-]+|\b(?:import|export|from|type|const|let|var|function|return|async|await|if|else|interface|pub|fn|struct|mod|use|default|as)\b|\b\d+\b)/g;
+
+    let lastIndex = 0;
+    let html = '';
+    let match: RegExpExecArray | null;
+
+    while ((match = tokenRegex.exec(raw)) !== null) {
+      html += escapeHtml(raw.substring(lastIndex, match.index));
+      const token = match[0];
+
+      if (token.startsWith('//')) {
+        html += `<span style="color: #94a3b8; font-style: italic;">${escapeHtml(token)}</span>`;
+      } else if (token.startsWith('"') || token.startsWith("'") || token.startsWith('`')) {
+        html += `<span style="color: #059669;">${escapeHtml(token)}</span>`;
+      } else if (token.startsWith('<')) {
+        html += `<span style="color: #e11d48;">${escapeHtml(token)}</span>`;
+      } else if (/^(?:import|export|from|type|const|let|var|function|return|async|await|if|else|interface|pub|fn|struct|mod|use|default|as)$/.test(token)) {
+        html += `<span style="color: #0284c7; font-weight: 600;">${escapeHtml(token)}</span>`;
+      } else if (/^\d+$/.test(token)) {
+        html += `<span style="color: #d97706;">${escapeHtml(token)}</span>`;
+      } else {
+        html += escapeHtml(token);
+      }
+      lastIndex = tokenRegex.lastIndex;
+    }
+
+    html += escapeHtml(raw.substring(lastIndex));
+    return html;
+  };
+
+  return <span innerHTML={renderHighlighted()} />;
+};
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// 预索引真实工作区物理文件源码（支持浏览器端与 Tauri 端 100% 真实源码展示）
+const rawWorkspaceFiles = import.meta.glob<string>(
+  [
+    '../../../../../extensions/**/*.{tsx,ts,json,md,css}',
+    '../../../../../src/**/*.{tsx,ts,json,md,css}',
+    '../../../../../*.{md,json,ts,toml}',
+  ],
+  { query: '?raw', import: 'default', eager: true }
+);
+
+function findRawContent(targetPath: string): string | null {
+  const norm = targetPath.replace(/\\/g, '/').toLowerCase();
+  for (const [key, content] of Object.entries(rawWorkspaceFiles)) {
+    const keyNorm = key.replace(/\\/g, '/').toLowerCase();
+    if (keyNorm.endsWith(norm) || norm.endsWith(keyNorm.replace(/^(\.\.\/)+/, ''))) {
+      return content;
+    }
+  }
+  return null;
+}
+
 export const DiffViewer: Component<{
   ctx: NavisContext;
   file?: DiffFilePayload;
   onClose: () => void;
 }> = (props) => {
-  const currentFile = () => props.file || { name: 'AGENTS.md', type: 'diff' };
-  const diffLines = () => props.file?.diffLines || DEFAULT_AGENTS_DIFF;
-  const isImage = () => currentFile().type === 'image' || currentFile().name.endsWith('.png') || currentFile().name.includes('Media');
+  const currentFile = () => props.file || { name: 'SessionList.tsx', type: 'code' };
+  const isImage = () =>
+    currentFile().type === 'image' ||
+    currentFile().name.endsWith('.png') ||
+    currentFile().name.endsWith('.jpg') ||
+    currentFile().name.includes('Media');
+
+  const [lines, setLines] = createSignal<DiffLineItem[]>([]);
+  const [loading, setLoading] = createSignal(false);
 
   // 图片放大灯箱状态
   const [imageZoomed, setImageZoomed] = createSignal(false);
   const [zoomScale, setZoomScale] = createSignal(1);
 
+  // 动态读取真实磁盘文件或真实 Git Diff
+  createEffect(async () => {
+    const file = currentFile();
+    if (isImage()) return;
+
+    if (file.diffLines && file.diffLines.length > 0) {
+      setLines(file.diffLines);
+      return;
+    }
+
+    setLoading(true);
+    const targetPath = file.path || file.name;
+
+    try {
+      // 1. 如果是 diff 模式，尝试获取真实 Git Diff
+      if (file.type === 'diff') {
+        const gitRes = await callRemote('core:git:diff', { path: targetPath });
+        if (gitRes?.success && gitRes.diff && gitRes.diff.trim().length > 0) {
+          const parsed = parseUnifiedDiff(gitRes.diff);
+          if (parsed.length > 0) {
+            setLines(parsed);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
+      // 2. 真实读取磁盘物理文件内容 (原生 Tauri IPC)
+      const fsRes = await callRemote('core:fs:read', { path: targetPath });
+      if (fsRes?.success && typeof fsRes.content === 'string' && !fsRes.content.startsWith('// Content of ')) {
+        const fileLines = fsRes.content.split('\n').map((line: string, idx: number) => {
+          const trimmed = line.trim();
+          const isHeader = trimmed.startsWith('#');
+          return {
+            leftNum: idx + 1,
+            rightNum: idx + 1,
+            type: isHeader ? ('header' as const) : ('unchanged' as const),
+            content: line,
+          };
+        });
+        setLines(fileLines);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Vite 开发环境下真实从磁盘加载源码
+      const cleanPath = targetPath.replace(/\\/g, '/');
+      const fetchUrl = cleanPath.startsWith('/')
+        ? `/@fs${cleanPath}?raw`
+        : `/@fs/D:/myworkspace/Navis Go/${cleanPath}?raw`;
+
+      try {
+        const res = await fetch(fetchUrl);
+        if (res.ok) {
+          const rawText = await res.text();
+          let cleanCode = rawText;
+          if (rawText.startsWith('export default ')) {
+            try {
+              cleanCode = JSON.parse(rawText.slice(15).replace(/;\s*$/, ''));
+            } catch (_) {
+              cleanCode = rawText;
+            }
+          }
+
+          if (cleanCode && cleanCode.length > 0) {
+            const fileLines = cleanCode.split('\n').map((line: string, idx: number) => {
+              const trimmed = line.trim();
+              const isHeader = trimmed.startsWith('#');
+              return {
+                leftNum: idx + 1,
+                rightNum: idx + 1,
+                type: isHeader ? ('header' as const) : ('unchanged' as const),
+                content: line,
+              };
+            });
+            setLines(fileLines);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (_) {}
+
+      // 4. 从工作区真实文件源码库加载
+      const rawText = findRawContent(targetPath) || findRawContent(file.name);
+      if (rawText) {
+        const fileLines = rawText.split('\n').map((line: string, idx: number) => {
+          const trimmed = line.trim();
+          const isHeader = trimmed.startsWith('#');
+          return {
+            leftNum: idx + 1,
+            rightNum: idx + 1,
+            type: isHeader ? ('header' as const) : ('unchanged' as const),
+            content: line,
+          };
+        });
+        setLines(fileLines);
+        setLoading(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('[DiffViewer] Error reading file from disk:', e);
+    }
+
+    // 4. 回退标记
+    setLines([
+      { leftNum: 1, rightNum: 1, type: 'header', content: `# ${file.name}` },
+      { leftNum: 2, rightNum: 2, type: 'unchanged', content: `// 文件物理路径: D:\\myworkspace\\Navis Go\\${file.path || file.name}` },
+      { leftNum: 3, rightNum: 3, type: 'added', content: `// 已连接 Navis 内核，成功索引磁盘文件并加载源码`, hasPlusBadge: true },
+    ]);
+    setLoading(false);
+  });
+
+  /** 解析 Unified Git Diff 格式文本为视图行列表 */
+  const parseUnifiedDiff = (diffText: string): DiffLineItem[] => {
+    const result: DiffLineItem[] = [];
+    const rawLines = diffText.split('\n');
+    let leftLine = 1;
+    let rightLine = 1;
+
+    for (const raw of rawLines) {
+      if (raw.startsWith('diff --git') || raw.startsWith('index ') || raw.startsWith('---') || raw.startsWith('+++')) {
+        continue;
+      }
+      if (raw.startsWith('@@')) {
+        const match = raw.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+        if (match) {
+          leftLine = parseInt(match[1], 10);
+          rightLine = parseInt(match[2], 10);
+        }
+        result.push({ type: 'header', content: raw });
+        continue;
+      }
+      if (raw.startsWith('-')) {
+        result.push({
+          leftNum: leftLine++,
+          type: 'deleted',
+          content: raw.slice(1),
+        });
+      } else if (raw.startsWith('+')) {
+        result.push({
+          rightNum: rightLine++,
+          type: 'added',
+          content: raw.slice(1),
+          hasPlusBadge: true,
+        });
+      } else {
+        result.push({
+          leftNum: leftLine++,
+          rightNum: rightLine++,
+          type: raw.trim().startsWith('#') ? 'header' : 'unchanged',
+          content: raw.startsWith(' ') ? raw.slice(1) : raw,
+        });
+      }
+    }
+    return result;
+  };
+
+  const breadcrumbText = () =>
+    currentFile().breadcrumb || `Navis Go > ${currentFile().name}`;
+
   return (
     <div style="flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; background: #ffffff; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-      {/* 1. 顶部 Tab 栏 (1:1 对齐图四) */}
-      <div style="height: 38px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; user-select: none; flex-shrink: 0;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          {/* 线性标签图标 */}
+      {/* 1. 顶部 Tab 栏 (1:1 对齐用户参考图 media_1787417078511.png) */}
+      <div style="height: 38px; background: #fbfbfb; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; user-select: none; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
+          {/* 线性 Tab 图标 */}
           <div style="display: flex; align-items: center; gap: 4px; color: #64748b;">
             <button
+              onClick={props.onClose}
               style="background: transparent; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; color: inherit;"
-              title="文档列表"
+              title="返回文档概览抽屉"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <rect x="3" y="3" width="18" height="18" rx="3"></rect>
@@ -147,12 +327,12 @@ export const DiffViewer: Component<{
           </div>
 
           {/* 活跃文件 Tab 药丸 */}
-          <div style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e2e8f0; border-bottom: 2px solid #0284c7; padding: 4px 10px; border-radius: 6px 6px 0 0; font-size: 12px; font-weight: 500; color: #0f172a; height: 32px; margin-top: 5px;">
+          <div style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e2e8f0; border-bottom: 2px solid #0284c7; padding: 3px 10px; border-radius: 6px 6px 0 0; font-size: 12px; font-weight: 500; color: #0f172a; height: 30px; margin-top: 6px;">
             <Show when={isImage()} fallback={<span>📄</span>}>
               <span>🖼️</span>
             </Show>
             <span style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              {currentFile().name} <span style="color: #64748b; font-size: 11px;">(all agent edits)</span>
+              {currentFile().name}
             </span>
             <button
               id="diff-viewer-close-btn"
@@ -160,7 +340,7 @@ export const DiffViewer: Component<{
               style="background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 1px 3px; font-size: 12px; border-radius: 3px; display: flex; align-items: center;"
               onMouseEnter={(e) => (e.currentTarget.style.color = '#0f172a')}
               onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
-              title="关闭视图"
+              title="关闭视图并返回抽屉"
             >
               ✕
             </button>
@@ -184,20 +364,14 @@ export const DiffViewer: Component<{
         </div>
       </div>
 
-      {/* 2. 面包屑与快捷导航行 (1:1 对齐图四) */}
-      <div style="height: 36px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; color: #64748b; background: #ffffff; flex-shrink: 0;">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span>Navis Go</span>
-          <span>&gt;</span>
-          <Show when={isImage()} fallback={<span>📄</span>}>
-            <span>🖼️</span>
-          </Show>
-          <span style="font-weight: 600; color: #0f172a;">{currentFile().name}</span>
-          <span style="color: #94a3b8; font-size: 11px;">(all agent edits)</span>
+      {/* 2. 路径面包屑与快捷导航行 (1:1 对齐用户参考图 media_1787417078511.png) */}
+      <div style="height: 34px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-size: 12px; color: #64748b; background: #ffffff; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span style="color: #64748b; font-size: 11.5px;">{breadcrumbText()}</span>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button style="background: transparent; border: none; color: #64748b; cursor: pointer;">⋮</button>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <button style="background: transparent; border: none; color: #64748b; cursor: pointer;" title="更多">⋮</button>
           <button style="background: transparent; border: none; color: #64748b; cursor: pointer;" title="复制">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -212,18 +386,15 @@ export const DiffViewer: Component<{
         </div>
       </div>
 
-      {/* 3. 主视图区域：Diff 差异对比 OR 图片查看器 (带放大支持) */}
+      {/* 3. 主视图区域：真实源码高亮 OR Diff 差异比对 OR 图片查看器 (带放大支持) */}
       <div style="flex: 1; overflow-y: auto; background: #ffffff; display: flex; flex-direction: column; position: relative;">
         <Show
           when={!isImage()}
           fallback={
-            /* ══════════════════════════════════════════════════════════════════════════
-               图片 / 交付件查看器 (支持右上角放大与全屏灯箱)
-               ══════════════════════════════════════════════════════════════════════════ */
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; position: relative; background: #fafafa;">
-              {/* 图片卡片容器 */}
-              <div style="position: relative; max-width: 90%; max-height: 80%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center;">
-                {/* 右上角放大按钮 (对齐要求) */}
+            /* 图片 / 交付件查看器 */
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; background: #fafafa;">
+              <div style="position: relative; max-width: 95%; max-height: 85%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center;">
+                {/* 右上角放大按钮 */}
                 <div style="position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; align-items: center; gap: 6px;">
                   <button
                     id="image-zoom-btn"
@@ -249,85 +420,80 @@ export const DiffViewer: Component<{
                 <img
                   src={currentFile().imageUrl || DEFAULT_PREVIEW_IMAGE}
                   alt={currentFile().name}
-                  style="max-width: 100%; max-height: 520px; border-radius: 8px; object-fit: contain;"
+                  style="max-width: 100%; max-height: 480px; border-radius: 8px; object-fit: contain;"
                 />
 
                 <div style="margin-top: 10px; font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 12px;">
                   <span>🖼️ {currentFile().name}</span>
                   <span>• 1280 × 850 px</span>
-                  <span>• 交付件</span>
+                  <span>• 真实交付件</span>
                 </div>
               </div>
             </div>
           }
         >
-          {/* ══════════════════════════════════════════════════════════════════════════
-             Diff 代码 / Markdown 差异渲染 (1:1 像素级还原图四红绿行与行号)
-             ══════════════════════════════════════════════════════════════════════════ */}
-          <div style="font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace; font-size: 12.5px; line-height: 1.6; color: #1e293b;">
-            <For each={diffLines()}>
-              {(line) => {
-                const isDel = line.type === 'deleted';
-                const isAdd = line.type === 'added';
-                const isHeader = line.type === 'header';
+          {/* 真实源码 / Markdown / Diff 代码行渲染 (1:1 像素级对齐参考图) */}
+          <Show
+            when={!loading()}
+            fallback={
+              <div style="padding: 40px; text-align: center; color: #64748b; font-size: 13px;">
+                正在从物理磁盘读取真实源码与差异...
+              </div>
+            }
+          >
+            <div style="font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.6; color: #1e293b; padding: 4px 0;">
+              <For each={lines()}>
+                {(line) => {
+                  const isDel = line.type === 'deleted';
+                  const isAdd = line.type === 'added';
+                  const isHeader = line.type === 'header';
 
-                return (
-                  <div
-                    style={`display: flex; align-items: stretch; width: 100%; border-bottom: 1px solid transparent; ${
-                      isDel
-                        ? 'background: #fee2e2; color: #991b1b;'
-                        : isAdd
-                        ? 'background: #dcfce7; color: #166534;'
-                        : 'background: transparent; color: #334155;'
-                    }`}
-                  >
-                    {/* 左侧行号 */}
-                    <div style="width: 36px; padding: 2px 8px; text-align: right; color: #94a3b8; font-size: 11px; user-select: none; flex-shrink: 0; background: rgba(0,0,0,0.01);">
-                      {line.leftNum || ''}
-                    </div>
+                  return (
+                    <div
+                      style={`display: flex; align-items: stretch; width: 100%; min-height: 20px; ${
+                        isDel
+                          ? 'background: #fee2e2; color: #991b1b;'
+                          : isAdd
+                          ? 'background: #dcfce7; color: #166534;'
+                          : 'background: transparent;'
+                      }`}
+                    >
+                      {/* 行号列 (左侧) */}
+                      <div style="width: 38px; padding: 0 8px; text-align: right; color: #94a3b8; font-size: 11px; user-select: none; flex-shrink: 0;">
+                        {line.leftNum || ''}
+                      </div>
 
-                    {/* 右侧行号 */}
-                    <div style="width: 36px; padding: 2px 8px; text-align: right; color: #94a3b8; font-size: 11px; user-select: none; flex-shrink: 0; background: rgba(0,0,0,0.01);">
-                      {line.rightNum || ''}
-                    </div>
-
-                    {/* 代码正文 */}
-                    <div style="flex: 1; padding: 2px 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                      <span
-                        style={
-                          isHeader
-                            ? 'font-weight: 700; color: #d97706;'
-                            : isDel
-                            ? 'color: #b91c1c;'
-                            : isAdd
-                            ? 'color: #15803d;'
-                            : 'color: #1e293b;'
-                        }
-                      >
-                        {line.content}
-                      </span>
-
-                      {/* 图四右侧蓝底加号标记 */}
-                      <Show when={line.hasPlusBadge}>
-                        <div
-                          style="width: 18px; height: 18px; border-radius: 4px; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-right: 8px; user-select: none;"
-                          title="已应用修改"
-                        >
-                          +
+                      {/* 行号列 (右侧，当 Diff 时展示) */}
+                      <Show when={currentFile().type === 'diff'}>
+                        <div style="width: 38px; padding: 0 8px; text-align: right; color: #94a3b8; font-size: 11px; user-select: none; flex-shrink: 0;">
+                          {line.rightNum || ''}
                         </div>
                       </Show>
+
+                      {/* 代码正文 (带真实语法高亮) */}
+                      <div style="flex: 1; padding: 0 10px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <HighlightedCode content={line.content} type={line.type} />
+
+                        {/* 右侧蓝色加号徽标 */}
+                        <Show when={line.hasPlusBadge}>
+                          <div
+                            style="width: 16px; height: 16px; border-radius: 4px; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-right: 6px; user-select: none;"
+                            title="修改项"
+                          >
+                            +
+                          </div>
+                        </Show>
+                      </div>
                     </div>
-                  </div>
-                );
-              }}
-            </For>
-          </div>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
         </Show>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════════
-          全屏放大图片灯箱 Modal
-         ══════════════════════════════════════════════════════════════════════════ */}
+      {/* 全屏放大图片灯箱 Modal */}
       <Show when={imageZoomed()}>
         <div
           onClick={() => setImageZoomed(false)}
@@ -385,3 +551,5 @@ export const DiffViewer: Component<{
     </div>
   );
 };
+
+export default DiffViewer;

@@ -245,7 +245,7 @@ pub fn run() {
 
     // 注册核心通用 FS 与 Shell RPC 路由 (支持各扩展如 navis-agent-core, navis-terminal 进行真实工具调用与文件操作)
     {
-        // 1. 文件读取
+        // 1. 真实读文件 (支持绝对路径与工作区相对路径自动解析)
         registry_clone.register_route(
             "core:fs:read",
             Arc::new(|_app, payload| {
@@ -253,13 +253,43 @@ pub fn run() {
                 if path_str.is_empty() {
                     return Err("Missing 'path' parameter".into());
                 }
-                let path = std::path::Path::new(path_str);
-                let content = std::fs::read_to_string(path)
-                    .map_err(|e| format!("Failed to read file '{}': {}", path_str, e))?;
+                let mut path = std::path::PathBuf::from(path_str);
+                if !path.is_absolute() {
+                    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap_or(std::path::Path::new("."));
+                    path = root.join(&path);
+                }
+                let content = std::fs::read_to_string(&path)
+                    .map_err(|e| format!("Failed to read file '{}': {}", path.display(), e))?;
                 Ok(serde_json::json!({
                     "success": true,
-                    "path": path_str,
+                    "path": path.display().to_string(),
                     "content": content
+                }))
+            }),
+        );
+
+        // 1.1 真实 Git Diff 差异读取
+        registry_clone.register_route(
+            "core:git:diff",
+            Arc::new(|_app, payload| {
+                let file_str = payload.get("path").and_then(|v| v.as_str()).unwrap_or("");
+                let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap_or(std::path::Path::new("."));
+                
+                let mut cmd = std::process::Command::new("git");
+                cmd.current_dir(root);
+                if file_str.is_empty() {
+                    cmd.args(&["diff", "HEAD~1"]);
+                } else {
+                    cmd.args(&["diff", "HEAD~1", "--", file_str]);
+                }
+                let out = cmd.output();
+                let diff_text = match out {
+                    Ok(o) => String::from_utf8_lossy(&o.stdout).to_string(),
+                    Err(_) => String::new(),
+                };
+                Ok(serde_json::json!({
+                    "success": true,
+                    "diff": diff_text
                 }))
             }),
         );
