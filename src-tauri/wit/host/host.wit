@@ -32,14 +32,8 @@ interface types {
         label: string,
     }
 
-    /// 会话快照（context.get-session 返回值）。
-    record session-snapshot {
-        id: string,
-        title: string,
-    }
-
-    /// 项目快照（context.get-active-project 返回值）。
-    record project-snapshot {
+    /// 宿主应用快照（context.get-app-state 返回值）。
+    record app-snapshot {
         id: string,
         name: string,
     }
@@ -81,11 +75,10 @@ interface operation {
     list-operations: func() -> list<operation-description>;
 }
 
-/// 上下文快照（对应 context host 接口）。
+/// 宿主上下文快照（对应 context host 接口）。
 interface context {
-    use types.{session-snapshot, project-snapshot};
-    get-session:        func() -> result<session-snapshot, string>;
-    get-active-project: func() -> result<project-snapshot, string>;
+    use types.{app-snapshot};
+    get-app-state: func() -> result<app-snapshot, string>;
 }
 
 /// 扩展 KV 存储（对应 34 §2.5 storage 声明）。

@@ -8,7 +8,7 @@ import { GoalEditorDrawer } from './components/GoalEditorDrawer';
 import { agentPipeline } from './pipeline/AgentPipeline';
 import { toast } from '@/core/toast/ToastStore';
 
-import { DiffViewer, type DiffFilePayload } from './components/DiffViewer';
+import { DiffViewer, type DiffFilePayload } from '../../../navis-editor/ExtensionUI/src/index';
 
 const AgentWorkspace = (props: { ctx: NavisContext }) => {
   const [sessionTitle, setSessionTitle] = createSignal('流水设计审查');

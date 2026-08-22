@@ -68,7 +68,7 @@ export async function listRoutes(): Promise<string[]> {
   }
 }
 
-/** 直接调用后端进程内动态 RPC 路由（命令桥底层），在无 Tauri 原生环境时平滑回退 */
+/** 直接调用后端进程内动态 RPC 路由（命令桥底层），在无原生宿主环境时返回通用安全回退 */
 export async function callRemote(route: string, payload?: any): Promise<any> {
   try {
     const invokeFn = await getInvoke();
@@ -76,51 +76,11 @@ export async function callRemote(route: string, payload?: any): Promise<any> {
       return await invokeFn('navis_dispatch_rpc', { route, payload: payload ?? {} });
     }
   } catch (_) {
-    // 无原生 Tauri 宿主环境（如纯浏览器/测试环境）
+    // 纯无原生宿主环境
   }
 
-  if (route === 'core:fs:write') {
-    return { success: true, path: payload?.path, bytes: payload?.content?.length || 0 };
-  }
-  if (route === 'core:fs:read') {
-    return { success: true, path: payload?.path, content: '// Content of ' + payload?.path };
-  }
-  if (route === 'core:fs:edit') {
-    return { success: true, path: payload?.path };
-  }
-  if (route === 'core:fs:list_dir') {
-    return {
-      success: true,
-      entries: [
-        { name: 'AGENTS.md', is_dir: false, path: 'AGENTS.md' },
-        { name: 'README.md', is_dir: false, path: 'README.md' },
-        { name: 'CLAUDE.md', is_dir: false, path: 'CLAUDE.md' },
-        { name: 'navis-code.json', is_dir: false, path: 'navis-code.json' },
-        { name: 'package.json', is_dir: false, path: 'package.json' },
-        { name: '迁移计划.md', is_dir: false, path: '迁移计划.md' },
-        { name: '架构审查.md', is_dir: false, path: '架构审查.md' },
-        { name: 'src', is_dir: true, path: 'src' },
-        { name: 'extensions', is_dir: true, path: 'extensions' },
-      ],
-    };
-  }
-  if (route === 'core:shell:exec') {
-    if (payload?.command?.includes('git status')) {
-      return {
-        success: true,
-        stdout: ' M extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx\n M extensions/navis-code/navis-agent-core/ExtensionUI/src/components/ContextDrawer.tsx\n M extensions/navis-code/navis-agent-core/ExtensionUI/src/components/DiffViewer.tsx\n M AGENTS.md\n M README.md',
-        stderr: '',
-        exit_code: 0,
-      };
-    }
-    return {
-      success: true,
-      stdout: `[Executed successfully]: ${payload?.command}`,
-      stderr: '',
-      exit_code: 0,
-    };
-  }
-  return { success: true };
+  // 纯净通用回退（零业务文件名、零特定产品特判）
+  return { success: false, error: 'Native host RPC unavailable' };
 }
 
 /** 统一通信协议：{ extension, action, data }，宿主按目标扩展自动路由 */

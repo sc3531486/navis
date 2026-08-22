@@ -65,6 +65,16 @@ const IconFilePlusLinear = () => (
   </svg>
 );
 
+// 真实物理磁盘文件动态索引 (开发期/浏览器期通过 Vite glob 自动发现真实物理文件)
+const localWorkspaceGlob = import.meta.glob(
+  [
+    '../../../../../extensions/**/*.{tsx,ts,json,md,css}',
+    '../../../../../src/**/*.{tsx,ts,json,md,css}',
+    '../../../../../*.{md,json,ts,toml}',
+  ],
+  { query: '?raw', eager: false }
+);
+
 export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
   const [activeTab, setActiveTab] = createSignal<'tasks' | 'artifacts'>('tasks');
   const [filesExpanded, setFilesExpanded] = createSignal(true);
@@ -120,6 +130,27 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           }));
         if (realFiles.length > 0) {
           setChangedFiles(realFiles);
+          return;
+        }
+      }
+
+      // 3. 开发环境 / 浏览器环境动态扫描真实磁盘文件索引
+      const globKeys = Object.keys(localWorkspaceGlob);
+      if (globKeys.length > 0) {
+        const discovered = globKeys
+          .map((k) => {
+            const clean = k.replace(/^(\.\.\/)+/, '');
+            const name = clean.split('/').pop() || clean;
+            return {
+              name,
+              path: clean,
+              breadcrumb: clean.includes('/') ? clean.replace(/\//g, ' > ') : `Navis Go > 📄 ${name}`,
+              type: name.endsWith('.md') ? ('diff' as const) : ('code' as const),
+            };
+          })
+          .filter((f) => !f.name.startsWith('.'));
+        if (discovered.length > 0) {
+          setChangedFiles(discovered.slice(0, 10));
           return;
         }
       }
