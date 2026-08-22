@@ -262,7 +262,23 @@ pub fn run() {
             navis_list_processes,
             navis_audit_log,
         ])
-        .setup(move |_app| {
+        .setup(move |app| {
+            // 通用产品图标装配：若当前产品清单声明了专属 icon 路径，从扩展目录中动态装配并注入窗口
+            if let Some(product_cfg) = &product {
+                if let Some(icon_rel_path) = &product_cfg.icon {
+                    use tauri::Manager;
+                    let icon_path = std::path::Path::new(icon_rel_path);
+                    if icon_path.exists() {
+                        if let Ok(img) = tauri::image::Image::from_path(icon_path) {
+                            if let Some(win) = app.get_webview_window("main") {
+                                let _ = win.set_icon(img);
+                                info!("[Navis Kernel] Applied product icon from extension: {}", icon_rel_path);
+                            }
+                        }
+                    }
+                }
+            }
+
             let ext_dirs = discover_extension_dirs();
             // 按清单 main 声明拉起插件后端进程
             for manifest in &manifests {
