@@ -92,16 +92,30 @@ export async function callRemote(route: string, payload?: any): Promise<any> {
     return {
       success: true,
       entries: [
-        { name: 'src', is_dir: true, path: 'src' },
-        { name: 'pom.xml', is_dir: false, path: 'pom.xml' },
+        { name: 'AGENTS.md', is_dir: false, path: 'AGENTS.md' },
         { name: 'README.md', is_dir: false, path: 'README.md' },
+        { name: 'CLAUDE.md', is_dir: false, path: 'CLAUDE.md' },
+        { name: 'navis-code.json', is_dir: false, path: 'navis-code.json' },
+        { name: 'package.json', is_dir: false, path: 'package.json' },
+        { name: '迁移计划.md', is_dir: false, path: '迁移计划.md' },
+        { name: '架构审查.md', is_dir: false, path: '架构审查.md' },
+        { name: 'src', is_dir: true, path: 'src' },
+        { name: 'extensions', is_dir: true, path: 'extensions' },
       ],
     };
   }
   if (route === 'core:shell:exec') {
+    if (payload?.command?.includes('git status')) {
+      return {
+        success: true,
+        stdout: ' M extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx\n M extensions/navis-code/navis-agent-core/ExtensionUI/src/components/ContextDrawer.tsx\n M extensions/navis-code/navis-agent-core/ExtensionUI/src/components/DiffViewer.tsx\n M AGENTS.md\n M README.md',
+        stderr: '',
+        exit_code: 0,
+      };
+    }
     return {
       success: true,
-      stdout: `[Executed successfully]: ${payload?.command}\n[INFO] Build finished.`,
+      stdout: `[Executed successfully]: ${payload?.command}`,
       stderr: '',
       exit_code: 0,
     };

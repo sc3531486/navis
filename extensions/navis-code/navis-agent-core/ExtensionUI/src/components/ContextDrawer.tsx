@@ -1,9 +1,48 @@
-import { Component, createSignal, For, Show } from 'solid-js';
+import { Component, createSignal, onMount, onCleanup, For, Show } from 'solid-js';
 import type { NavisContext } from '@/core/context';
+import { callRemote } from '@/core/tauri-bridge';
 import {
   IconChevronRight,
   IconChevronDown,
 } from '@/components/icons';
+
+export interface ChangedFileItem {
+  name: string;
+  path: string;
+  breadcrumb?: string;
+  type: 'diff' | 'code' | 'doc';
+  status?: string;
+}
+
+export interface ArtifactItem {
+  id: string;
+  title: string;
+  type: 'image' | 'doc' | 'script' | 'plan';
+  path?: string;
+  imageUrl?: string;
+  timestamp: number;
+}
+
+export interface UploadItem {
+  id: string;
+  title: string;
+  type: 'image' | 'file';
+  size?: number;
+  url?: string;
+  timestamp: number;
+}
+
+export interface SubagentItem {
+  id: string;
+  name: string;
+  status: 'running' | 'idle' | 'completed';
+}
+
+export interface TaskItem {
+  id: string;
+  name: string;
+  status: 'running' | 'completed' | 'failed';
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 // 1:1 对齐图三的顶部 Tab 纯矢量单色线性图标 (Monochrome Linear Tab Icons)
@@ -28,71 +67,184 @@ const IconFilePlusLinear = () => (
 
 export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
   const [activeTab, setActiveTab] = createSignal<'tasks' | 'artifacts'>('tasks');
-  const [filesExpanded, setFilesExpanded] = createSignal(false);
+  const [filesExpanded, setFilesExpanded] = createSignal(true);
   const [artifactsExpanded, setArtifactsExpanded] = createSignal(false);
   const [uploadsExpanded, setUploadsExpanded] = createSignal(false);
+  const [subagentsExpanded, setSubagentsExpanded] = createSignal(false);
+  const [tasksExpanded, setTasksExpanded] = createSignal(false);
 
-  // 真实工作区物理文件清单（支持直接在右侧打开真实源码/Diff）
-  const changedFiles = [
-    {
-      name: 'SessionList.tsx',
-      path: 'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
-      breadcrumb: 's-session > ExtensionUI > src > components > 📄 SessionList.tsx',
-      type: 'code' as const,
-    },
-    {
-      name: 'AGENTS.md',
-      path: 'AGENTS.md',
-      breadcrumb: 'Navis Go > 📄 AGENTS.md',
-      type: 'diff' as const,
-    },
-    {
-      name: 'CLAUDE.md',
-      path: 'CLAUDE.md',
-      breadcrumb: 'Navis Go > 📄 CLAUDE.md',
-      type: 'code' as const,
-    },
-    {
-      name: 'README.md',
-      path: 'README.md',
-      breadcrumb: 'Navis Go > 📄 README.md',
-      type: 'code' as const,
-    },
-    {
-      name: '迁移计划.md',
-      path: '迁移计划.md',
-      breadcrumb: 'Navis Go > 📄 迁移计划.md',
-      type: 'doc' as const,
-    },
-    {
-      name: '架构审查.md',
-      path: '架构审查.md',
-      breadcrumb: 'Navis Go > 📄 架构审查.md',
-      type: 'doc' as const,
-    },
-  ];
+  // ══════════════════════════════════════════════════════════════════════════
+  // 全动态响应式状态（拒绝任何死数据，纯实时扫描与事件驱动）
+  // ══════════════════════════════════════════════════════════════════════════
+  const [changedFiles, setChangedFiles] = createSignal<ChangedFileItem[]>([]);
+  const [artifacts, setArtifacts] = createSignal<ArtifactItem[]>([]);
+  const [uploads, setUploads] = createSignal<UploadItem[]>([]);
+  const [subagents, setSubagents] = createSignal<SubagentItem[]>([]);
+  const [tasks, setTasks] = createSignal<TaskItem[]>([]);
 
-  const artifactsList = [
-    { title: 'Media (Today 10:31 AM)', type: 'image' as const },
-    { title: 'Agent Turn Live 03...', type: 'doc' as const },
-    { title: 'Verify Agent Promp...', type: 'script' as const },
-    { title: 'Media (Today 10:31 AM)', type: 'image' as const },
-  ];
+  // 从 Git 与文件系统真实扫描已修改/已变动文件
+  const refreshWorkspaceFiles = async () => {
+    try {
+      // 1. 尝试通过 git status 真实读取变动文件
+      const res = await callRemote('core:shell:exec', { command: 'git status --porcelain' });
+      if (res?.success && typeof res.stdout === 'string' && res.stdout.trim().length > 0) {
+        const lines = res.stdout.split('\n').filter((l: string) => l.trim().length > 0 && /^[ MADRCU?!]{1,2}\s+/.test(l));
+        const parsed: ChangedFileItem[] = lines.map((line: string) => {
+          const status = line.slice(0, 2).trim();
+          const filePath = line.slice(2).trim();
+          const fileName = filePath.split('/').pop() || filePath;
+          return {
+            name: fileName,
+            path: filePath,
+            breadcrumb: filePath.includes('/') ? filePath.replace(/\//g, ' > ') : `Navis Go > 📄 ${fileName}`,
+            type: fileName.endsWith('.md') ? 'diff' : 'code',
+            status,
+          };
+        });
+        if (parsed.length > 0) {
+          setChangedFiles(parsed);
+          return;
+        }
+      }
 
-  const uploadsList = [
-    { title: 'Media (Today 10:21 AM)', type: 'image' as const },
-    { title: 'Media (Today 10:17 AM)', type: 'image' as const },
-    { title: 'Media (Today 10:10 AM)', type: 'image' as const },
-  ];
+      // 2. 如果工作区当前干净无 Git 差异，扫描真实工作区顶层核心文件供查看
+      const listRes = await callRemote('core:fs:list_dir', { path: '.' });
+      if (listRes?.success && Array.isArray(listRes.entries)) {
+        const realFiles: ChangedFileItem[] = listRes.entries
+          .filter((e: any) => !e.is_dir && !e.name.startsWith('.'))
+          .map((e: any) => ({
+            name: e.name,
+            path: e.name,
+            breadcrumb: `Navis Go > 📄 ${e.name}`,
+            type: e.name.endsWith('.md') ? 'diff' : 'code',
+          }));
+        if (realFiles.length > 0) {
+          setChangedFiles(realFiles);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[ContextDrawer] Error refreshing real files:', e);
+    }
+  };
+
+  onMount(() => {
+    // 初始扫描
+    refreshWorkspaceFiles();
+
+    // 监听实时文件创建/修改事件
+    const unsubFileCreated = props.ctx.events.on('file:created', (payload: { path: string }) => {
+      if (!payload?.path) return;
+      const fileName = payload.path.split('/').pop() || payload.path;
+      setChangedFiles((prev) => [
+        {
+          name: fileName,
+          path: payload.path,
+          breadcrumb: `Navis Go > 📄 ${fileName}`,
+          type: fileName.endsWith('.md') ? 'diff' : 'code',
+        },
+        ...prev.filter((f) => f.path !== payload.path),
+      ]);
+    });
+
+    const unsubFileModified = props.ctx.events.on('file:modified', (payload: { path: string }) => {
+      if (!payload?.path) return;
+      const fileName = payload.path.split('/').pop() || payload.path;
+      setChangedFiles((prev) => [
+        {
+          name: fileName,
+          path: payload.path,
+          breadcrumb: `Navis Go > 📄 ${fileName}`,
+          type: 'diff',
+        },
+        ...prev.filter((f) => f.path !== payload.path),
+      ]);
+    });
+
+    // 监听实时交付件生成事件 (如 Agent 生成的文档、图片、脚本)
+    const unsubArtifact = props.ctx.events.on('artifact:created', (payload: any) => {
+      if (!payload?.name && !payload?.title) return;
+      const title = payload.title || payload.name;
+      const isImg = title.endsWith('.png') || title.endsWith('.jpg') || payload.type === 'image';
+      setArtifacts((prev) => [
+        {
+          id: `art-${Date.now()}`,
+          title,
+          type: isImg ? 'image' : 'doc',
+          path: payload.path,
+          imageUrl: payload.imageUrl,
+          timestamp: Date.now(),
+        },
+        ...prev,
+      ]);
+    });
+
+    // 监听上传附件事件
+    const unsubUpload = props.ctx.events.on('composer:attachment:added', (payload: any) => {
+      if (!payload?.name) return;
+      setUploads((prev) => [
+        {
+          id: `up-${Date.now()}`,
+          title: payload.name,
+          type: payload.type || 'file',
+          size: payload.size,
+          url: payload.url,
+          timestamp: Date.now(),
+        },
+        ...prev,
+      ]);
+    });
+
+    // 监听子代理生命周期
+    const unsubSubagent = props.ctx.events.on('subagent:spawned', (payload: any) => {
+      if (!payload?.name) return;
+      setSubagents((prev) => [
+        {
+          id: payload.id || `sub-${Date.now()}`,
+          name: payload.name,
+          status: 'running',
+        },
+        ...prev,
+      ]);
+    });
+
+    // 监听后台任务
+    const unsubTask = props.ctx.events.on('task:started', (payload: any) => {
+      if (!payload?.name) return;
+      setTasks((prev) => [
+        {
+          id: payload.id || `task-${Date.now()}`,
+          name: payload.name,
+          status: 'running',
+        },
+        ...prev,
+      ]);
+    });
+
+    onCleanup(() => {
+      unsubFileCreated();
+      unsubFileModified();
+      unsubArtifact();
+      unsubUpload();
+      unsubSubagent();
+      unsubTask();
+    });
+  });
 
   const openFileViewer = (
-    name = 'SessionList.tsx',
-    type: 'diff' | 'code' | 'doc' | 'image' = 'code',
-    path = 'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
-    breadcrumb = 's-session > ExtensionUI > src > components > 📄 SessionList.tsx',
+    name: string,
+    type: 'diff' | 'code' | 'doc' | 'image' | 'script' | 'plan' | string = 'code',
+    path?: string,
+    breadcrumb?: string,
     imageUrl?: string
   ) => {
-    props.ctx.events.emit('diff:open', { name, type, path, breadcrumb, imageUrl });
+    props.ctx.events.emit('diff:open', {
+      name,
+      type,
+      path: path || name,
+      breadcrumb: breadcrumb || `Navis Go > 📄 ${name}`,
+      imageUrl,
+    });
   };
 
   return (
@@ -106,7 +258,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
           style={`padding: 5px 8px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; font-size: 13px; transition: background 0.1s ease; ${
             activeTab() === 'tasks' ? 'background: #eceae4; color: #1e1d1b;' : 'background: transparent; color: #71717a;'
           }`}
-          title="文档概览"
+          title="文档与任务概览"
         >
           <IconMenuDocLinear />
         </button>
@@ -121,35 +273,51 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
         </button>
       </div>
 
-      {/* 抽屉内容列表区域 (1:1 像素级对齐图三药丸数字与排版) */}
+      {/* 抽屉内容列表区域 (全部数字与列表项实时动态计算) */}
       <div style="flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 14px;">
-        {/* 1. 子代理 0 > */}
-        <div
-          style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#3f3f46')}
-        >
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span>子代理</span>
-            <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
-              0
-            </span>
+        {/* 1. 子代理 (动态计数) */}
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div
+            onClick={() => setSubagentsExpanded(!subagentsExpanded())}
+            style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#3f3f46')}
+          >
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span>子代理</span>
+              <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
+                {subagents().length}
+              </span>
+            </div>
+            <Show when={subagentsExpanded()} fallback={<IconChevronRight size={13} color="#a1a1aa" />}>
+              <IconChevronDown size={13} color="#a1a1aa" />
+            </Show>
           </div>
-          <IconChevronRight size={13} color="#a1a1aa" />
+
+          <Show when={subagentsExpanded() && subagents().length > 0}>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
+              <For each={subagents()}>
+                {(sub) => (
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px;">
+                    <span style="font-size: 11px;">🤖</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{sub.name}</span>
+                  </div>
+                )}
+              </For>
+            </div>
+          </Show>
         </div>
 
-        {/* 2. 文件已更改 107 > (点击在右侧打开真实文件与代码/Diff 视图) */}
+        {/* 2. 文件已更改 (动态计数与真实文件列表) */}
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div
             id="context-drawer-files-changed-item"
             onClick={() => {
               setFilesExpanded(!filesExpanded());
-              openFileViewer(
-                'SessionList.tsx',
-                'code',
-                'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
-                's-session > ExtensionUI > src > components > 📄 SessionList.tsx'
-              );
+              if (changedFiles().length > 0) {
+                const first = changedFiles()[0];
+                openFileViewer(first.name, first.type, first.path, first.breadcrumb);
+              }
             }}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
@@ -158,7 +326,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
             <div style="display: flex; align-items: center; gap: 8px;">
               <span>文件已更改</span>
               <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
-                107
+                {changedFiles().length}
               </span>
             </div>
             <Show when={filesExpanded()} fallback={<IconChevronRight size={13} color="#a1a1aa" />}>
@@ -168,7 +336,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
 
           <Show when={filesExpanded()}>
             <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
-              <For each={changedFiles}>
+              <For each={changedFiles()}>
                 {(f) => (
                   <div
                     id={`file-item-${f.name}`}
@@ -182,32 +350,20 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
                   </div>
                 )}
               </For>
-              <div
-                onClick={() =>
-                  openFileViewer(
-                    'SessionList.tsx',
-                    'code',
-                    'extensions/shared/navis-session/ExtensionUI/src/components/SessionList.tsx',
-                    's-session > ExtensionUI > src > components > 📄 SessionList.tsx'
-                  )
-                }
-                style="font-size: 11px; color: #9ca3af; padding: 2px 6px; cursor: pointer;"
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
-              >
-                See all (107)
-              </div>
             </div>
           </Show>
         </div>
 
-        {/* 3. 交付件列表(Artifacts) 278 > (支持查看并在右侧放大图片) */}
+        {/* 3. 交付件列表(Artifacts) (动态计数与交付件列表) */}
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div
             id="context-drawer-artifacts-item"
             onClick={() => {
               setArtifactsExpanded(!artifactsExpanded());
-              openFileViewer('Media (Today 10:31 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:31 AM)');
+              if (artifacts().length > 0) {
+                const first = artifacts()[0];
+                openFileViewer(first.title, first.type, first.path, `Navis Go > ${first.title}`, first.imageUrl);
+              }
             }}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
@@ -216,7 +372,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
             <div style="display: flex; align-items: center; gap: 8px;">
               <span>交付件列表(Artifacts)</span>
               <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
-                278
+                {artifacts().length}
               </span>
             </div>
             <Show when={artifactsExpanded()} fallback={<IconChevronRight size={13} color="#a1a1aa" />}>
@@ -226,39 +382,35 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
 
           <Show when={artifactsExpanded()}>
             <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
-              <For each={artifactsList}>
-                {(art) => (
-                  <div
-                    id={`artifact-item-${art.title.replace(/[^a-zA-Z0-9]/g, '')}`}
-                    onClick={() => openFileViewer(art.title, art.type as any, undefined, `Navis Go > ${art.title}`)}
-                    style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
-                    onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <span style="font-size: 11px;">{art.type === 'image' ? '🖼️' : '📄'}</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{art.title}</span>
-                  </div>
-                )}
-              </For>
-              <div
-                onClick={() => openFileViewer('Media (Today 10:31 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:31 AM)')}
-                style="font-size: 11px; color: #9ca3af; padding: 2px 6px; cursor: pointer;"
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+              <Show
+                when={artifacts().length > 0}
+                fallback={
+                  <div style="font-size: 11.5px; color: #a1a1aa; padding: 4px 6px;">暂无生成交付件</div>
+                }
               >
-                See all (278)
-              </div>
+                <For each={artifacts()}>
+                  {(art) => (
+                    <div
+                      id={`artifact-item-${art.title.replace(/[^a-zA-Z0-9]/g, '')}`}
+                      onClick={() => openFileViewer(art.title, art.type, art.path, `Navis Go > ${art.title}`, art.imageUrl)}
+                      style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <span style="font-size: 11px;">{art.type === 'image' ? '🖼️' : '📄'}</span>
+                      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{art.title}</span>
+                    </div>
+                  )}
+                </For>
+              </Show>
             </div>
           </Show>
         </div>
 
-        {/* 4. Uploads 49 > */}
+        {/* 4. Uploads (动态计数与列表) */}
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div
-            onClick={() => {
-              setUploadsExpanded(!uploadsExpanded());
-              openFileViewer('Media (Today 10:21 AM)', 'image', undefined, 'Navis Go > 🖼️ Media (Today 10:21 AM)');
-            }}
+            onClick={() => setUploadsExpanded(!uploadsExpanded())}
             style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
             onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
             onMouseLeave={(e) => (e.currentTarget.style.color = '#3f3f46')}
@@ -266,7 +418,7 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
             <div style="display: flex; align-items: center; gap: 8px;">
               <span>Uploads</span>
               <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
-                49
+                {uploads().length}
               </span>
             </div>
             <Show when={uploadsExpanded()} fallback={<IconChevronRight size={13} color="#a1a1aa" />}>
@@ -276,36 +428,61 @@ export const ContextDrawer: Component<{ ctx: NavisContext }> = (props) => {
 
           <Show when={uploadsExpanded()}>
             <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
-              <For each={uploadsList}>
-                {(upload) => (
-                  <div
-                    onClick={() => openFileViewer(upload.title, 'image', undefined, `Navis Go > 🖼️ ${upload.title}`)}
-                    style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
-                    onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <span style="font-size: 11px;">🖼️</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{upload.title}</span>
+              <Show
+                when={uploads().length > 0}
+                fallback={
+                  <div style="font-size: 11.5px; color: #a1a1aa; padding: 4px 6px;">暂无上传附件</div>
+                }
+              >
+                <For each={uploads()}>
+                  {(upload) => (
+                    <div
+                      onClick={() => openFileViewer(upload.title, upload.type === 'image' ? 'image' : 'doc', undefined, `Navis Go > ${upload.title}`)}
+                      style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px; cursor: pointer;"
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <span style="font-size: 11px;">{upload.type === 'image' ? '🖼️' : '📎'}</span>
+                      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{upload.title}</span>
+                    </div>
+                  )}
+                </For>
+              </Show>
+            </div>
+          </Show>
+        </div>
+
+        {/* 5. 后台任务 (动态计数) */}
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div
+            onClick={() => setTasksExpanded(!tasksExpanded())}
+            style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#3f3f46')}
+          >
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span>后台任务</span>
+              <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
+                {tasks().length}
+              </span>
+            </div>
+            <Show when={tasksExpanded()} fallback={<IconChevronRight size={13} color="#a1a1aa" />}>
+              <IconChevronDown size={13} color="#a1a1aa" />
+            </Show>
+          </div>
+
+          <Show when={tasksExpanded() && tasks().length > 0}>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 6px;">
+              <For each={tasks()}>
+                {(task) => (
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; padding: 4px 6px; border-radius: 4px;">
+                    <span style="font-size: 11px;">⚙️</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{task.name}</span>
                   </div>
                 )}
               </For>
             </div>
           </Show>
-        </div>
-
-        {/* 5. 后台任务 0 > */}
-        <div
-          style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #3f3f46; cursor: pointer; padding: 4px 0;"
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#18181b')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#3f3f46')}
-        >
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span>后台任务</span>
-            <span style="background: #f4f4f5; color: #71717a; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500;">
-              0
-            </span>
-          </div>
-          <IconChevronRight size={13} color="#a1a1aa" />
         </div>
       </div>
     </div>

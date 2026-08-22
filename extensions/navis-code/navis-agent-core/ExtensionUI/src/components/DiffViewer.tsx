@@ -14,7 +14,7 @@ export interface DiffFilePayload {
   name: string;
   path?: string;
   breadcrumb?: string;
-  type?: 'diff' | 'image' | 'code' | 'doc';
+  type?: 'diff' | 'image' | 'code' | 'doc' | 'script' | 'plan' | string;
   imageUrl?: string;
   diffLines?: DiffLineItem[];
 }
