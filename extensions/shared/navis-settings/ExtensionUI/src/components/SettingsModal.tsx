@@ -171,11 +171,11 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
     <Show when={open()}>
       <div
         onClick={() => setOpen(false)}
-        style="position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px;"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; pointer-events: auto;"
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          style="width: 920px; max-width: 95vw; height: 620px; max-height: 90vh; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 14px; box-shadow: 0 24px 48px -12px rgba(0,0,0,0.18); overflow: hidden; display: flex; flex-direction: row; animation: navis-pop 0.15s ease-out;"
+          style="width: 920px; max-width: 95vw; height: 620px; max-height: 90vh; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 14px; box-shadow: 0 24px 48px -12px rgba(0,0,0,0.18); overflow: hidden; display: flex; flex-direction: row; animation: navis-pop 0.15s ease-out; pointer-events: auto;"
         >
           {/* 左侧主要导航栏 (Vertical Navigation) */}
           <div style="width: 220px; background: #f8f8f7; border-right: 1px solid #eaeaea; display: flex; flex-direction: column; justify-content: space-between; padding: 16px 10px;">
