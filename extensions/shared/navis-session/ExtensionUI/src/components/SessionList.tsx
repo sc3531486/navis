@@ -163,13 +163,13 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
         </For>
       </div>
 
-      {/* 侧边栏底部模型状态与设置入口 (1:1 像素级复刻参考图 3) */}
+      {/* 侧边栏底部 Provider 齿轮入口 (点击直接打开 Settings 面板) */}
       <div style="border-top: 1px solid #eae7e1; padding: 6px 10px; display: flex; align-items: center; position: relative;">
         <div
           id="sidebar-bottom-model-btn"
           onClick={(e) => {
             e.stopPropagation();
-            setShowGatewayMenu(!showGatewayMenu());
+            props.ctx.events.emit('settings:open', { tab: 'models' });
           }}
           style="display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: all 0.15s ease; user-select: none;"
           onMouseEnter={(e) => {
@@ -178,7 +178,7 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent';
           }}
-          title="切换模型或打开设置"
+          title="点击打开设置中心 (Settings)"
         >
           <IconSettings size={14} color="#18181b" />
           <span style="font-size: 13px; font-weight: 400; color: #18181b; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
