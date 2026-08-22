@@ -277,12 +277,28 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
       });
     });
 
+    const unsubGoalStep = props.ctx.events.on('timeline:goal:step', (payload: any) => {
+      const stepMsgId = `goal-step-${payload.round}-${Date.now()}`;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: stepMsgId,
+          role: 'assistant',
+          content: `🎯 **${payload.phase}**\n\n- **核心行动**: ${payload.action}\n- **阶段状态**: ✅ 自动验证完成，继续推进下阶段`,
+          thinking: payload.thought,
+          timestamp: payload.timestamp,
+        },
+      ]);
+      scrollToBottom();
+    });
+
     const unsubSession = props.ctx.events.on('session:created', () => {
       setMessages([]);
     });
 
     onCleanup(() => {
       unsubTurn();
+      unsubGoalStep();
       unsubSession();
     });
   });

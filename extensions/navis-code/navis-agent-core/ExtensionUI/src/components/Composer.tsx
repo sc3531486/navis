@@ -2,6 +2,9 @@ import { Component, createSignal, Show, For, onMount, onCleanup } from 'solid-js
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
+import { ClarificationModal, type ClarificationQuestion } from './ClarificationModal';
+import { MilestoneRoadmap, type MilestoneItem } from './MilestoneRoadmap';
+import { GoalRunner } from '../services/GoalRunner';
 import {
   IconPlus,
   IconSparkles,
@@ -135,6 +138,8 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [activeSpecialMode, setActiveSpecialMode] = createSignal<'normal' | 'goal' | 'plan'>('normal');
   const [isHoveringModeChip, setIsHoveringModeChip] = createSignal(false);
 
+  const goalRunner = new GoalRunner(props.ctx);
+
   interface ActiveGoal {
     id: string;
     title: string;
@@ -145,6 +150,19 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [activeGoal, setActiveGoal] = createSignal<ActiveGoal | null>(null);
   const [hoverGoalBtn, setHoverGoalBtn] = createSignal<'trash' | 'play' | 'expand' | null>(null);
   const [nowTs, setNowTs] = createSignal(Date.now());
+
+  // 计划模式决策确认与里程碑图谱状态
+  const [showClarification, setShowClarification] = createSignal(false);
+  const [pendingPlanContent, setPendingPlanContent] = createSignal('');
+  const [clarificationQuestion, setClarificationQuestion] = createSignal<ClarificationQuestion>({
+    title: '请确认本次计划的核心技术实现路径与交付策略：',
+    options: [
+      '方案 A：基于原生微内核事件总线解耦，保证零侵入与高扩展性',
+      '方案 B：引入分层状态机管理多阶段生命周期，强化异常恢复能力',
+      '策略 C：执行完成后自动运行全量自动化测试套件确保无回归风险',
+    ],
+  });
+  const [planMilestones, setPlanMilestones] = createSignal<MilestoneItem[]>([]);
 
   onMount(() => {
     const timer = setInterval(() => setNowTs(Date.now()), 1000);
@@ -199,14 +217,80 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     }
   };
 
+  const executePlanWithClarification = (selectedOpts: string[], customInput: string) => {
+    setShowClarification(false);
+    const content = pendingPlanContent();
+    setPendingPlanContent('');
+    setActiveSpecialMode('normal');
+
+    // 动态根据工作量大小生成节点 (S: 15m, M: 45m, L: 2h)
+    const initialMilestones: MilestoneItem[] = [
+      { id: 'm-1', title: '架构规划与依赖解耦', desc: '确定接口契约与事件拓扑', status: 'running', effort: 'small' },
+      { id: 'm-2', title: '核心模块研发与插槽绑定', desc: '编写通用组件与微内核服务', status: 'pending', effort: 'large' },
+      { id: 'm-3', title: '自动化测试与回归自检', desc: '运行 cargo check 与测试套件', status: 'pending', effort: 'medium' },
+      { id: 'm-4', title: '集成交付与文档同步', desc: '输出交付报告与架构归档', status: 'pending', effort: 'small' },
+    ];
+    setPlanMilestones(initialMilestones);
+
+    // 触发 Agent Turn
+    const activeProvider = gatewayStore.activeProvider();
+    const activeModel = gatewayStore.activeModel();
+    props.ctx.events.emit('agent:turn:start', {
+      content: `${content}${customInput ? `\n[补充要求]: ${customInput}` : ''}`,
+      model: activeModel?.name || gatewayStore.activeModelId() || 'gemini-3.7-flash',
+      modelId: gatewayStore.activeModelId(),
+      provider: activeProvider?.name,
+      permissionMode: permissionMode(),
+      reasoning: reasoningIntensity(),
+      mode: 'plan',
+      timestamp: Date.now(),
+      clarification: { selected: selectedOpts, custom: customInput },
+    });
+
+    // 动态模拟里程碑状态推进 (正在执行绿色转圈 -> 完成变绿勾)
+    setTimeout(() => {
+      setPlanMilestones((prev) =>
+        prev.map((m, i) => (i === 0 ? { ...m, status: 'completed' } : i === 1 ? { ...m, status: 'running' } : m))
+      );
+    }, 2800);
+
+    setTimeout(() => {
+      setPlanMilestones((prev) =>
+        prev.map((m, i) => (i <= 1 ? { ...m, status: 'completed' } : i === 2 ? { ...m, status: 'running' } : m))
+      );
+    }, 5600);
+
+    setTimeout(() => {
+      setPlanMilestones((prev) =>
+        prev.map((m, i) => (i <= 2 ? { ...m, status: 'completed' } : i === 3 ? { ...m, status: 'running' } : m))
+      );
+    }, 8200);
+
+    setTimeout(() => {
+      setPlanMilestones((prev) => prev.map((m) => ({ ...m, status: 'completed' })));
+      toast.success('执行计划所有里程碑全部完成！');
+    }, 10800);
+
+    setUsedTokens((prev) => prev + Math.floor(content.length * 1.5 + 400));
+    setText('');
+  };
+
   const handleSend = () => {
     const content = text().trim();
     if (!content) return;
 
+    const mode = activeSpecialMode();
+
+    // 计划模式：先弹出关键决策与选项确认弹窗
+    if (mode === 'plan') {
+      setPendingPlanContent(content);
+      setShowClarification(true);
+      return;
+    }
+
     // 检查是否配置了有效模型与 Provider
     const activeProvider = gatewayStore.activeProvider();
     const activeModel = gatewayStore.activeModel();
-    const mode = activeSpecialMode();
 
     props.ctx.events.emit('agent:turn:start', {
       content,
@@ -220,13 +304,15 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     });
 
     if (mode === 'goal') {
+      const gid = `g-${Date.now()}`;
       setActiveGoal({
-        id: `g-${Date.now()}`,
+        id: gid,
         title: content,
-        status: 'paused',
+        status: 'running',
         createdAt: Date.now(),
       });
       setActiveSpecialMode('normal');
+      goalRunner.startGoal(gid, content);
     }
 
     // 模拟增加本次交互的 Token 消耗
@@ -457,6 +543,14 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
         </div>
       </Show>
 
+      {/* 计划模式：吸顶动态里程碑节点图谱 (按工作量自适应间隔 + 绿圈旋转进行中/实心绿勾完成) */}
+      <Show when={planMilestones().length > 0}>
+        <MilestoneRoadmap
+          milestones={planMilestones()}
+          onClose={() => setPlanMilestones([])}
+        />
+      </Show>
+
       {/* 活跃目标横幅 (1:1 像素级复刻参考图 1-5) */}
       <Show when={activeGoal()}>
         <div
@@ -489,6 +583,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               <button
                 id="goal-btn-trash"
                 onClick={() => {
+                  goalRunner.stopGoal();
                   setActiveGoal(null);
                   toast.info('已清除目标');
                 }}
@@ -522,6 +617,11 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                   if (!g) return;
                   const newStatus = g.status === 'running' ? 'paused' : 'running';
                   setActiveGoal({ ...g, status: newStatus });
+                  if (newStatus === 'running') {
+                    goalRunner.resumeGoal();
+                  } else {
+                    goalRunner.pauseGoal();
+                  }
                   toast.info(newStatus === 'running' ? '已恢复目标运行' : '已暂停目标');
                 }}
                 onMouseEnter={() => setHoverGoalBtn('play')}
@@ -885,6 +985,14 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
           </button>
         </div>
       </div>
+
+      {/* 计划模式：关键决策与选项交互确认弹窗 */}
+      <ClarificationModal
+        open={showClarification()}
+        question={clarificationQuestion()}
+        onSkip={() => executePlanWithClarification([], '')}
+        onConfirm={(selectedOpts, customInput) => executePlanWithClarification(selectedOpts, customInput)}
+      />
     </div>
   );
 };
