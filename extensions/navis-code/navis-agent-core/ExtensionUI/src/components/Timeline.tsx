@@ -1,6 +1,7 @@
 import { Component, createSignal, For, Show, onMount, onCleanup } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
+import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
 
 interface MessageTurn {
   id: string;
@@ -16,18 +17,21 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
   const [messages, setMessages] = createSignal<MessageTurn[]>([]);
   let scrollContainer: HTMLDivElement | undefined;
 
-  const handleCheckAgain = () => {
+  const handleCheckAgain = async () => {
     setIsChecking(true);
     toast.info('正在检测本地网关 127.0.0.1:15721...');
-    setTimeout(() => {
-      setIsChecking(false);
+    const res = await gatewayStore.testConnection('gateway-local');
+    setIsChecking(false);
+    if (res.success) {
       setAlertVisible(false);
-      toast.success('网关连接成功！Agent 引擎已就绪');
-    }, 1200);
+      toast.success(`网关连接成功！延迟: ${res.pingMs}ms，Agent 引擎已就绪`);
+    } else {
+      toast.error('网关连接失败，请检查端口是否开启');
+    }
   };
 
   const handleOpenSetup = () => {
-    props.ctx.events.emit('settings:open', { tab: 'gateway' });
+    props.ctx.events.emit('settings:open', { tab: 'models' });
   };
 
   const handleRestoreSession = () => {

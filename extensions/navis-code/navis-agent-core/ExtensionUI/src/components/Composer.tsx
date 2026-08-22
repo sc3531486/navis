@@ -1,11 +1,11 @@
-import { Component, createSignal, Show, onMount, onCleanup } from 'solid-js';
+import { Component, createSignal, Show, For, onMount, onCleanup } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
+import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
 
 export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [text, setText] = createSignal('');
   const [permissionMode, setPermissionMode] = createSignal<'Bypass permissions' | 'Ask for confirmation' | 'Read-only'>('Bypass permissions');
-  const [selectedModel, setSelectedModel] = createSignal('gemini-3.7-flash');
   const [reasoningIntensity, setReasoningIntensity] = createSignal<'Off' | 'Low' | 'Medium' | 'High'>('High');
   const [activeDropdown, setActiveDropdown] = createSignal<'perm' | 'plus' | 'model' | 'reason' | 'context' | null>(null);
 
@@ -13,16 +13,20 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     const content = text().trim();
     if (!content) return;
 
+    const currentModel = gatewayStore.activeModel();
+
     props.ctx.events.emit('agent:turn:start', {
       content,
-      model: selectedModel(),
+      model: currentModel?.name || gatewayStore.activeModelId(),
+      modelId: gatewayStore.activeModelId(),
+      provider: gatewayStore.activeProvider()?.name,
       permission: permissionMode(),
       reasoning: reasoningIntensity(),
       timestamp: Date.now(),
     });
 
     setText('');
-    toast.info(`已发送给 ${selectedModel()}`);
+    toast.info(`已发送指令至 ${currentModel?.name || 'Agent'}`);
   };
 
   const handleCopyContext = () => {
@@ -149,7 +153,9 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                     setActiveDropdown(null);
                     toast.info('已切换为自动执行模式');
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f7f6f2;"
+                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
+                    permissionMode() === 'Bypass permissions' ? 'background: #f7f6f2;' : ''
+                  }`}
                 >
                   <b style="color: #2d2b28;">Bypass permissions</b>
                   <div style="font-size: 11px; color: #8e8b83;">自动放行文件与终端命令执行</div>
@@ -160,7 +166,9 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                     setActiveDropdown(null);
                     toast.info('已切换为确认审批模式');
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;"
+                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
+                    permissionMode() === 'Ask for confirmation' ? 'background: #f7f6f2;' : ''
+                  }`}
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
@@ -173,7 +181,9 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                     setActiveDropdown(null);
                     toast.info('已切换为严格只读模式');
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;"
+                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
+                    permissionMode() === 'Read-only' ? 'background: #f7f6f2;' : ''
+                  }`}
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
@@ -205,7 +215,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                   onClick={() => {
                     setActiveDropdown(null);
                     props.ctx.commands.execute('project:open-folder');
-                    toast.info('已添加上下文工作区');
+                    toast.info('已添加工作区文件');
                   }}
                   style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
@@ -230,7 +240,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
 
           {/* 右侧：模型选择、思考强度与状态指示灯 */}
           <div style="display: flex; align-items: center; gap: 10px; position: relative;">
-            {/* 模型选择器 */}
+            {/* 动态模型选择器 */}
             <div
               onClick={(e) => {
                 e.stopPropagation();
@@ -240,49 +250,57 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <span style="font-weight: 500; color: #4b4843;">{selectedModel()}</span>
+              <span style="font-weight: 500; color: #4b4843;">{gatewayStore.activeModel()?.name || gatewayStore.activeModelId()}</span>
               <span style="font-size: 10px; opacity: 0.7;">▾</span>
             </div>
 
-            {/* 模型选择下拉 */}
+            {/* 动态模型下拉菜单 */}
             <Show when={activeDropdown() === 'model'}>
               <div
                 onClick={(e) => e.stopPropagation()}
-                style="position: absolute; right: 80px; bottom: 32px; width: 190px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
+                style="position: absolute; right: 80px; bottom: 32px; width: 260px; max-height: 280px; overflow-y: auto; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
               >
-                <div
-                  onClick={() => {
-                    setSelectedModel('gemini-3.7-flash');
-                    setActiveDropdown(null);
-                    toast.info('已选用 gemini-3.7-flash (极速)');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; background: #f7f6f2;"
-                >
-                  ⚡ gemini-3.7-flash
+                <div style="padding: 4px 8px; font-size: 11px; font-weight: 600; color: #8e8b83; border-bottom: 1px solid #f0eee8;">
+                  当前 Provider: {gatewayStore.activeProvider().name}
                 </div>
+                <For each={gatewayStore.activeProvider().models}>
+                  {(m) => (
+                    <div
+                      onClick={() => {
+                        gatewayStore.setActiveModel(m.id);
+                        setActiveDropdown(null);
+                        toast.info(`已切换模型: ${m.name}`);
+                      }}
+                      style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; ${
+                        gatewayStore.activeModelId() === m.id ? 'background: #f7f6f2;' : ''
+                      }`}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
+                      onMouseLeave={(e) => {
+                        if (gatewayStore.activeModelId() !== m.id) e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <b style="font-size: 12px; color: #1e1d1b;">{m.name}</b>
+                        <Show when={m.capabilities.reasoning}>
+                          <span style="font-size: 9px; color: #c2410c; background: #fff7ed; padding: 1px 4px; border-radius: 3px;">
+                            Reasoning
+                          </span>
+                        </Show>
+                      </div>
+                      <span style="font-size: 10.5px; color: #8e8b83; font-family: monospace;">{m.id}</span>
+                    </div>
+                  )}
+                </For>
                 <div
                   onClick={() => {
-                    setSelectedModel('claude-3-7-sonnet');
                     setActiveDropdown(null);
-                    toast.info('已选用 claude-3-7-sonnet (高智力)');
+                    props.ctx.events.emit('settings:open', { tab: 'models' });
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
+                  style="padding: 6px 8px; border-top: 1px solid #f0eee8; cursor: pointer; font-size: 11.5px; color: #c2410c; text-align: center; font-weight: 500;"
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  🧠 claude-3-7-sonnet
-                </div>
-                <div
-                  onClick={() => {
-                    setSelectedModel('deepseek-r1');
-                    setActiveDropdown(null);
-                    toast.info('已选用 deepseek-r1 (推理)');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  🔬 deepseek-r1
+                  ⚙️ 打开模型配置中心...
                 </div>
               </div>
             </Show>
@@ -352,7 +370,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
 
             {/* 就绪指示灯 */}
             <span
-              onClick={() => toast.success('Agent 运行时在线就绪')}
+              onClick={() => toast.success(`当前 Provider [${gatewayStore.activeProvider().name}] 就绪`)}
               style="width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 6px rgba(22,163,74,0.4); cursor: pointer;"
               title="Agent 就绪"
             />

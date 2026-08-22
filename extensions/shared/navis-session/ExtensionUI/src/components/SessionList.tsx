@@ -1,6 +1,7 @@
 import { Component, createSignal, For, Show, onMount, onCleanup } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
+import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
 
 interface SessionItem {
   id: string;
@@ -279,29 +280,30 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
             style="position: absolute; left: 10px; bottom: 48px; width: 220px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); padding: 6px; z-index: 200; display: flex; flex-direction: column; gap: 2px;"
           >
             <div style="padding: 6px 8px; border-bottom: 1px solid #eae7e1; font-size: 11.5px; color: #76736c;">
-              当前网关: <b style="color: #1e1d1b;">127.0.0.1:15721</b>
+              当前网关: <b style="color: #1e1d1b;">{gatewayStore.activeProvider().name}</b>
+              <div style="font-size: 10.5px; color: #8e8b83; margin-top: 2px;">{gatewayStore.activeModel().name}</div>
             </div>
             <button
               onClick={() => {
                 setUserMenuOpen(false);
-                props.ctx.events.emit('settings:open', { tab: 'gateway' });
+                props.ctx.events.emit('settings:open', { tab: 'models' });
               }}
               style="padding: 7px 8px; text-align: left; background: transparent; border: none; border-radius: 5px; font-size: 12.5px; color: #2d2b28; cursor: pointer;"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              🌐 网关配置与状态
+              🤖 模型与 Provider 管理
             </button>
             <button
               onClick={() => {
                 setUserMenuOpen(false);
-                props.ctx.events.emit('settings:open', { tab: 'keys' });
+                props.ctx.events.emit('settings:open', { tab: 'sandbox' });
               }}
               style="padding: 7px 8px; text-align: left; background: transparent; border: none; border-radius: 5px; font-size: 12.5px; color: #2d2b28; cursor: pointer;"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              🔑 切换 API 密钥
+              🛡️ 沙箱执行权限设置
             </button>
             <button
               onClick={() => {
@@ -318,7 +320,7 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
         </Show>
 
         <button
-          onClick={() => props.ctx.events.emit('settings:open', { tab: 'general' })}
+          onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
           style="background: transparent; border: none; font-size: 13px; color: #918e87; cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
           onMouseEnter={(e) => (e.currentTarget.style.background = '#eceae4')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
