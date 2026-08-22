@@ -15,6 +15,9 @@ pub struct ProductConfig {
     pub shell: Option<String>,
     #[serde(default)]
     pub description: Option<String>,
+    /// 产品专属图标声明（如 "extensions/navis-code/navis-code/ExtensionUI/assets/icon.png"）
+    #[serde(default)]
+    pub icon: Option<String>,
     /// 本产品装配的业务扩展 id 列表
     #[serde(default)]
     pub extensions: Vec<String>,

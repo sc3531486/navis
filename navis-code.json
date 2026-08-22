@@ -3,6 +3,7 @@
   "name": "Navis Code",
   "shell": "navis-code",
   "description": "Navis Code 产品组装清单：基于 Claude Code / Cowork 设计哲学的 Agent 编码协同工作台。",
+  "icon": "extensions/navis-code/navis-code/ExtensionUI/assets/icon.png",
   "extensions": [
     "navis-code",
     "navis-agent-core",

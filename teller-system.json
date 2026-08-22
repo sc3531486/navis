@@ -3,5 +3,6 @@
   "name": "Teller System",
   "shell": "teller-system-shell",
   "description": "柜面系统产品组装清单（示例）：在 Navis 上组装的垂直业务客户端。启用本产品无需修改 src/ 与 src-tauri/，只需在 extensions/ 下新增扩展并在本清单声明。",
+  "icon": "extensions/teller-system/assets/icon.png",
   "extensions": []
 }
