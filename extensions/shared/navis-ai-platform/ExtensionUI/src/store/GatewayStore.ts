@@ -421,10 +421,11 @@ export const gatewayStore = {
     setProviders((prev) =>
       prev.map((p) => {
         if (p.id === providerId) {
-          return {
-            ...p,
-            models: p.models.map((m) => (m.id === modelId ? { ...m, ...updates } : m)),
-          };
+          const modelIndex = p.models.findIndex((m) => m.id === modelId);
+          if (modelIndex >= 0) {
+            Object.assign(p.models[modelIndex], updates);
+            return { ...p, models: [...p.models] };
+          }
         }
         return p;
       }),

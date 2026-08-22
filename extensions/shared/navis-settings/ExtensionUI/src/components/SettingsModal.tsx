@@ -1,4 +1,4 @@
-import { Component, createSignal, onMount, onCleanup, Show, For } from 'solid-js';
+import { Component, createSignal, onMount, onCleanup, Show, For, Index } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore, type ProviderItem, type ModelItem } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
@@ -447,29 +447,30 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
 
                     {/* 表体行 */}
                     <div style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
-                      <For each={currentProvider()?.models}>
-                        {(model) => (
+                      <Index each={currentProvider()?.models}>
+                        {(model, index) => (
                           <div
                             style="display: grid; grid-template-columns: 1.2fr 1.3fr 90px 85px 36px; align-items: center; padding: 6px 10px; border-bottom: 1px solid #f4f4f5; gap: 6px;"
                           >
                             {/* 菜单显示名 */}
                             <input
                               type="text"
-                              value={model.name}
+                              value={model().name}
                               onInput={(e) =>
-                                gatewayStore.updateModel(currentProvider().id, model.id, { name: e.currentTarget.value })
+                                gatewayStore.updateModel(currentProvider().id, model().id, { name: e.currentTarget.value })
                               }
                               style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
                             />
 
                             {/* 实际请求模型 (下拉选择框，获取模型后自动填充) */}
                             <select
-                              value={model.id}
+                              value={model().id}
                               onChange={(e) => {
                                 const selectedId = e.currentTarget.value;
-                                gatewayStore.updateModel(currentProvider().id, model.id, {
+                                const oldId = model().id;
+                                gatewayStore.updateModel(currentProvider().id, oldId, {
                                   id: selectedId,
-                                  name: model.name === model.id || !model.name ? selectedId : model.name,
+                                  name: model().name === oldId || !model().name ? selectedId : model().name,
                                 });
                               }}
                               style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
@@ -477,7 +478,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                               <For
                                 each={Array.from(
                                   new Set([
-                                    model.id,
+                                    model().id,
                                     ...(currentProvider()?.fetchedModelIds || []),
                                     ...(currentProvider()?.models.map((m) => m.id) || []),
                                   ]),
@@ -490,9 +491,9 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                             {/* 上下文窗口 */}
                             <input
                               type="number"
-                              value={model.contextWindow || 128000}
+                              value={model().contextWindow || 128000}
                               onInput={(e) =>
-                                gatewayStore.updateModel(currentProvider().id, model.id, {
+                                gatewayStore.updateModel(currentProvider().id, model().id, {
                                   contextWindow: Number(e.currentTarget.value) || 128000,
                                 })
                               }
@@ -501,9 +502,9 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
 
                             {/* 思考等级 */}
                             <select
-                              value={model.thinkingLevel || 'none'}
+                              value={model().thinkingLevel || 'none'}
                               onChange={(e) =>
-                                gatewayStore.updateModel(currentProvider().id, model.id, {
+                                gatewayStore.updateModel(currentProvider().id, model().id, {
                                   thinkingLevel: e.currentTarget.value as any,
                                 })
                               }
@@ -519,8 +520,8 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                             <div style="display: flex; align-items: center; justify-content: center;">
                               <button
                                 onClick={() => {
-                                  gatewayStore.deleteModel(currentProvider().id, model.id);
-                                  toast.info(`已移除模型: ${model.name}`);
+                                  gatewayStore.deleteModel(currentProvider().id, model().id);
+                                  toast.info(`已移除模型: ${model().name}`);
                                 }}
                                 style="background: transparent; border: none; color: #a1a1aa; cursor: pointer; padding: 3px; border-radius: 4px; display: flex; align-items: center;"
                                 title="删除此映射"
@@ -532,7 +533,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                             </div>
                           </div>
                         )}
-                      </For>
+                      </Index>
                     </div>
                   </div>
                 </div>
