@@ -2,6 +2,20 @@ import { Component, createSignal, For, Show, onMount, onCleanup } from 'solid-js
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
+import {
+  IconClose,
+  IconCheck,
+  IconZap,
+  IconLightbulb,
+  IconWrench,
+  IconAsterisk,
+  IconChevronRight,
+  IconShield,
+  IconDollarSign,
+  IconPlug,
+  IconActivity,
+  IconCpu,
+} from '@/components/icons';
 
 export interface ToolCallItem {
   id: string;
@@ -73,13 +87,6 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
       }),
     );
     toast.warning('已拒绝该操作');
-  };
-
-  const handleCopyCode = (code: string) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(code);
-    }
-    toast.success('已复制代码至剪贴板');
   };
 
   const handleRestoreSession = () => {
@@ -262,7 +269,9 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
       <div style="width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 20px;">
         {/* 1. 欢迎标题 */}
         <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
-          <span style="color: #c2410c; font-size: 22px;">✳</span>
+          <span style="color: #ea580c; display: flex; align-items: center;">
+            <IconAsterisk size={24} />
+          </span>
           <h1 style="font-size: 22px; font-weight: 600; color: #1e1d1b; margin: 0; letter-spacing: -0.3px;">
             Welcome back, super
           </h1>
@@ -278,10 +287,10 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
                 setAlertVisible(false);
                 toast.info('已忽略告警提示');
               }}
-              style="position: absolute; right: 14px; top: 12px; background: transparent; border: none; font-size: 14px; color: #b5ad9b; cursor: pointer; padding: 2px 6px; border-radius: 4px;"
+              style="position: absolute; right: 14px; top: 12px; background: transparent; border: none; font-size: 14px; color: #b5ad9b; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center;"
               title="关闭通知"
             >
-              ✕
+              <IconClose size={14} />
             </button>
 
             <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: #8a6d25;">
@@ -303,9 +312,10 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
               <button
                 onClick={handleCheckAgain}
                 disabled={isChecking()}
-                style="padding: 5px 14px; background: #ffffff; border: 1px solid #dfd5be; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: #443719; cursor: pointer; transition: all 0.1s;"
+                style="padding: 5px 14px; background: #ffffff; border: 1px solid #dfd5be; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: #443719; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; gap: 5px;"
               >
-                {isChecking() ? 'Checking...' : 'Check again'}
+                <IconZap size={13} color="#ea580c" />
+                <span>{isChecking() ? 'Checking...' : 'Check again'}</span>
               </button>
             </div>
           </div>
@@ -334,7 +344,7 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
               </div>
               <div style="display: flex; align-items: center; gap: 6px; color: #8e8b83; font-size: 12px;">
                 <span>yesterday</span>
-                <span>&gt;</span>
+                <IconChevronRight size={13} />
               </div>
             </div>
           </div>
@@ -362,7 +372,7 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
                   <Show when={msg.thinking}>
                     <details style="background: #faf9f6; border: 1px solid #eae7e1; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #76736c;">
                       <summary style="cursor: pointer; font-weight: 500; user-select: none; display: flex; align-items: center; gap: 6px;">
-                        <span>💡</span>
+                        <IconLightbulb size={14} color="#eab308" />
                         <span>Thinking 思考过程</span>
                       </summary>
                       <div style="margin-top: 8px; line-height: 1.5; color: #5a5750; white-space: pre-wrap; font-family: inherit;">
@@ -387,7 +397,7 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
                           >
                             <div style="display: flex; align-items: center; justify-content: space-between;">
                               <div style="display: flex; align-items: center; gap: 6px;">
-                                <span>🛠️</span>
+                                <IconWrench size={13} color="#64748b" />
                                 <b style="color: #1e293b; font-family: monospace;">{tool.toolName}</b>
                                 <span style="color: #64748b; font-family: monospace;">{tool.argsSummary}</span>
                               </div>
@@ -421,9 +431,10 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
                                 </button>
                                 <button
                                   onClick={() => handleApproveTool(msg.id, tool.id)}
-                                  style="padding: 4px 12px; background: #16a34a; border: none; border-radius: 4px; font-size: 11.5px; color: #ffffff; font-weight: 500; cursor: pointer;"
+                                  style="padding: 4px 12px; background: #16a34a; border: none; border-radius: 4px; font-size: 11.5px; color: #ffffff; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;"
                                 >
-                                  ✓ 允许执行 (Approve)
+                                  <IconCheck size={12} />
+                                  <span>允许执行 (Approve)</span>
                                 </button>
                               </div>
                             </Show>

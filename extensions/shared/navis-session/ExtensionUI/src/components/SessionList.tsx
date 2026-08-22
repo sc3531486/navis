@@ -2,332 +2,238 @@ import { Component, createSignal, For, Show, onMount, onCleanup } from 'solid-js
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
+import {
+  IconPlus,
+  IconCpu,
+  IconSettings,
+  IconPrompt,
+  IconFolder,
+  IconChevronRight,
+  IconSparkles,
+} from '@/components/icons';
 
 interface SessionItem {
   id: string;
   title: string;
-  status: 'needs_input' | 'running' | 'completed' | 'idle';
-  timestamp: string;
-}
-
-interface ProjectGroup {
-  id: string;
-  name: string;
-  sessions: SessionItem[];
+  group: string;
+  updatedAt: string;
+  active?: boolean;
 }
 
 export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
-  const [activeMode, setActiveMode] = createSignal<'cowork' | 'code'>('cowork');
-  const [activeSessionId, setActiveSessionId] = createSignal<string>('s-1');
-  const [userMenuOpen, setUserMenuOpen] = createSignal(false);
-  const [projectMenuId, setProjectMenuId] = createSignal<string | null>(null);
-
-  const [projectGroups, setProjectGroups] = createSignal<ProjectGroup[]>([
-    {
-      id: 'p-docs',
-      name: '设计文档',
-      sessions: [
-        { id: 's-1', title: '流水设计审查', status: 'needs_input', timestamp: '昨天' },
-        { id: 's-2', title: '流水设计文档编写', status: 'idle', timestamp: '3天前' },
-      ],
-    },
-    {
-      id: 'p-msg',
-      name: 'message-center',
-      sessions: [
-        { id: 's-3', title: 'message-center架构文档', status: 'idle', timestamp: '4天前' },
-        { id: 's-4', title: '压测', status: 'idle', timestamp: '上周' },
-      ],
-    },
-    {
-      id: 'p-novel',
-      name: '小说',
-      sessions: [
-        { id: 's-5', title: '小说审查', status: 'idle', timestamp: '上周' },
-        { id: 's-6', title: '项目初始化', status: 'completed', timestamp: '2周前' },
-      ],
-    },
-    {
-      id: 'p-gm',
-      name: 'GM',
-      sessions: [
-        { id: 's-7', title: 'Project initialization', status: 'completed', timestamp: '2周前' },
-        { id: 's-8', title: '基础版本交易梳理 -TE', status: 'idle', timestamp: '1个月前' },
-        { id: 's-9', title: '基础版本交易梳理 -ECTIP', status: 'idle', timestamp: '1个月前' },
-      ],
-    },
-    {
-      id: 'p-workbee',
-      name: 'workbee',
-      sessions: [
-        { id: 's-10', title: '分析00-21', status: 'idle', timestamp: '1个月前' },
-        { id: 's-11', title: 'WorkBee产品设计审查', status: 'idle', timestamp: '1个月前' },
-        { id: 's-12', title: '分析', status: 'idle', timestamp: '1个月前' },
-      ],
-    },
+  const [activeTab, setActiveTab] = createSignal<'cowork' | 'code'>('cowork');
+  const [showGatewayMenu, setShowGatewayMenu] = createSignal(false);
+  const [sessions, setSessions] = createSignal<SessionItem[]>([
+    { id: '1', title: '流水设计审查', group: '设计文档', updatedAt: 'yesterday', active: true },
+    { id: '2', title: '流水设计文档编写', group: '设计文档', updatedAt: '2d ago' },
+    { id: '3', title: 'message-center架构文档', group: 'message-center', updatedAt: '3d ago' },
+    { id: '4', title: '压测', group: 'message-center', updatedAt: '4d ago' },
+    { id: '5', title: '小说审查', group: '小说', updatedAt: '5d ago' },
+    { id: '6', title: '项目初始化', group: '小说', updatedAt: '6d ago' },
+    { id: '7', title: '基础版本交易梳理 -TE', group: 'GM', updatedAt: '7d ago' },
+    { id: '8', title: '基础版本交易梳理 -ECTIP', group: 'GM', updatedAt: '8d ago' },
+    { id: '9', title: '分析00-21', group: 'workbee', updatedAt: '9d ago' },
   ]);
 
-  const handleModeChange = (mode: 'cowork' | 'code') => {
-    setActiveMode(mode);
+  const handleTabChange = (mode: 'cowork' | 'code') => {
+    setActiveTab(mode);
     props.ctx.events.emit('navis:mode:change', { mode });
-    toast.info(`已切换至 ${mode === 'cowork' ? 'Cowork 协同模式' : 'Code 编码模式'}`);
-  };
-
-  const handleSelectSession = (session: SessionItem, groupName: string) => {
-    setActiveSessionId(session.id);
-    props.ctx.events.emit('session:selected', {
-      session,
-      groupName,
-    });
-    toast.info(`载入会话: ${session.title}`);
+    toast.info(`已切换至 ${mode === 'cowork' ? 'Cowork 协同模式' : 'Code 开发模式'}`);
   };
 
   const handleNewSession = () => {
-    const newId = `s-${Date.now()}`;
-    const newSession: SessionItem = {
+    const newId = String(Date.now());
+    const newTitle = `新会话 ${sessions().length + 1}`;
+    const newSess: SessionItem = {
       id: newId,
-      title: `新会话 #${projectGroups()[0].sessions.length + 1}`,
-      status: 'idle',
-      timestamp: '刚刚',
+      title: newTitle,
+      group: '工作区',
+      updatedAt: 'just now',
+      active: true,
     };
-
-    setProjectGroups((prev) => {
-      const copy = [...prev];
-      copy[0].sessions.unshift(newSession);
-      return copy;
-    });
-
-    setActiveSessionId(newId);
-    props.ctx.events.emit('session:created', newSession);
-    toast.success('已新建会话，可以开始提问！');
+    setSessions((prev) => [newSess, ...prev.map((s) => ({ ...s, active: false }))]);
+    props.ctx.events.emit('session:created', { id: newId, title: newTitle });
+    toast.success('已新建会话');
   };
 
-  const handleOpenCustomize = () => {
-    props.ctx.events.emit('settings:open', { tab: 'prompt' });
+  const handleSelectSession = (id: string) => {
+    setSessions((prev) =>
+      prev.map((s) => ({
+        ...s,
+        active: s.id === id,
+      })),
+    );
+    const target = sessions().find((s) => s.id === id);
+    if (target) {
+      props.ctx.events.emit('session:switched', { id: target.id, title: target.title });
+      toast.info(`切换至会话: ${target.title}`);
+    }
   };
 
-  // 全局点击关闭浮动菜单
   onMount(() => {
-    const handleClickOutside = () => {
-      setUserMenuOpen(false);
-      setProjectMenuId(null);
-    };
+    const handleClickOutside = () => setShowGatewayMenu(false);
     window.addEventListener('click', handleClickOutside);
     onCleanup(() => window.removeEventListener('click', handleClickOutside));
   });
 
   return (
-    <div style="display: flex; flex-direction: column; height: 100%; width: 100%; user-select: none; position: relative;">
-      {/* 顶部模式切换胶囊 */}
-      <div style="padding: 12px 14px 8px;">
-        <div style="display: flex; background: #eae8e1; padding: 2px; border-radius: 8px; gap: 2px;">
+    <div style="display: flex; flex-direction: column; height: 100%; min-height: 0; background: #f8f8f7; color: #2d2b28; font-size: 13px;">
+      {/* 顶部双模式切换胶囊 (Cowork vs Code) */}
+      <div style="padding: 10px 12px 6px;">
+        <div style="display: flex; background: #eae7e1; padding: 2px; border-radius: 8px;">
           <button
-            onClick={() => handleModeChange('cowork')}
-            style={`flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 0; font-size: 12.5px; font-weight: 500; border-radius: 6px; border: none; cursor: pointer; transition: all 0.15s ease; ${
-              activeMode() === 'cowork'
-                ? 'background: #ffffff; color: #1e1d1b; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 600;'
-                : 'background: transparent; color: #76736c;'
+            onClick={() => handleTabChange('cowork')}
+            style={`flex: 1; padding: 4px 0; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.1s ease; ${
+              activeTab() === 'cowork' ? 'background: #ffffff; color: #1e1d1b; box-shadow: 0 1px 3px rgba(0,0,0,0.06);' : 'background: transparent; color: #76736c;'
             }`}
           >
-            <span style="font-size: 13px; color: #c2410c;">✨</span>
+            <IconSparkles size={13} color="#ea580c" />
             <span>Cowork</span>
           </button>
           <button
-            onClick={() => handleModeChange('code')}
-            style={`flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 0; font-size: 12.5px; font-weight: 500; border-radius: 6px; border: none; cursor: pointer; transition: all 0.15s ease; ${
-              activeMode() === 'code'
-                ? 'background: #ffffff; color: #1e1d1b; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 600;'
-                : 'background: transparent; color: #76736c;'
+            onClick={() => handleTabChange('code')}
+            style={`flex: 1; padding: 4px 0; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.1s ease; ${
+              activeTab() === 'code' ? 'background: #ffffff; color: #1e1d1b; box-shadow: 0 1px 3px rgba(0,0,0,0.06);' : 'background: transparent; color: #76736c;'
             }`}
           >
-            <span style="font-size: 11px; opacity: 0.8;">&lt;/&gt;</span>
-            <span>Code</span>
+            <span>&lt;/&gt; Code</span>
           </button>
         </div>
       </div>
 
-      {/* 核心操作按钮 */}
-      <div style="padding: 0 14px 10px; display: flex; flex-direction: column; gap: 6px;">
+      {/* 新建会话与快捷操作 */}
+      <div style="padding: 4px 12px 8px; display: flex; flex-direction: column; gap: 4px;">
         <button
           onClick={handleNewSession}
-          style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; background: #eceae4; border: 1px solid #e2dfd7; border-radius: 8px; color: #2d2b28; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: all 0.1s ease;"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#e3e1da')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = '#eceae4')}
+          style="width: 100%; display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: transparent; border: 1px solid #e7e4dc; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: #2d2b28; cursor: pointer; transition: background 0.1s ease;"
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#eeebe4')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
         >
-          <span style="font-size: 15px; font-weight: 600; line-height: 1;">+</span>
-          <span>New</span>
+          <IconPlus size={14} />
+          <span>New Session</span>
         </button>
 
         <button
-          onClick={handleOpenCustomize}
-          style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; background: transparent; border: none; border-radius: 7px; color: #2d2b28; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: background 0.1s;"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#eceae4')}
+          onClick={() => props.ctx.events.emit('settings:open', { tab: 'prompt' })}
+          style="width: 100%; display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: transparent; border: none; border-radius: 6px; font-size: 12.5px; color: #5a5750; cursor: pointer; transition: background 0.1s ease;"
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#eeebe4')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
         >
-          <span style="font-size: 14px; opacity: 0.8;">🎛️</span>
-          <span>Customize</span>
+          <IconPrompt size={14} />
+          <span>Customize Prompt</span>
         </button>
       </div>
 
-      {/* 项目与会话列表 (可滚动区域) */}
-      <div style="flex: 1; overflow-y: auto; padding: 4px 10px 12px; display: flex; flex-direction: column; gap: 14px; min-height: 0;">
-        <For each={projectGroups()}>
-          {(group) => (
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-              {/* 项目组标题 */}
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 6px; font-size: 11px; font-weight: 600; color: #918e87; letter-spacing: 0.2px; position: relative;">
-                <span>{group.name}</span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setProjectMenuId(projectMenuId() === group.id ? null : group.id);
-                  }}
-                  style="font-size: 11px; opacity: 0.7; cursor: pointer; padding: 2px 4px; border-radius: 4px;"
-                >
-                  ⋮
-                </span>
-
-                {/* 项目快捷菜单 */}
-                <Show when={projectMenuId() === group.id}>
-                  <div
-                    onClick={(e) => e.stopPropagation()}
-                    style="position: absolute; right: 0; top: 22px; width: 140px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
-                  >
-                    <button
-                      onClick={() => {
-                        setProjectMenuId(null);
-                        handleNewSession();
-                      }}
-                      style="padding: 6px 8px; text-align: left; background: transparent; border: none; border-radius: 4px; font-size: 12px; color: #2d2b28; cursor: pointer;"
-                    >
-                      + 新建会话
-                    </button>
-                    <button
-                      onClick={() => {
-                        setProjectMenuId(null);
-                        toast.info(`重命名项目: ${group.name}`);
-                      }}
-                      style="padding: 6px 8px; text-align: left; background: transparent; border: none; border-radius: 4px; font-size: 12px; color: #2d2b28; cursor: pointer;"
-                    >
-                      ✏️ 重命名
-                    </button>
+      {/* 会话列表区域 */}
+      <div style="flex: 1; overflow-y: auto; padding: 0 8px 12px; display: flex; flex-direction: column; gap: 2px;">
+        <For each={sessions()}>
+          {(sess, index) => {
+            const isFirstInGroup = () => index() === 0 || sessions()[index() - 1]?.group !== sess.group;
+            return (
+              <>
+                <Show when={isFirstInGroup()}>
+                  <div style="padding: 10px 8px 3px; font-size: 11px; font-weight: 600; color: #8e8b83; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; gap: 4px;">
+                    <IconFolder size={12} />
+                    <span>{sess.group}</span>
                   </div>
                 </Show>
-              </div>
-
-              {/* 组内会话条目 */}
-              <For each={group.sessions}>
-                {(item) => (
-                  <div
-                    onClick={() => handleSelectSession(item, group.name)}
-                    style={`display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12.5px; transition: all 0.1s ease; ${
-                      activeSessionId() === item.id
-                        ? 'background: #eceae4; color: #1e1d1b; font-weight: 500;'
-                        : 'color: #4b4843;'
-                    }`}
-                    onMouseEnter={(e) => {
-                      if (activeSessionId() !== item.id) e.currentTarget.style.background = '#f0eee8';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeSessionId() !== item.id) e.currentTarget.style.background = 'transparent';
-                    }}
-                  >
-                    {/* 状态小圆点 */}
-                    <span
-                      style={`width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; ${
-                        item.status === 'needs_input'
-                          ? 'background: #d97706;'
-                          : item.status === 'running'
-                          ? 'background: #2563eb;'
-                          : item.status === 'completed'
-                          ? 'background: #16a34a;'
-                          : 'border: 1.5px solid #a8a49c; background: transparent;'
-                      }`}
-                    />
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
-                      {item.title}
-                    </span>
+                <div
+                  onClick={() => handleSelectSession(sess.id)}
+                  style={`display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s ease; ${
+                    sess.active ? 'background: #eae7e1; color: #1e1d1b; font-weight: 500;' : 'background: transparent; color: #4b4843;'
+                  }`}
+                  onMouseEnter={(e) => {
+                    if (!sess.active) e.currentTarget.style.background = '#f0eee8';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!sess.active) e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                    <span style={`width: 6px; height: 6px; border-radius: 50%; ${sess.active ? 'background: #c2410c;' : 'background: transparent;'}`} />
+                    <span style="overflow: hidden; text-overflow: ellipsis; font-size: 12.5px;">{sess.title}</span>
                   </div>
-                )}
-              </For>
-            </div>
-          )}
+                  <Show when={sess.active}>
+                    <IconChevronRight size={12} color="#8e8b83" />
+                  </Show>
+                </div>
+              </>
+            );
+          }}
         </For>
       </div>
 
-      {/* 底部用户信息栏 (常驻贴底) */}
-      <div
-        style="height: 44px; flex-shrink: 0; border-top: 1px solid #eae7e1; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-size: 12px; color: #4b4843; position: relative;"
-      >
+      {/* 侧边栏底部模型状态与设置入口 */}
+      <div style="border-top: 1px solid #eae7e1; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; position: relative;">
         <div
           onClick={(e) => {
             e.stopPropagation();
-            setUserMenuOpen(!userMenuOpen());
+            setShowGatewayMenu(!showGatewayMenu());
           }}
-          style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: background 0.1s;"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#eceae4')}
+          style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 6px; border-radius: 4px;"
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#eae7e1')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          title="模型与网关状态"
         >
-          <span style="color: #c2410c; font-size: 14px; font-weight: bold;">✳</span>
-          <span style="font-weight: 500; color: #1e1d1b;">super</span>
-          <span style="color: #918e87; font-size: 11px;">· Gateway ∨</span>
+          <IconCpu size={14} color="#ea580c" />
+          <span style="font-size: 11.5px; font-weight: 500; color: #4b4843; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {gatewayStore.activeModel()?.name || gatewayStore.activeModelId()}
+          </span>
         </div>
-
-        {/* 用户与网关弹出菜单 */}
-        <Show when={userMenuOpen()}>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style="position: absolute; left: 10px; bottom: 48px; width: 220px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); padding: 6px; z-index: 200; display: flex; flex-direction: column; gap: 2px;"
-          >
-            <div style="padding: 6px 8px; border-bottom: 1px solid #eae7e1; font-size: 11.5px; color: #76736c;">
-              当前网关: <b style="color: #1e1d1b;">{gatewayStore.activeProvider().name}</b>
-              <div style="font-size: 10.5px; color: #8e8b83; margin-top: 2px;">{gatewayStore.activeModel().name}</div>
-            </div>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                props.ctx.events.emit('settings:open', { tab: 'models' });
-              }}
-              style="padding: 7px 8px; text-align: left; background: transparent; border: none; border-radius: 5px; font-size: 12.5px; color: #2d2b28; cursor: pointer;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            >
-              🤖 模型与 Provider 管理
-            </button>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                props.ctx.events.emit('settings:open', { tab: 'sandbox' });
-              }}
-              style="padding: 7px 8px; text-align: left; background: transparent; border: none; border-radius: 5px; font-size: 12.5px; color: #2d2b28; cursor: pointer;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            >
-              🛡️ 沙箱执行权限设置
-            </button>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                toast.info('已清除本地登录会话');
-              }}
-              style="padding: 7px 8px; text-align: left; background: transparent; border: none; border-radius: 5px; font-size: 12.5px; color: #c2410c; cursor: pointer;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#fef2f2')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            >
-              🚪 注销登录
-            </button>
-          </div>
-        </Show>
 
         <button
           onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
-          style="background: transparent; border: none; font-size: 13px; color: #918e87; cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#eceae4')}
+          style="background: transparent; border: none; font-size: 13px; color: #76736c; cursor: pointer; padding: 4px 6px; border-radius: 4px; display: flex; align-items: center;"
+          title="打开设置中心"
+          onMouseEnter={(e) => (e.currentTarget.style.background = '#eae7e1')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-          title="打开全局设置"
         >
-          ⚙
+          <IconSettings size={15} />
         </button>
+
+        {/* 弹出菜单 */}
+        <Show when={showGatewayMenu()}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style="position: absolute; bottom: 44px; left: 10px; width: 220px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 6px; z-index: 100; display: flex; flex-direction: column; gap: 4px;"
+          >
+            <div style="font-size: 11px; font-weight: 600; color: #8e8b83; padding: 2px 6px;">
+              当前 Provider: {gatewayStore.activeProvider()?.name}
+            </div>
+            <For each={gatewayStore.activeProvider()?.models}>
+              {(m) => (
+                <div
+                  onClick={() => {
+                    gatewayStore.setActiveModel(m.id);
+                    setShowGatewayMenu(false);
+                    toast.info(`已切换默认模型为: ${m.name}`);
+                  }}
+                  style={`padding: 5px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; ${
+                    gatewayStore.activeModelId() === m.id ? 'background: #f7f6f2; font-weight: 600;' : ''
+                  }`}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
+                  onMouseLeave={(e) => {
+                    if (gatewayStore.activeModelId() !== m.id) e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <span>{m.name}</span>
+                  <Show when={gatewayStore.activeModelId() === m.id}>
+                    <span style="font-size: 10px; color: #16a34a;">●</span>
+                  </Show>
+                </div>
+              )}
+            </For>
+            <div
+              onClick={() => {
+                setShowGatewayMenu(false);
+                props.ctx.events.emit('settings:open', { tab: 'models' });
+              }}
+              style="border-top: 1px solid #f4f2ee; padding: 5px 8px; font-size: 11.5px; color: #c2410c; cursor: pointer; margin-top: 2px;"
+            >
+              配置更多 Provider...
+            </div>
+          </div>
+        </Show>
       </div>
     </div>
   );

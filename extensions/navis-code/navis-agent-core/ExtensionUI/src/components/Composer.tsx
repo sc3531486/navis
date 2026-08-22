@@ -2,23 +2,40 @@ import { Component, createSignal, Show, For, onMount, onCleanup } from 'solid-js
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
+import {
+  IconSend,
+  IconPlus,
+  IconCopy,
+  IconFolder,
+  IconGitBranch,
+  IconChevronDown,
+  IconSparkles,
+  IconPrompt,
+  IconShield,
+  IconCpu,
+  IconActivity,
+  IconDollarSign,
+  IconPlug,
+  IconTrash,
+  IconCheck,
+} from '@/components/icons';
 
 interface SlashCommand {
   id: string;
   name: string;
   desc: string;
-  icon: string;
+  iconComponent: any;
 }
 
 const slashCommands: SlashCommand[] = [
-  { id: '/help', name: '/help', desc: '查看可用指令列表与使用指南', icon: '❓' },
-  { id: '/init', name: '/init', desc: '分析工作区并初始化项目记忆与规范', icon: '🚀' },
-  { id: '/compact', name: '/compact', desc: '压缩会话上下文窗口并释放 Token 预算', icon: '🗜️' },
-  { id: '/cost', name: '/cost', desc: '查看当前会话的 Token 用量与费用统计', icon: '💰' },
-  { id: '/test', name: '/test', desc: '运行项目自动化测试套件 (cargo / npm test)', icon: '🧪' },
-  { id: '/doctor', name: '/doctor', desc: '运行网关、Node、Rust 与沙箱健康诊断', icon: '🩺' },
-  { id: '/mcp', name: '/mcp', desc: '查看已连接的 MCP 服务与扩展工具', icon: '🔌' },
-  { id: '/clear', name: '/clear', desc: '清空当前会话的时间线消息', icon: '🧹' },
+  { id: '/help', name: '/help', desc: '查看可用指令列表与使用指南', iconComponent: IconPrompt },
+  { id: '/init', name: '/init', desc: '分析工作区并初始化项目记忆与规范', iconComponent: IconSparkles },
+  { id: '/compact', name: '/compact', desc: '压缩会话上下文窗口并释放 Token 预算', iconComponent: IconCpu },
+  { id: '/cost', name: '/cost', desc: '查看当前会话的 Token 用量与费用统计', iconComponent: IconDollarSign },
+  { id: '/test', name: '/test', desc: '运行项目自动化测试套件 (cargo / npm test)', iconComponent: IconActivity },
+  { id: '/doctor', name: '/doctor', desc: '运行网关、Node、Rust 与沙箱健康诊断', iconComponent: IconShield },
+  { id: '/mcp', name: '/mcp', desc: '查看已连接的 MCP 服务与扩展工具', iconComponent: IconPlug },
+  { id: '/clear', name: '/clear', desc: '清空当前会话的时间线消息', iconComponent: IconTrash },
 ];
 
 export const Composer: Component<{ ctx: NavisContext }> = (props) => {
@@ -103,33 +120,29 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               SLASH 指令 (快捷命令)
             </div>
             <For each={filteredSlashCommands()}>
-              {(cmd, idx) => (
-                <div
-                  onClick={() => handleSelectSlash(cmd)}
-                  onMouseEnter={() => setSelectedSlashIndex(idx())}
-                  style={`padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; transition: background 0.1s; ${
-                    selectedSlashIndex() === idx() ? 'background: #f7f6f2;' : 'background: transparent;'
-                  }`}
-                >
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>{cmd.icon}</span>
-                    <b style="color: #1e1d1b; font-family: monospace;">{cmd.name}</b>
+              {(cmd, idx) => {
+                const IconComp = cmd.iconComponent;
+                return (
+                  <div
+                    onClick={() => handleSelectSlash(cmd)}
+                    onMouseEnter={() => setSelectedSlashIndex(idx())}
+                    style={`padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; transition: background 0.1s; ${
+                      selectedSlashIndex() === idx() ? 'background: #f7f6f2;' : 'background: transparent;'
+                    }`}
+                  >
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #ea580c; display: flex; align-items: center;">
+                        <IconComp size={14} />
+                      </span>
+                      <b style="color: #1e1d1b; font-family: monospace;">{cmd.name}</b>
+                    </div>
+                    <span style="font-size: 11.5px; color: #76736c;">{cmd.desc}</span>
                   </div>
-                  <span style="font-size: 11.5px; color: #76736c;">{cmd.desc}</span>
-                </div>
-              )}
+                );
+              }}
             </For>
           </div>
         </Show>
-
-        {/* 吉祥物 Mascot */}
-        <div
-          onClick={() => toast.info('Navis Agent 在线待命 🦀')}
-          style="position: absolute; right: 20px; top: -14px; z-index: 2; cursor: pointer; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));"
-          title="Navis Mascot"
-        >
-          <span style="font-size: 22px; display: block; transform: rotate(10deg);">🦀</span>
-        </div>
 
         {/* 顶部上下文药丸胶囊 */}
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 4px; border-bottom: 1px solid #f4f2ee;">
@@ -139,35 +152,29 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                 e.stopPropagation();
                 setActiveDropdown(activeDropdown() === 'context' ? null : 'context');
               }}
-              style="display: flex; align-items: center; gap: 4px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750; cursor: pointer;"
+              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750; cursor: pointer;"
             >
-              <span>💻</span>
+              <IconCpu size={12} color="#71717a" />
               <span style="font-weight: 500;">Local</span>
             </div>
             <div
-              style="display: flex; align-items: center; gap: 4px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
+              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
             >
-              <span>📁</span>
+              <IconFolder size={12} color="#71717a" />
               <span style="font-weight: 500;">Navis Go</span>
             </div>
             <div
-              style="display: flex; align-items: center; gap: 4px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
+              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
             >
-              <span style="font-size: 10px;"></span>
+              <IconGitBranch size={12} color="#71717a" />
               <span style="font-weight: 500;">main</span>
-            </div>
-            <div
-              style="display: flex; align-items: center; gap: 4px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
-            >
-              <span style="font-size: 11px;">☐</span>
-              <span>worktree</span>
             </div>
             <button
               onClick={handleCopyContext}
-              style="background: transparent; border: none; font-size: 12px; color: #8e8b83; cursor: pointer; padding: 2px 4px; border-radius: 4px;"
+              style="background: transparent; border: none; font-size: 12px; color: #8e8b83; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
               title="复制上下文路径"
             >
-              📋
+              <IconCopy size={12} />
             </button>
           </div>
         </div>
@@ -203,18 +210,18 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                 handleSend();
               }
             }}
-            placeholder="Describe a task, ask a question, or type / for commands (Enter 发送)"
+            placeholder="输入任务指令、提问，或键入 / 唤起快捷指令 (Enter 发送)"
             style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; line-height: 1.5; color: #2d2b28; resize: none; min-height: 48px; max-height: 160px; font-family: inherit;"
           />
           <button
             onClick={handleSend}
             disabled={!text().trim()}
-            style={`width: 28px; height: 28px; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; transition: all 0.1s ease; margin-bottom: 2px; ${
-              text().trim() ? 'background: #2d2b28; color: #ffffff;' : 'background: #f0eee8; color: #b5b2aa; cursor: not-allowed;'
+            style={`width: 28px; height: 28px; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s ease; margin-bottom: 2px; ${
+              text().trim() ? 'background: #18181b; color: #ffffff;' : 'background: #f0eee8; color: #b5b2aa; cursor: not-allowed;'
             }`}
             title="发送消息 (Enter)"
           >
-            ↵
+            <IconSend size={13} />
           </button>
         </div>
 
@@ -232,7 +239,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <span>{permissionMode()}</span>
-              <span style="font-size: 10px; opacity: 0.7;">▾</span>
+              <IconChevronDown size={11} color="#8e8b83" />
             </div>
 
             {/* 权限选择下拉菜单 */}
@@ -293,10 +300,10 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                 e.stopPropagation();
                 setActiveDropdown(activeDropdown() === 'plus' ? null : 'plus');
               }}
-              style="background: transparent; border: none; font-size: 14px; color: #76736c; cursor: pointer; padding: 2px 6px; border-radius: 4px;"
+              style="background: transparent; border: none; color: #76736c; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center;"
               title="添加上下文文件或资源"
             >
-              +
+              <IconPlus size={13} />
             </button>
 
             {/* 附件选择下拉菜单 */}
@@ -311,22 +318,24 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                     props.ctx.commands.execute('project:open-folder');
                     toast.info('已添加工作区文件');
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
+                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; display: flex; align-items: center; gap: 6px;"
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  📎 添加工作区文件...
+                  <IconFolder size={13} color="#71717a" />
+                  <span>添加工作区文件...</span>
                 </div>
                 <div
                   onClick={() => {
                     setActiveDropdown(null);
                     props.ctx.events.emit('settings:open', { tab: 'prompt' });
                   }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
+                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; display: flex; align-items: center; gap: 6px;"
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  📝 插入自定义 Prompt...
+                  <IconPrompt size={13} color="#71717a" />
+                  <span>插入自定义 Prompt...</span>
                 </div>
               </div>
             </Show>
@@ -345,7 +354,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <span style="font-weight: 500; color: #4b4843;">{gatewayStore.activeModel()?.name || gatewayStore.activeModelId()}</span>
-              <span style="font-size: 10px; opacity: 0.7;">▾</span>
+              <IconChevronDown size={11} color="#8e8b83" />
             </div>
 
             {/* 动态模型下拉菜单 */}
@@ -410,7 +419,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <span>{reasoningIntensity()}</span>
-              <span style="font-size: 10px; opacity: 0.7;">▾</span>
+              <IconChevronDown size={11} color="#8e8b83" />
             </div>
 
             {/* 思考强度下拉 */}

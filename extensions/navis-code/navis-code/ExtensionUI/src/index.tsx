@@ -4,6 +4,14 @@ import { DynamicSlot } from '@/core/slots/DynamicSlot';
 import { componentRegistry } from '@/core/components/ComponentRegistry';
 import { toast } from '@/core/toast/ToastStore';
 import { CommandPalette } from './components/CommandPalette';
+import {
+  IconMenu,
+  IconSplit,
+  IconSearch,
+  IconArrowLeft,
+  IconArrowRight,
+  IconClose,
+} from '@/components/icons';
 
 // 产品级主布局：对标 Claude Code / Cowork 的极简暖白色桌面外壳
 const StudioLayout = (props: { ctx: NavisContext }) => {
@@ -66,22 +74,22 @@ const StudioLayout = (props: { ctx: NavisContext }) => {
         style="height: 38px; background: #ffffff; border-bottom: 1px solid #eae7e1; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; user-select: none; z-index: 10;"
       >
         {/* 左侧导航与控制图标 */}
-        <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 4px;">
           <button
             onClick={() => {
               setSidebarOpen(!sidebarOpen());
               toast.info(sidebarOpen() ? '已展开侧边栏' : '已收起侧边栏');
             }}
-            style="background: transparent; border: none; font-size: 15px; color: #5a5750; cursor: pointer; padding: 4px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
+            style="background: transparent; border: none; color: #5a5750; cursor: pointer; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
             title="切换侧边栏"
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            ☰
+            <IconMenu size={15} />
           </button>
           <button
             onClick={handleSplitToggle}
-            style={`border: none; font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; ${
+            style={`border: none; cursor: pointer; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center; ${
               splitView() ? 'background: #eceae4; color: #1e1d1b;' : 'background: transparent; color: #5a5750;'
             }`}
             title="分屏视图"
@@ -92,35 +100,35 @@ const StudioLayout = (props: { ctx: NavisContext }) => {
               if (!splitView()) e.currentTarget.style.background = 'transparent';
             }}
           >
-            ◫
+            <IconSplit size={14} />
           </button>
           <button
             onClick={() => props.ctx.commands.execute('command:palette')}
-            style="background: transparent; border: none; font-size: 13px; color: #5a5750; cursor: pointer; padding: 4px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
+            style="background: transparent; border: none; color: #5a5750; cursor: pointer; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
             title="全局搜索 (Ctrl+P)"
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            🔍
+            <IconSearch size={14} />
           </button>
-          <div style="width: 1px; height: 14px; background: #e7e4dc; margin: 0 2px;" />
+          <div style="width: 1px; height: 14px; background: #e7e4dc; margin: 0 4px;" />
           <button
             onClick={() => toast.info('后退到上一会话')}
-            style="background: transparent; border: none; font-size: 13px; color: #8e8b83; cursor: pointer; padding: 2px 6px; border-radius: 4px;"
+            style="background: transparent; border: none; color: #8e8b83; cursor: pointer; padding: 4px 5px; border-radius: 4px; display: flex; align-items: center;"
             title="后退"
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            ←
+            <IconArrowLeft size={13} />
           </button>
           <button
             onClick={() => toast.info('前进到下一会话')}
-            style="background: transparent; border: none; font-size: 13px; color: #8e8b83; cursor: pointer; padding: 2px 6px; border-radius: 4px;"
+            style="background: transparent; border: none; color: #8e8b83; cursor: pointer; padding: 4px 5px; border-radius: 4px; display: flex; align-items: center;"
             title="前进"
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f0eee8')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            →
+            <IconArrowRight size={13} />
           </button>
         </div>
 
@@ -154,7 +162,7 @@ const StudioLayout = (props: { ctx: NavisContext }) => {
           </button>
           <button
             onClick={handleWindowClose}
-            style="background: transparent; border: none; color: #76736c; padding: 4px 8px; border-radius: 4px; font-size: 14px; cursor: pointer;"
+            style="background: transparent; border: none; color: #76736c; padding: 4px 6px; border-radius: 4px; cursor: pointer; display: flex; align-items: center;"
             title="关闭"
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#ef4444';
@@ -165,7 +173,7 @@ const StudioLayout = (props: { ctx: NavisContext }) => {
               e.currentTarget.style.color = '#76736c';
             }}
           >
-            ✕
+            <IconClose size={13} />
           </button>
         </div>
       </div>
