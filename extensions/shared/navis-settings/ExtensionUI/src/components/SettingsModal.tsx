@@ -274,7 +274,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                           </div>
                           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #71717a;">
                             <span>{p.models.length} 个模型</span>
-                            <span style="font-family: monospace;">{p.upstreamProtocol || 'responses'}</span>
+                            <span>{p.upstreamProtocol || 'responses'}</span>
                           </div>
                         </div>
                       );
@@ -342,7 +342,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                     type="text"
                     value={currentProvider()?.baseUrl || ''}
                     onInput={(e) => gatewayStore.updateProvider(currentProvider().id, { baseUrl: e.currentTarget.value })}
-                    style="width: 100%; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 10px; font-size: 12.5px; color: #18181b; font-family: monospace; outline: none;"
+                    style="width: 100%; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 10px; font-size: 13px; color: #18181b; outline: none;"
                   />
                 </div>
 
@@ -355,7 +355,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                       value={currentProvider()?.apiKey || ''}
                       onInput={(e) => gatewayStore.updateProvider(currentProvider().id, { apiKey: e.currentTarget.value })}
                       placeholder="sk-..."
-                      style="flex: 1; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 36px 7px 10px; font-size: 12.5px; color: #18181b; font-family: monospace; outline: none;"
+                      style="flex: 1; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 36px 7px 10px; font-size: 13px; color: #18181b; outline: none;"
                     />
                     <button
                       onClick={() => setShowApiKey(!showApiKey())}
@@ -459,7 +459,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                               onInput={(e) =>
                                 gatewayStore.updateModel(currentProvider().id, model.id, { name: e.currentTarget.value })
                               }
-                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 4px 6px; font-size: 11.5px; color: #18181b; outline: none;"
+                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
                             />
 
                             {/* 实际请求模型 (下拉选择框，获取模型后自动填充) */}
@@ -472,7 +472,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                                   name: model.name === model.id || !model.name ? selectedId : model.name,
                                 });
                               }}
-                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 4px 6px; font-size: 11.5px; color: #18181b; font-family: monospace; outline: none;"
+                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
                             >
                               <For
                                 each={Array.from(
@@ -496,7 +496,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                                   contextWindow: Number(e.currentTarget.value) || 128000,
                                 })
                               }
-                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 4px 6px; font-size: 11.5px; color: #18181b; outline: none;"
+                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
                             />
 
                             {/* 思考等级 */}
@@ -507,7 +507,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                                   thinkingLevel: e.currentTarget.value as any,
                                 })
                               }
-                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 4px 4px; font-size: 11px; color: #18181b; outline: none;"
+                              style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 6px; font-size: 12px; color: #18181b; outline: none;"
                             >
                               <option value="none">未设置</option>
                               <option value="low">low</option>
@@ -720,7 +720,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                       type="text"
                       value={newProviderUrl()}
                       onInput={(e) => setNewProviderUrl(e.currentTarget.value)}
-                      style="background: #fafaf9; border: 1px solid #e4e4e7; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: monospace;"
+                      style="background: #fafaf9; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 10px; font-size: 12.5px; color: #18181b; outline: none;"
                     />
                   </div>
 
@@ -731,7 +731,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                       placeholder="sk-..."
                       value={newProviderKey()}
                       onInput={(e) => setNewProviderKey(e.currentTarget.value)}
-                      style="background: #fafaf9; border: 1px solid #e4e4e7; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: monospace;"
+                      style="background: #fafaf9; border: 1px solid #e4e4e7; border-radius: 6px; padding: 7px 10px; font-size: 12.5px; color: #18181b; outline: none;"
                     />
                   </div>
 
