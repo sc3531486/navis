@@ -163,33 +163,28 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
         </For>
       </div>
 
-      {/* 侧边栏底部模型状态与设置入口 */}
-      <div style="border-top: 1px solid #eae7e1; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; position: relative;">
+      {/* 侧边栏底部模型状态与设置入口 (1:1 像素级复刻参考图 3) */}
+      <div style="border-top: 1px solid #eae7e1; padding: 6px 10px; display: flex; align-items: center; position: relative;">
         <div
+          id="sidebar-bottom-model-btn"
           onClick={(e) => {
             e.stopPropagation();
             setShowGatewayMenu(!showGatewayMenu());
           }}
-          style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 6px; border-radius: 4px;"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#eae7e1')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-          title="模型与网关状态"
+          style="display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: all 0.15s ease; user-select: none;"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#e2e8f0';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
+          title="切换模型或打开设置"
         >
-          <IconCpu size={14} color="#ea580c" />
-          <span style="font-size: 11.5px; font-weight: 500; color: #4b4843; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            {gatewayStore.activeModel()?.name || gatewayStore.activeModelId()}
+          <IconSettings size={14} color="#18181b" />
+          <span style="font-size: 13px; font-weight: 400; color: #18181b; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {gatewayStore.activeModel()?.name || gatewayStore.activeModelId() || 'custom'}
           </span>
         </div>
-
-        <button
-          onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
-          style="background: transparent; border: none; font-size: 13px; color: #76736c; cursor: pointer; padding: 4px 6px; border-radius: 4px; display: flex; align-items: center;"
-          title="打开设置中心"
-          onMouseEnter={(e) => (e.currentTarget.style.background = '#eae7e1')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-        >
-          <IconSettings size={15} />
-        </button>
 
         {/* 弹出菜单 */}
         <Show when={showGatewayMenu()}>
