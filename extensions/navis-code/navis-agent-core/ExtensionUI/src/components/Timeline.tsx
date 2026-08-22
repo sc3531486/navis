@@ -236,11 +236,16 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
         },
         onToolCall: (toolCall) => {
           setMessages((prev) =>
-            prev.map((m) =>
-              m.id === pendingAiMsgId
-                ? { ...m, toolCalls: [...(m.toolCalls || []), toolCall] }
-                : m,
-            ),
+            prev.map((m) => {
+              if (m.id !== pendingAiMsgId) return m;
+              const existing = m.toolCalls || [];
+              const idx = existing.findIndex((t) => t.id === toolCall.id);
+              const updated =
+                idx >= 0
+                  ? existing.map((t, i) => (i === idx ? toolCall : t))
+                  : [...existing, toolCall];
+              return { ...m, toolCalls: updated };
+            }),
           );
           scrollToBottom();
         },
@@ -448,6 +453,62 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
                         ⚙️ 打开模型设置
                       </button>
                     </div>
+                  </div>
+                </Show>
+
+                {/* 真实工具调用卡片 (Tool Calls & Execution Result) */}
+                <Show when={msg.toolCalls && msg.toolCalls.length > 0}>
+                  <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 4px 0 8px;">
+                    <For each={msg.toolCalls}>
+                      {(tool) => (
+                        <div
+                          style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);"
+                        >
+                          {/* 工具卡片头部 */}
+                          <div
+                            style="padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;"
+                          >
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                              <span style="color: #2563eb; font-size: 13px;">⚙️</span>
+                              <span style="font-weight: 600; font-size: 12.5px; color: #0f172a; font-family: monospace;">
+                                {tool.toolName}
+                              </span>
+                              <span
+                                style={`font-size: 11px; padding: 1px 6px; border-radius: 4px; font-weight: 500; ${
+                                  tool.status === 'completed'
+                                    ? 'background: #dcfce7; color: #15803d;'
+                                    : tool.status === 'approved'
+                                    ? 'background: #e0f2fe; color: #0369a1;'
+                                    : tool.status === 'rejected'
+                                    ? 'background: #fee2e2; color: #b91c1c;'
+                                    : 'background: #fef3c7; color: #b45309;'
+                                }`}
+                              >
+                                {tool.status === 'completed'
+                                  ? '✓ 已执行'
+                                  : tool.status === 'rejected'
+                                  ? '✕ 已拒绝'
+                                  : tool.needsApproval
+                                  ? '⏳ 等待批准'
+                                  : '⚙ 执行中...'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* 工具参数与输出结果预览 */}
+                          <div style="padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                            <div style="color: #64748b; font-family: monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; background: #fafafa; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9; max-height: 140px; overflow-y: auto;">
+                              {tool.argsSummary}
+                            </div>
+                            <Show when={tool.outputSummary}>
+                              <div style="color: #166534; background: #f0fdf4; padding: 6px 10px; border-radius: 6px; border: 1px solid #dcfce7; font-size: 11.5px; font-family: monospace;">
+                                {tool.outputSummary}
+                              </div>
+                            </Show>
+                          </div>
+                        </div>
+                      )}
+                    </For>
                   </div>
                 </Show>
 

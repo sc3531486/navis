@@ -243,6 +243,153 @@ pub fn run() {
         }
     }
 
+    // 注册核心通用 FS 与 Shell RPC 路由 (支持各扩展如 navis-agent-core, navis-terminal 进行真实工具调用与文件操作)
+    {
+        // 1. 文件读取
+        registry_clone.register_route(
+            "core:fs:read",
+            Arc::new(|_app, payload| {
+                let path_str = payload.get("path").and_then(|v| v.as_str()).unwrap_or("");
+                if path_str.is_empty() {
+                    return Err("Missing 'path' parameter".into());
+                }
+                let path = std::path::Path::new(path_str);
+                let content = std::fs::read_to_string(path)
+                    .map_err(|e| format!("Failed to read file '{}': {}", path_str, e))?;
+                Ok(serde_json::json!({
+                    "success": true,
+                    "path": path_str,
+                    "content": content
+                }))
+            }),
+        );
+
+        // 2. 真实写文件（自动递归创建父目录）
+        registry_clone.register_route(
+            "core:fs:write",
+            Arc::new(|_app, payload| {
+                let path_str = payload.get("path").and_then(|v| v.as_str()).unwrap_or("");
+                let content = payload.get("content").and_then(|v| v.as_str()).unwrap_or("");
+                if path_str.is_empty() {
+                    return Err("Missing 'path' parameter".into());
+                }
+                let path = std::path::Path::new(path_str);
+                if let Some(parent) = path.parent() {
+                    if !parent.exists() {
+                        let _ = std::fs::create_dir_all(parent);
+                    }
+                }
+                std::fs::write(path, content)
+                    .map_err(|e| format!("Failed to write file '{}': {}", path_str, e))?;
+                info!("[Navis Kernel] Successfully wrote file: {}", path_str);
+                Ok(serde_json::json!({
+                    "success": true,
+                    "path": path_str,
+                    "bytes": content.len()
+                }))
+            }),
+        );
+
+        // 3. 文件修改与段落替换
+        registry_clone.register_route(
+            "core:fs:edit",
+            Arc::new(|_app, payload| {
+                let path_str = payload.get("path").and_then(|v| v.as_str()).unwrap_or("");
+                let old_str = payload.get("old_str").and_then(|v| v.as_str()).unwrap_or("");
+                let new_str = payload.get("new_str").and_then(|v| v.as_str()).unwrap_or("");
+                if path_str.is_empty() {
+                    return Err("Missing 'path' parameter".into());
+                }
+                let path = std::path::Path::new(path_str);
+                let content = std::fs::read_to_string(path)
+                    .map_err(|e| format!("Failed to read file '{}': {}", path_str, e))?;
+                if !content.contains(old_str) {
+                    return Err(format!("Target string not found in file '{}'", path_str));
+                }
+                let updated = content.replacen(old_str, new_str, 1);
+                std::fs::write(path, updated)
+                    .map_err(|e| format!("Failed to edit file '{}': {}", path_str, e))?;
+                info!("[Navis Kernel] Successfully edited file: {}", path_str);
+                Ok(serde_json::json!({
+                    "success": true,
+                    "path": path_str
+                }))
+            }),
+        );
+
+        // 4. 目录列表
+        registry_clone.register_route(
+            "core:fs:list_dir",
+            Arc::new(|_app, payload| {
+                let path_str = payload.get("path").and_then(|v| v.as_str()).unwrap_or(".");
+                let path = std::path::Path::new(path_str);
+                let mut entries = Vec::new();
+                if let Ok(dir) = std::fs::read_dir(path) {
+                    for entry in dir.flatten() {
+                        let is_dir = entry.file_type().map(|t| t.is_dir()).unwrap_or(false);
+                        entries.push(serde_json::json!({
+                            "name": entry.file_name().to_string_lossy(),
+                            "is_dir": is_dir,
+                            "path": entry.path().to_string_lossy()
+                        }));
+                    }
+                }
+                Ok(serde_json::json!({
+                    "success": true,
+                    "entries": entries
+                }))
+            }),
+        );
+
+        // 5. 真实 Shell 命令执行
+        registry_clone.register_route(
+            "core:shell:exec",
+            Arc::new(|_app, payload| {
+                let command = payload.get("command").and_then(|v| v.as_str()).unwrap_or("");
+                let cwd = payload.get("cwd").and_then(|v| v.as_str()).unwrap_or(".");
+                if command.is_empty() {
+                    return Err("Missing 'command' parameter".into());
+                }
+
+                #[cfg(target_os = "windows")]
+                let output = std::process::Command::new("pwsh")
+                    .arg("-Command")
+                    .arg(command)
+                    .current_dir(cwd)
+                    .output()
+                    .or_else(|_| {
+                        std::process::Command::new("cmd")
+                            .arg("/C")
+                            .arg(command)
+                            .current_dir(cwd)
+                            .output()
+                    });
+
+                #[cfg(not(target_os = "windows"))]
+                let output = std::process::Command::new("sh")
+                    .arg("-c")
+                    .arg(command)
+                    .current_dir(cwd)
+                    .output();
+
+                match output {
+                    Ok(out) => {
+                        let stdout = String::from_utf8_lossy(&out.stdout).to_string();
+                        let stderr = String::from_utf8_lossy(&out.stderr).to_string();
+                        let code = out.status.code().unwrap_or(-1);
+                        Ok(serde_json::json!({
+                            "success": out.status.success(),
+                            "stdout": stdout,
+                            "stderr": stderr,
+                            "exit_code": code
+                        }))
+                    }
+                    Err(e) => Err(format!("Failed to execute command '{}': {}", command, e)),
+                }
+            }),
+        );
+    }
+
     let setup_transport = transport.clone();
     let app_result = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
