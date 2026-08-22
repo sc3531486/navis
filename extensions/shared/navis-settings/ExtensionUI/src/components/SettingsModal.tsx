@@ -470,8 +470,9 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                                 const oldId = model().id;
                                 gatewayStore.updateModel(currentProvider().id, oldId, {
                                   id: selectedId,
-                                  name: model().name === oldId || !model().name ? selectedId : model().name,
+                                  name: selectedId, // 总是自动同步菜单显示名
                                 });
+                                toast.info(`已选定模型: ${selectedId}，菜单显示名已同步`);
                               }}
                               style="width: 100%; min-width: 0; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 5px; padding: 5px 8px; font-size: 12.5px; color: #18181b; outline: none;"
                             >
@@ -484,7 +485,11 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                                   ]),
                                 )}
                               >
-                                {(optId) => <option value={optId}>{optId}</option>}
+                                {(optId) => (
+                                  <option value={optId} selected={optId === model().id}>
+                                    {optId}
+                                  </option>
+                                )}
                               </For>
                             </select>
 

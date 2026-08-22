@@ -423,8 +423,9 @@ export const gatewayStore = {
         if (p.id === providerId) {
           const modelIndex = p.models.findIndex((m) => m.id === modelId);
           if (modelIndex >= 0) {
-            Object.assign(p.models[modelIndex], updates);
-            return { ...p, models: [...p.models] };
+            const updatedModels = [...p.models];
+            updatedModels[modelIndex] = { ...updatedModels[modelIndex], ...updates };
+            return { ...p, models: updatedModels };
           }
         }
         return p;
