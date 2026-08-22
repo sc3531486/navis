@@ -3,15 +3,62 @@ import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
 
+interface SlashCommand {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+}
+
+const slashCommands: SlashCommand[] = [
+  { id: '/help', name: '/help', desc: '查看可用指令列表与使用指南', icon: '❓' },
+  { id: '/init', name: '/init', desc: '分析工作区并初始化项目记忆与规范', icon: '🚀' },
+  { id: '/compact', name: '/compact', desc: '压缩会话上下文窗口并释放 Token 预算', icon: '🗜️' },
+  { id: '/cost', name: '/cost', desc: '查看当前会话的 Token 用量与费用统计', icon: '💰' },
+  { id: '/test', name: '/test', desc: '运行项目自动化测试套件 (cargo / npm test)', icon: '🧪' },
+  { id: '/doctor', name: '/doctor', desc: '运行网关、Node、Rust 与沙箱健康诊断', icon: '🩺' },
+  { id: '/mcp', name: '/mcp', desc: '查看已连接的 MCP 服务与扩展工具', icon: '🔌' },
+  { id: '/clear', name: '/clear', desc: '清空当前会话的时间线消息', icon: '🧹' },
+];
+
 export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [text, setText] = createSignal('');
   const [permissionMode, setPermissionMode] = createSignal<'Bypass permissions' | 'Ask for confirmation' | 'Read-only'>('Bypass permissions');
   const [reasoningIntensity, setReasoningIntensity] = createSignal<'Off' | 'Low' | 'Medium' | 'High'>('High');
   const [activeDropdown, setActiveDropdown] = createSignal<'perm' | 'plus' | 'model' | 'reason' | 'context' | null>(null);
+  const [selectedSlashIndex, setSelectedSlashIndex] = createSignal(0);
+
+  // 匹配 Slash 命令
+  const showSlashMenu = () => {
+    const val = text();
+    return val.startsWith('/') && !val.includes(' ');
+  };
+
+  const filteredSlashCommands = () => {
+    const val = text().toLowerCase();
+    return slashCommands.filter((c) => c.name.toLowerCase().startsWith(val));
+  };
+
+  const handleSelectSlash = (cmd: SlashCommand) => {
+    setText(cmd.name + ' ');
+    if (cmd.id === '/clear') {
+      props.ctx.events.emit('session:created');
+      setText('');
+      toast.success('已清空当前会话消息');
+      return;
+    }
+  };
 
   const handleSend = () => {
     const content = text().trim();
     if (!content) return;
+
+    if (content === '/clear') {
+      props.ctx.events.emit('session:created');
+      setText('');
+      toast.success('已清空当前会话消息');
+      return;
+    }
 
     const currentModel = gatewayStore.activeModel();
 
@@ -47,6 +94,34 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
       <div
         style="width: 100%; max-width: 760px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07); display: flex; flex-direction: column; overflow: visible; position: relative; pointer-events: auto;"
       >
+        {/* Slash 命令浮动弹窗 */}
+        <Show when={showSlashMenu() && filteredSlashCommands().length > 0}>
+          <div
+            style="position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; width: 100%; max-width: 420px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.14); padding: 6px; z-index: 120; display: flex; flex-direction: column; gap: 2px;"
+          >
+            <div style="padding: 4px 8px; font-size: 11px; font-weight: 600; color: #8e8b83; border-bottom: 1px solid #f4f2ee;">
+              SLASH 指令 (快捷命令)
+            </div>
+            <For each={filteredSlashCommands()}>
+              {(cmd, idx) => (
+                <div
+                  onClick={() => handleSelectSlash(cmd)}
+                  onMouseEnter={() => setSelectedSlashIndex(idx())}
+                  style={`padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; transition: background 0.1s; ${
+                    selectedSlashIndex() === idx() ? 'background: #f7f6f2;' : 'background: transparent;'
+                  }`}
+                >
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>{cmd.icon}</span>
+                    <b style="color: #1e1d1b; font-family: monospace;">{cmd.name}</b>
+                  </div>
+                  <span style="font-size: 11.5px; color: #76736c;">{cmd.desc}</span>
+                </div>
+              )}
+            </For>
+          </div>
+        </Show>
+
         {/* 吉祥物 Mascot */}
         <div
           onClick={() => toast.info('Navis Agent 在线待命 🦀')}
@@ -104,12 +179,31 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
             value={text()}
             onInput={(e) => setText(e.currentTarget.value)}
             onKeyDown={(e) => {
+              if (showSlashMenu() && filteredSlashCommands().length > 0) {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setSelectedSlashIndex((i) => Math.min(i + 1, filteredSlashCommands().length - 1));
+                  return;
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setSelectedSlashIndex((i) => Math.max(i - 1, 0));
+                  return;
+                } else if (e.key === 'Tab' || (e.key === 'Enter' && !e.shiftKey)) {
+                  e.preventDefault();
+                  const list = filteredSlashCommands();
+                  if (list[selectedSlashIndex()]) {
+                    handleSelectSlash(list[selectedSlashIndex()]);
+                    return;
+                  }
+                }
+              }
+
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
               }
             }}
-            placeholder="Describe a task or ask a question (Enter 发送, Shift+Enter 换行)"
+            placeholder="Describe a task, ask a question, or type / for commands (Enter 发送)"
             style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; line-height: 1.5; color: #2d2b28; resize: none; min-height: 48px; max-height: 160px; font-family: inherit;"
           />
           <button
