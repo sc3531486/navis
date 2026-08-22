@@ -34,11 +34,15 @@ const slashCommands: SlashCommand[] = [
 
 export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [text, setText] = createSignal('');
-  const [reasoningIntensity, setReasoningIntensity] = createSignal<'High' | 'Medium' | 'Low' | 'Off'>('High');
-  const [permissionMode, setPermissionMode] = createSignal<'Bypass permissions' | 'Ask for confirmation' | 'Read-only'>('Bypass permissions');
+  const [reasoningIntensity, setReasoningIntensity] = createSignal<'高' | '中' | '低' | '关'>('高');
+  const [permissionMode, setPermissionMode] = createSignal<'请求批准' | '直接执行' | '只读模式'>('请求批准');
   const [showModelPicker, setShowModelPicker] = createSignal(false);
+  const [showAddMenu, setShowAddMenu] = createSignal(false);
+  const [showPermMenu, setShowPermMenu] = createSignal(false);
+  const [showContextTooltip, setShowContextTooltip] = createSignal(false);
+  const [showPlusTooltip, setShowPlusTooltip] = createSignal(false);
   const [selectedSlashIndex, setSelectedSlashIndex] = createSignal(0);
-  const [hasAttachment, setHasAttachment] = createSignal(true);
+  const [usedTokens, setUsedTokens] = createSignal(14820); // 响应式 Token 用量
 
   // 匹配 Slash 命令
   const showSlashMenu = () => {
@@ -84,27 +88,146 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
       timestamp: Date.now(),
     });
 
+    // 递增已用 Token
+    setUsedTokens((prev) => prev + Math.round(content.length * 2.5) + 320);
+
     setText('');
-    setHasAttachment(false);
+    setShowAddMenu(false);
     toast.info(`已发送指令至 ${currentModel?.name || 'Agent'}`);
   };
 
   onMount(() => {
-    const handleClickOutside = () => setShowModelPicker(false);
+    const handleClickOutside = () => {
+      setShowModelPicker(false);
+      setShowAddMenu(false);
+      setShowPermMenu(false);
+    };
     window.addEventListener('click', handleClickOutside);
     onCleanup(() => window.removeEventListener('click', handleClickOutside));
   });
 
-  const activeModelName = () => {
-    const m = gatewayStore.activeModel();
-    if (m?.name) return m.name.replace(/^gemini-/, 'Gemini ').replace(/-flash$/, ' Flash');
-    return 'Gemini 3.7 Flash';
+  const activeModel = () => gatewayStore.activeModel();
+  const contextCapacity = () => activeModel()?.contextWindow || 1000000;
+  const usageRatio = () => Math.min(1, Math.max(0.005, usedTokens() / contextCapacity()));
+  const usagePercentage = () => ((usedTokens() / contextCapacity()) * 100).toFixed(1);
+  const remainingPercentage = () => (100 - Number(usagePercentage())).toFixed(1);
+  const remainingTokens = () => Math.max(0, contextCapacity() - usedTokens());
+
+  const activeModelDisplayName = () => {
+    const m = activeModel();
+    if (m?.name) return m.name.replace(/^gemini-/, '').replace(/-flash$/, ' Flash');
+    return '自定义';
   };
 
   return (
     <div
-      style="width: 100%; max-width: 780px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; position: relative;"
+      style="width: 100%; max-width: 780px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; position: relative;"
     >
+      {/* 1. 点击 + 弹出的完整多功能卡片 (1:1 像素级复刻参考图) */}
+      <Show when={showAddMenu()}>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style="position: absolute; left: 0; right: 0; bottom: 100%; margin-bottom: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 10px 12px; z-index: 130; display: flex; flex-direction: column; gap: 12px;"
+        >
+          {/* 分组一：添加 */}
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-size: 11px; font-weight: 600; color: #94a3b8; padding: 2px 6px;">添加</div>
+
+            {/* 文件和文件夹 (高亮选中项) */}
+            <div
+              onClick={() => {
+                setShowAddMenu(false);
+                props.ctx.commands.execute('command:palette');
+                toast.success('已唤起文件选择器');
+              }}
+              style="display: flex; align-items: center; gap: 10px; padding: 7px 10px; background: #f1f5f9; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: #1e293b; font-weight: 500;"
+            >
+              <span>📎</span>
+              <span>文件和文件夹</span>
+            </div>
+
+            {/* 在项目中使用 Work */}
+            <div
+              onClick={() => {
+                setShowAddMenu(false);
+                toast.info('已选择项目上下文: Navis Go');
+              }}
+              style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: #334155;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>📁</span>
+                <span>在项目中使用 Work</span>
+              </div>
+              <span style="font-size: 11.5px; color: #94a3b8;">为新聊天选择项目</span>
+            </div>
+
+            {/* 目标 */}
+            <div
+              onClick={() => {
+                setShowAddMenu(false);
+                toast.info('目标设定面板已就绪');
+              }}
+              style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: #334155;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>🎯</span>
+                <span>目标</span>
+              </div>
+              <span style="font-size: 11.5px; color: #94a3b8;">设置要持续追求的目标</span>
+            </div>
+
+            {/* 计划模式 */}
+            <div
+              onClick={() => {
+                setShowAddMenu(false);
+                toast.success('已开启计划模式 (Planning Mode)');
+              }}
+              style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: #334155;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>💡</span>
+                <span>计划模式</span>
+              </div>
+              <span style="font-size: 11.5px; color: #94a3b8;">开启计划模式</span>
+            </div>
+          </div>
+
+          {/* 分组二：插件 */}
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-size: 11px; font-weight: 600; color: #94a3b8; padding: 2px 6px;">插件</div>
+            <div
+              onClick={() => {
+                setShowAddMenu(false);
+                toast.info('Windows 宿主自动化已接入 (Control Windows apps)');
+              }}
+              style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: #334155;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>🖼️</span>
+                <span>电脑</span>
+              </div>
+              <span style="font-size: 11.5px; color: #94a3b8;">Control Windows apps</span>
+            </div>
+          </div>
+
+          {/* 分组三：文件和聊天 */}
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 11px; font-weight: 600; color: #94a3b8; padding: 2px 6px;">文件和聊天</div>
+            <div style="padding: 6px 10px; font-size: 12px; color: #94a3b8; background: #f8fafc; border-radius: 6px; border: 1px dashed #e2e8f0;">
+              输入内容以搜索文件或聊天
+            </div>
+          </div>
+        </div>
+      </Show>
+
       {/* Slash 命令浮动弹窗 */}
       <Show when={showSlashMenu() && filteredSlashCommands().length > 0}>
         <div
@@ -135,29 +258,8 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
         </div>
       </Show>
 
-      {/* 顶部附件微型缩略图 (完全对标 Antigravity 样式) */}
-      <Show when={hasAttachment()}>
-        <div style="padding: 8px 12px 2px; display: flex; align-items: center;">
-          <div
-            style="position: relative; width: 34px; height: 34px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; flex-direction: column; justify-content: center; padding: 3px; gap: 2px; cursor: pointer;"
-            title="查看附件 (media.png)"
-          >
-            <div style="height: 2px; background: #ea580c; border-radius: 1px; width: 60%;"></div>
-            <div style="height: 2px; background: #94a3b8; border-radius: 1px; width: 85%;"></div>
-            <div style="height: 2px; background: #94a3b8; border-radius: 1px; width: 75%;"></div>
-            <div style="height: 2px; background: #0284c7; border-radius: 1px; width: 50%;"></div>
-            <button
-              onClick={() => setHasAttachment(false)}
-              style="position: absolute; -top: 4px; -right: 4px; width: 12px; height: 12px; border-radius: 50%; background: #64748b; color: #ffffff; border: none; font-size: 9px; display: none; align-items: center; justify-content: center; cursor: pointer;"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      </Show>
-
       {/* 核心输入区域 */}
-      <div style="display: flex; align-items: flex-end; padding: 4px 12px 2px;">
+      <div style="display: flex; align-items: flex-end; padding: 8px 14px 4px;">
         <textarea
           rows={1}
           value={text()}
@@ -187,28 +289,87 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               handleSend();
             }
           }}
-          placeholder="提问任何问题，使用 @ 提及，/ 执行操作"
+          placeholder="随心输入、提问任何问题，使用 @ 提及，/ 执行操作"
           style="flex: 1; border: none; outline: none; background: transparent; font-size: 13px; line-height: 1.5; color: #1e293b; resize: none; min-height: 32px; max-height: 140px; font-family: inherit; padding: 0;"
         />
       </div>
 
       {/* 底部参数控制工具栏 */}
       <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 10px 8px; position: relative;">
-        {/* 左侧：+ 按钮 + 模型与思考强度胶囊 */}
+        {/* 左侧：+ 按钮 (带黑色提示悬浮框) + 权限模式胶囊 */}
         <div style="display: flex; align-items: center; gap: 8px; position: relative;">
           {/* + 按钮 */}
-          <button
-            onClick={() => {
-              setHasAttachment(true);
-              toast.success('已附加图片/文件到上下文');
-            }}
-            style="background: transparent; border: none; color: #64748b; font-size: 14px; cursor: pointer; padding: 2px 4px; display: flex; align-items: center;"
-            title="添加附件或上下文"
-          >
-            +
-          </button>
+          <div style="position: relative; display: flex; align-items: center;">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAddMenu(!showAddMenu());
+              }}
+              onMouseEnter={() => setShowPlusTooltip(true)}
+              onMouseLeave={() => setShowPlusTooltip(false)}
+              style="width: 24px; height: 24px; border-radius: 6px; border: 1px solid #e2e8f0; background: #ffffff; color: #475569; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 300;"
+            >
+              +
+            </button>
 
-          {/* 模型与思考强度选择胶囊 */}
+            {/* + 按钮 Hover 黑色提示浮窗 */}
+            <Show when={showPlusTooltip() && !showAddMenu()}>
+              <div
+                style="position: absolute; left: 0; bottom: 100%; margin-bottom: 6px; background: #0f172a; color: #ffffff; font-size: 11px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none; z-index: 150; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+              >
+                添加文件等内容 @
+              </div>
+            </Show>
+          </div>
+
+          {/* 权限模式选择胶囊 (e.g. ✋ 请求批准) */}
+          <div style="position: relative;">
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowPermMenu(!showPermMenu());
+              }}
+              style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #475569; cursor: pointer; padding: 2px 6px; border-radius: 4px;"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <span>✋</span>
+              <span>{permissionMode()}</span>
+            </div>
+
+            {/* 权限模式下拉菜单 */}
+            <Show when={showPermMenu()}>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style="position: absolute; left: 0; bottom: 100%; margin-bottom: 6px; width: 140px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); padding: 4px; z-index: 120; display: flex; flex-direction: column; gap: 2px;"
+              >
+                <For each={['请求批准', '直接执行', '只读模式'] as const}>
+                  {(mode) => (
+                    <div
+                      onClick={() => {
+                        setPermissionMode(mode);
+                        setShowPermMenu(false);
+                      }}
+                      style={`padding: 5px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; ${
+                        permissionMode() === mode ? 'background: #f1f5f9; color: #0284c7; font-weight: 600;' : 'color: #334155;'
+                      }`}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = permissionMode() === mode ? '#f1f5f9' : 'transparent')
+                      }
+                    >
+                      {mode}
+                    </div>
+                  )}
+                </For>
+              </div>
+            </Show>
+          </div>
+        </div>
+
+        {/* 右侧：模型选择 (自定义 高) + 上下文使用率饼图 + 蓝色发送按钮 */}
+        <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+          {/* 模型与思考强度胶囊 (自定义 高) */}
           <div
             onClick={(e) => {
               e.stopPropagation();
@@ -218,22 +379,20 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
             onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            <span>{activeModelName()}</span>
+            <span>{activeModelDisplayName()}</span>
             <span style="color: #64748b;">{reasoningIntensity()}</span>
-            <span style="color: #94a3b8; font-size: 10px;">^</span>
           </div>
 
-          {/* 模型与参数弹出层 */}
+          {/* 模型弹出层 */}
           <Show when={showModelPicker()}>
             <div
               onClick={(e) => e.stopPropagation()}
-              style="position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; width: 260px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; z-index: 120; display: flex; flex-direction: column; gap: 8px;"
+              style="position: absolute; right: 80px; bottom: 100%; margin-bottom: 8px; width: 240px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; z-index: 120; display: flex; flex-direction: column; gap: 8px;"
             >
               <div style="font-size: 11px; font-weight: 600; color: #64748b; padding: 2px 4px;">
                 选择模型与思考等级
               </div>
 
-              {/* 模型列表 */}
               <div style="display: flex; flex-direction: column; gap: 2px; max-height: 160px; overflow-y: auto;">
                 <For each={gatewayStore.activeProvider()?.models || []}>
                   {(m) => (
@@ -260,11 +419,10 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                 </For>
               </div>
 
-              {/* 思考等级分段切换 */}
               <div style="border-top: 1px solid #f1f5f9; padding-top: 6px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="font-size: 10.5px; color: #64748b; font-weight: 500;">思考等级 (Reasoning)</div>
                 <div style="display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px;">
-                  <For each={['High', 'Medium', 'Low', 'Off'] as const}>
+                  <For each={['高', '中', '低', '关'] as const}>
                     {(level) => (
                       <button
                         onClick={() => setReasoningIntensity(level)}
@@ -282,17 +440,60 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               </div>
             </div>
           </Show>
-        </div>
 
-        {/* 右侧：语音按钮 + 蓝色圆形发送按钮 */}
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <button
-            onClick={() => toast.info('语音输入就绪 (Mic Active)')}
-            style="background: transparent; border: none; color: #64748b; cursor: pointer; padding: 2px; font-size: 14px; display: flex; align-items: center;"
-            title="语音输入"
+          {/* 4. 上下文使用率饼图 (SVG 环形饼图 + 鼠标 Hover 浮窗) */}
+          <div
+            id="context-pie-btn"
+            style="position: relative; display: flex; align-items: center; cursor: pointer; padding: 2px;"
+            onMouseEnter={() => setShowContextTooltip(true)}
+            onMouseLeave={() => setShowContextTooltip(false)}
           >
-            🎤
-          </button>
+            <svg width="18" height="18" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+              {/* 背景底圈 (剩余容量) */}
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#e2e8f0"
+                stroke-width="4.5"
+              />
+              {/* 前景进度弧 (已使用比例) */}
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#0284c7"
+                stroke-width="4.5"
+                stroke-dasharray={`${usageRatio() * 88} 88`}
+                stroke-linecap="round"
+              />
+            </svg>
+
+            {/* 上下文使用率详细浮窗 */}
+            <Show when={showContextTooltip()}>
+              <div
+                style="position: absolute; right: 0; bottom: 100%; margin-bottom: 8px; width: 220px; background: #0f172a; color: #ffffff; border-radius: 8px; padding: 10px 12px; font-size: 11.5px; z-index: 150; box-shadow: 0 10px 25px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 6px; pointer-events: none;"
+              >
+                <div style="font-weight: 600; border-bottom: 1px solid #334155; padding-bottom: 4px; color: #38bdf8;">
+                  上下文窗口使用率
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">已使用:</span>
+                  <span style="font-weight: 500;">{usagePercentage()}% ({usedTokens().toLocaleString()} Tokens)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8;">剩余可用:</span>
+                  <span style="color: #4ade80;">{remainingPercentage()}% ({remainingTokens().toLocaleString()} Tokens)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px dashed #334155; padding-top: 4px;">
+                  <span style="color: #94a3b8;">窗口总上限:</span>
+                  <span style="color: #cbd5e1;">{contextCapacity().toLocaleString()} Tokens</span>
+                </div>
+              </div>
+            </Show>
+          </div>
 
           {/* 蓝色圆形发送按钮 (➔) */}
           <button
@@ -301,7 +502,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
             style={`width: 26px; height: 26px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; ${
               text().trim()
                 ? 'background: #0284c7; color: #ffffff;'
-                : 'background: #0284c7; color: #ffffff; opacity: 0.9;'
+                : 'background: #64748b; color: #ffffff; opacity: 0.8;'
             }`}
             title="发送消息 (Enter)"
           >

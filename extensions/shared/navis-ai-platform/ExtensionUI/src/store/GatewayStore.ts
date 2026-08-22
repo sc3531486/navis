@@ -305,30 +305,81 @@ export const gatewayStore = {
 
   async fetchModels(id: string): Promise<string[]> {
     const p = providers().find((item) => item.id === id);
-    if (!p) return [];
+    if (!p || !p.baseUrl) return [];
 
-    await new Promise((r) => setTimeout(r, 600));
+    const rawUrl = p.baseUrl.replace(/\/+$/, '');
+    let endpoint = '';
+    if (rawUrl.endsWith('/models')) {
+      endpoint = rawUrl;
+    } else if (rawUrl.endsWith('/v1')) {
+      endpoint = `${rawUrl}/models`;
+    } else {
+      endpoint = `${rawUrl}/v1/models`;
+    }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (p.apiKey && p.apiKey !== 'sk-gateway-local-token') {
+      if (p.type === 'anthropic' || p.upstreamProtocol === 'anthropic_messages') {
+        headers['x-api-key'] = p.apiKey;
+        headers['anthropic-version'] = '2023-06-01';
+      } else {
+        headers['Authorization'] = `Bearer ${p.apiKey}`;
+      }
+    }
 
     let remoteIds: string[] = [];
-    if (p.type === 'anthropic') {
-      remoteIds = ['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229'];
-    } else if (p.type === 'openai') {
-      remoteIds = ['gpt-4o', 'gpt-4o-mini', 'o3-mini', 'o1', 'gpt-4-turbo', 'gpt-3.5-turbo'];
-    } else if (p.type === 'deepseek') {
-      remoteIds = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'];
-    } else if (p.type === 'ollama') {
-      remoteIds = ['qwen2.5-coder:32b', 'deepseek-r1:14b', 'llama3.3:70b', 'mistral-small:24b'];
-    } else {
-      remoteIds = [
-        'gemini-3.7-flash',
-        'gemini-3.1-pro-high',
-        'gemini-3-pro-image',
-        'gemini-3.7',
-        'gemini-2.5-flash',
-        'deepseek-chat',
-        'deepseek-reasoner',
-        'qwen2.5-coder-32b',
-      ];
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'GET',
+        headers,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const json = await res.json();
+        // 兼容标准 OpenAI 格式: { data: [{ id: "gemini-3.7-flash" }, ...] }
+        if (Array.isArray(json?.data)) {
+          remoteIds = json.data.map((m: any) => m.id || m.name).filter(Boolean);
+        } else if (Array.isArray(json?.models)) {
+          // 兼容 Ollama / Claude / custom: { models: [...] }
+          remoteIds = json.models.map((m: any) => m.name || m.id || m.model).filter(Boolean);
+        } else if (Array.isArray(json)) {
+          remoteIds = json.map((m: any) => (typeof m === 'string' ? m : m.id || m.name)).filter(Boolean);
+        }
+      }
+    } catch (e: any) {
+      clearTimeout(timer);
+      console.warn(`[GatewayStore] Real /v1/models fetch failed from ${endpoint}:`, e?.message);
+    }
+
+    // 若真实端点拉取到了模型，则使用远端模型；若网络未通，保留基础常用候选
+    if (remoteIds.length === 0) {
+      if (p.type === 'anthropic') {
+        remoteIds = ['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229'];
+      } else if (p.type === 'openai') {
+        remoteIds = ['gpt-4o', 'gpt-4o-mini', 'o3-mini', 'o1', 'gpt-4-turbo', 'gpt-3.5-turbo'];
+      } else if (p.type === 'deepseek') {
+        remoteIds = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'];
+      } else if (p.type === 'ollama') {
+        remoteIds = ['qwen2.5-coder:32b', 'deepseek-r1:14b', 'llama3.3:70b', 'mistral-small:24b'];
+      } else {
+        remoteIds = [
+          'gemini-3.7-flash',
+          'gemini-3.1-pro-high',
+          'gemini-3-pro-image',
+          'gemini-3.7',
+          'gemini-2.5-flash',
+          'deepseek-chat',
+          'deepseek-reasoner',
+          'qwen2.5-coder-32b',
+        ];
+      }
     }
 
     const merged = Array.from(new Set([...(p.fetchedModelIds || []), ...remoteIds, ...p.models.map((m) => m.id)]));
