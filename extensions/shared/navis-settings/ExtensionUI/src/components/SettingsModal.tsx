@@ -176,7 +176,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                 <span style="color: #c2410c; display: flex; align-items: center;">
                   <IconSettings size={17} />
                 </span>
-                <span style="font-size: 13.5px; font-weight: 600; color: #18181b;">Navis Settings</span>
+                <span style="font-size: 13.5px; font-weight: 600; color: #18181b;">Navis Code Setting</span>
               </div>
 
               <button

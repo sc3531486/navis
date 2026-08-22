@@ -12,6 +12,7 @@ export interface AgentPromptPayload {
   provider?: string;
   permission?: string;
   reasoning?: string;
+  mode?: 'goal' | 'plan' | 'normal';
   timestamp: number;
 }
 

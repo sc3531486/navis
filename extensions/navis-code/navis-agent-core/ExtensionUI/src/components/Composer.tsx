@@ -103,6 +103,19 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [selectedSlashIndex, setSelectedSlashIndex] = createSignal(0);
   const [usedTokens, setUsedTokens] = createSignal(14820); // 响应式 Token 用量
 
+  const [activeSpecialMode, setActiveSpecialMode] = createSignal<'normal' | 'goal' | 'plan'>('normal');
+  const [isHoveringModeChip, setIsHoveringModeChip] = createSignal(false);
+
+  const placeholderText = () => {
+    if (activeSpecialMode() === 'goal') {
+      return '描述你的目标，定义可衡量的成果，以获得最佳效果';
+    }
+    if (activeSpecialMode() === 'plan') {
+      return '描述你的任务以生成套餐...';
+    }
+    return '随心输入、提问任何问题，使用 @ 提及，/ 执行操作';
+  };
+
   // 匹配 Slash 命令
   const showSlashMenu = () => {
     const val = text();
@@ -131,14 +144,40 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     // 检查是否配置了有效模型与 Provider
     const activeProvider = gatewayStore.activeProvider();
     const activeModel = gatewayStore.activeModel();
+    const mode = activeSpecialMode();
+
+    let finalContent = content;
+    if (mode === 'goal') {
+      finalContent = `[GOAL ORIENTED TASK EXECUTION]:
+Objective / Target: ${content}
+
+Please break down this goal and execute:
+1. 🎯 核心目标与可衡量成果 (Key Deliverables & Acceptance Criteria)
+2. 📋 阶段性拆解与执行里程碑 (Milestones & Execution Roadmap)
+3. ⚡ 自动化执行步骤与自测检验 (Autonomous Actions & Validation)
+
+Provide clear, structured autonomous progress toward achieving this goal.`;
+    } else if (mode === 'plan') {
+      finalContent = `[PLANNING & STRATEGY GENERATION]:
+Task: ${content}
+
+Please generate an end-to-end plan package:
+1. 💡 任务架构与方案分析 (Architectural Analysis)
+2. 📦 完整实现套餐与步骤清单 (Step-by-Step Implementation Package)
+3. ⚠️ 风险评估与回滚策略 (Risk Assessment & Fallback)
+4. 🔍 验证与交付标准 (Verification Criteria)
+
+Output the structured plan package for user approval.`;
+    }
 
     props.ctx.events.emit('agent:turn:start', {
-      content,
+      content: finalContent,
       model: activeModel?.name || gatewayStore.activeModelId() || 'gemini-3.7-flash',
       modelId: gatewayStore.activeModelId(),
       provider: activeProvider?.name,
       permissionMode: permissionMode(),
       reasoning: reasoningIntensity(),
+      mode: mode,
       timestamp: Date.now(),
     });
 
@@ -226,11 +265,13 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               <span>文件和文件夹</span>
             </div>
 
-            {/* 目标 */}
+            {/* 目标 (1:1 对标参考图 2) */}
             <div
+              id="menu-item-goal"
               onClick={() => {
+                setActiveSpecialMode('goal');
                 setShowAddMenu(false);
-                toast.info('目标设定面板已就绪');
+                toast.info('已开启目标设定模式 (Goal Mode)');
               }}
               style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #18181b;"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
@@ -243,11 +284,13 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               <span style="font-size: 11.5px; color: #94a3b8;">设置要持续追求的目标</span>
             </div>
 
-            {/* 计划模式 */}
+            {/* 计划模式 (1:1 对标参考图 3) */}
             <div
+              id="menu-item-plan"
               onClick={() => {
+                setActiveSpecialMode('plan');
                 setShowAddMenu(false);
-                toast.success('已开启计划模式 (Planning Mode)');
+                toast.info('已开启计划模式 (Planning Mode)');
               }}
               style="display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #18181b;"
               onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
@@ -357,14 +400,14 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
         </div>
       </Show>
 
-      {/* 主输入文本区域 */}
+      {/* 主输入文本区域 (动态切换占位符) */}
       <div style="padding: 12px 14px 4px;">
         <textarea
           rows={3}
           value={text()}
           onInput={(e) => setText(e.currentTarget.value)}
           onKeyDown={handleKeyDown}
-          placeholder="随心输入、提问任何问题，使用 @ 提及，/ 执行操作"
+          placeholder={placeholderText()}
           style="width: 100%; border: none; outline: none; resize: none; font-size: 13.5px; line-height: 1.6; color: #18181b; background: transparent; font-family: inherit;"
         />
       </div>
@@ -373,7 +416,7 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
       <div
         style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px 10px; border-top: 1px solid #f8fafc;"
       >
-        {/* 左侧：+ 按钮 与 请求批准胶囊 */}
+        {/* 左侧：+ 按钮 与 请求批准胶囊 与 特殊模式微标 (目标/计划) */}
         <div style="display: flex; align-items: center; gap: 8px;">
           {/* + 按钮 */}
           <div style="position: relative;">
@@ -443,6 +486,72 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               </div>
             </Show>
           </div>
+
+          {/* 目标模式微标 (1:1 像素级对齐参考图 3：悬停变 ⓧ 胶囊) */}
+          <Show when={activeSpecialMode() === 'goal'}>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 1px; height: 13px; background: #e2e8f0;" />
+              <div
+                id="active-mode-chip-goal"
+                onClick={() => {
+                  setActiveSpecialMode('normal');
+                  setIsHoveringModeChip(false);
+                  toast.info('已退出目标模式');
+                }}
+                onMouseEnter={() => setIsHoveringModeChip(true)}
+                onMouseLeave={() => setIsHoveringModeChip(false)}
+                style={`display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; padding: 3px 10px; border-radius: 9999px; transition: all 0.15s ease; user-select: none; ${
+                  isHoveringModeChip()
+                    ? 'background: #f1f5f9; color: #475569;'
+                    : 'background: transparent; color: #334155;'
+                }`}
+                title="点击退出目标模式"
+              >
+                <Show
+                  when={isHoveringModeChip()}
+                  fallback={<IconTargetSVG />}
+                >
+                  <div style="width: 14px; height: 14px; border-radius: 50%; background: #64748b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; line-height: 1;">
+                    ✕
+                  </div>
+                </Show>
+                <span>目标</span>
+              </div>
+            </div>
+          </Show>
+
+          {/* 计划模式微标 (1:1 像素级对齐参考图 3：悬停变 ⓧ 胶囊) */}
+          <Show when={activeSpecialMode() === 'plan'}>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 1px; height: 13px; background: #e2e8f0;" />
+              <div
+                id="active-mode-chip-plan"
+                onClick={() => {
+                  setActiveSpecialMode('normal');
+                  setIsHoveringModeChip(false);
+                  toast.info('已退出计划模式');
+                }}
+                onMouseEnter={() => setIsHoveringModeChip(true)}
+                onMouseLeave={() => setIsHoveringModeChip(false)}
+                style={`display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; padding: 3px 10px; border-radius: 9999px; transition: all 0.15s ease; user-select: none; ${
+                  isHoveringModeChip()
+                    ? 'background: #f1f5f9; color: #475569;'
+                    : 'background: transparent; color: #334155;'
+                }`}
+                title="点击退出计划模式"
+              >
+                <Show
+                  when={isHoveringModeChip()}
+                  fallback={<IconBulbSVG />}
+                >
+                  <div style="width: 14px; height: 14px; border-radius: 50%; background: #64748b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; line-height: 1;">
+                    ✕
+                  </div>
+                </Show>
+                <span>计划</span>
+              </div>
+            </div>
+          </Show>
         </div>
 
         {/* 右侧：模型选择 (3.7 Flash 高) + 上下文使用率饼图 + 蓝色发送按钮 */}
