@@ -249,7 +249,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
           <div style="flex: 1; display: flex; flex-direction: column; background: #ffffff; overflow: hidden;">
             {/* 1. 模型与网关面板 */}
             <Show when={activeMainTab() === 'models'}>
-              <div style="flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; gap: 16px;">
+              <div style="flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; gap: 16px; overscroll-behavior: contain;">
                 {/* 顶部水平 Provider 标签选择器 */}
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -581,7 +581,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
 
             {/* 2. 沙箱权限面板 */}
             <Show when={activeMainTab() === 'sandbox'}>
-              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; overscroll-behavior: contain;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0;">
                     Agent 执行策略与权限沙箱 (Execution Policy)
@@ -657,7 +657,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
 
             {/* 3. 自定义指令面板 */}
             <Show when={activeMainTab() === 'prompt'}>
-              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; overscroll-behavior: contain;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                   <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0;">
                     系统提示词与自定义指令 (Custom Instructions)
@@ -699,7 +699,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
 
             {/* 4. 通用与外观面板 */}
             <Show when={activeMainTab() === 'general'}>
-              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+              <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; overscroll-behavior: contain;">
                 <div style="display: flex; flex-direction: column; gap: 5px;">
                   <label style="font-size: 12.5px; font-weight: 600; color: #18181b;">外观主题 (Appearance Theme):</label>
                   <select
