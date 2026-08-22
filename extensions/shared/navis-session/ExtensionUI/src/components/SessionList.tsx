@@ -29,6 +29,23 @@ const IconEditLinear = () => (
   </svg>
 );
 
+// ══════════════════════════════════════════════════════════════════════════
+// 1:1 对齐图五：展开态 (经验分享) 与关闭态 (软件工具包) 的纯矢量线性图标
+// ══════════════════════════════════════════════════════════════════════════
+const IconFolderExpanded = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+    <path d="M2 10h20l-2 10H4L2 10z"></path>
+  </svg>
+);
+
+const IconFolderCollapsed = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+    <line x1="3" y1="11" x2="21" y2="11"></line>
+  </svg>
+);
+
 const IconFolderLinear = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -407,7 +424,9 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
                     >
                       <IconChevronDown size={11} />
                     </span>
-                    <IconFolderLinear />
+                    <Show when={isCollapsed()} fallback={<IconFolderExpanded />}>
+                      <IconFolderCollapsed />
+                    </Show>
                     <span style="overflow: hidden; text-overflow: ellipsis;">{proj.name}</span>
                   </div>
 

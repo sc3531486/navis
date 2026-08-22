@@ -8,10 +8,13 @@ import { GoalEditorDrawer } from './components/GoalEditorDrawer';
 import { agentPipeline } from './pipeline/AgentPipeline';
 import { toast } from '@/core/toast/ToastStore';
 
+import { DiffViewer, type DiffFilePayload } from './components/DiffViewer';
+
 const AgentWorkspace = (props: { ctx: NavisContext }) => {
   const [sessionTitle, setSessionTitle] = createSignal('流水设计审查');
   const [goalEditorOpen, setGoalEditorOpen] = createSignal(false);
   const [editingGoalTitle, setEditingGoalTitle] = createSignal('我们的目标是做一个万物皆扩展的底座');
+  const [activeDiffFile, setActiveDiffFile] = createSignal<DiffFilePayload | null>(null);
 
   onMount(() => {
     const unsubOpen = props.ctx.events.on('goal:editor:open', (payload: { title?: string }) => {
@@ -23,9 +26,17 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
     });
     const unsubSession = props.ctx.events.on('session:switched', (payload: { title?: string }) => {
       if (payload?.title) setSessionTitle(payload.title);
+      setActiveDiffFile(null);
     });
     const unsubSessionCreated = props.ctx.events.on('session:created', (payload: { title?: string }) => {
       if (payload?.title) setSessionTitle(payload.title);
+      setActiveDiffFile(null);
+    });
+    const unsubDiffOpen = props.ctx.events.on('diff:open', (payload: DiffFilePayload) => {
+      setActiveDiffFile(payload);
+    });
+    const unsubDiffClose = props.ctx.events.on('diff:close', () => {
+      setActiveDiffFile(null);
     });
 
     onCleanup(() => {
@@ -33,56 +44,69 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
       unsubClose();
       unsubSession();
       unsubSessionCreated();
+      unsubDiffOpen();
+      unsubDiffClose();
     });
   });
 
   return (
     <div style="display: flex; flex-direction: row; height: 100%; width: 100%; background: #ffffff; overflow: hidden;">
-      {/* 中央主视口 (Header + 消息滚动流 + 底部 Composer 输入框) */}
-      <div style="flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; background: #ffffff;">
-        {/* 1. 顶部面包屑与标题栏 */}
-        <div
-          style="height: 42px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; user-select: none; background: #ffffff; flex-shrink: 0;"
-        >
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569;">
-            <span style="font-weight: 500; color: #1e293b;">Navis Go</span>
-            <span style="color: #94a3b8;">/</span>
-            <span style="color: #64748b;">{sessionTitle()}</span>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button
-              onClick={() => toast.info('Navis IDE 集成套件已就绪')}
-              style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#f8fafc')}
+      {/* 中央主视口 (当打开文件/交付件时渲染 DiffViewer，否则展示对话视口与底部 Composer) */}
+      <Show
+        when={activeDiffFile()}
+        fallback={
+          <div style="flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; overflow: hidden; background: #ffffff;">
+            {/* 1. 顶部面包屑与标题栏 */}
+            <div
+              style="height: 42px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; user-select: none; background: #ffffff; flex-shrink: 0;"
             >
-              <span>🚀</span>
-              <span>安装 IDE</span>
-            </button>
-            <button
-              onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
-              style="background: transparent; border: none; color: #64748b; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 14px;"
-              title="更多选项"
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569;">
+                <span style="font-weight: 500; color: #1e293b;">Navis Go</span>
+                <span style="color: #94a3b8;">/</span>
+                <span style="color: #64748b;">{sessionTitle()}</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button
+                  onClick={() => toast.info('Navis IDE 集成套件已就绪')}
+                  style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer;"
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#f8fafc')}
+                >
+                  <span>🚀</span>
+                  <span>安装 IDE</span>
+                </button>
+                <button
+                  onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
+                  style="background: transparent; border: none; color: #64748b; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 14px;"
+                  title="更多选项"
+                >
+                  ⋮
+                </button>
+              </div>
+            </div>
+
+            {/* 2. 消息流滚动视口 */}
+            <div
+              id="timeline-scroll-container"
+              style="flex: 1; overflow-y: auto; min-height: 0; padding: 20px 28px 12px; display: flex; flex-direction: column; align-items: center; overscroll-behavior: contain;"
             >
-              ⋮
-            </button>
+              <Timeline ctx={props.ctx} />
+            </div>
+
+            {/* 3. 底部固定 Composer 输入控制栏 (绝不沉底遮挡，始终完整展示) */}
+            <div style="width: 100%; padding: 4px 28px 16px; flex-shrink: 0; display: flex; justify-content: center; background: #ffffff;">
+              <Composer ctx={props.ctx} />
+            </div>
           </div>
-        </div>
-
-        {/* 2. 消息流滚动视口 */}
-        <div
-          id="timeline-scroll-container"
-          style="flex: 1; overflow-y: auto; min-height: 0; padding: 20px 28px 12px; display: flex; flex-direction: column; align-items: center; overscroll-behavior: contain;"
-        >
-          <Timeline ctx={props.ctx} />
-        </div>
-
-        {/* 3. 底部固定 Composer 输入控制栏 (绝不沉底遮挡，始终完整展示) */}
-        <div style="width: 100%; padding: 4px 28px 16px; flex-shrink: 0; display: flex; justify-content: center; background: #ffffff;">
-          <Composer ctx={props.ctx} />
-        </div>
-      </div>
+        }
+      >
+        <DiffViewer
+          ctx={props.ctx}
+          file={activeDiffFile()!}
+          onClose={() => setActiveDiffFile(null)}
+        />
+      </Show>
 
       {/* 4. 活跃目标编辑右侧区域 (1:1 像素级复刻参考图) */}
       <Show when={goalEditorOpen()}>
