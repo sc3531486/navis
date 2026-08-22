@@ -3,16 +3,20 @@ import type { NavisContext, NavisPlugin } from '@/core/context';
 import { componentRegistry } from '@/core/components/ComponentRegistry';
 import { Composer } from './components/Composer';
 import { Timeline } from './components/Timeline';
+import { ContextDrawer } from './components/ContextDrawer';
 import { agentPipeline } from './pipeline/AgentPipeline';
 
 const AgentWorkspace = (props: { ctx: NavisContext }) => {
   return (
-    <div style="display: flex; flex-direction: column; height: 100%; width: 100%; background: #ffffff; position: relative; overflow: hidden;">
-      {/* 消息与欢迎画布区 */}
-      <Timeline ctx={props.ctx} />
+    <div style="display: flex; flex-direction: row; height: 100%; width: 100%; background: #ffffff; position: relative; overflow: hidden;">
+      {/* 中央主视口：消息流与底部悬浮 Composer 输入框 */}
+      <div style="flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; min-width: 0;">
+        <Timeline ctx={props.ctx} />
+        <Composer ctx={props.ctx} />
+      </div>
 
-      {/* 底部悬浮 Composer 输入框 */}
-      <Composer ctx={props.ctx} />
+      {/* 右侧上下文面板：子代理、更改文件、交付件Artifacts、用户上传、后台任务 */}
+      <ContextDrawer ctx={props.ctx} />
     </div>
   );
 };
@@ -26,6 +30,7 @@ export const NavisAgentCoreExtension: NavisPlugin = {
     componentRegistry.bind('navis-agent-core', {
       Composer: () => <Composer ctx={ctx} />,
       Timeline: () => <Timeline ctx={ctx} />,
+      ContextDrawer: () => <ContextDrawer ctx={ctx} />,
       AgentWorkspace: () => <AgentWorkspace ctx={ctx} />,
     });
 

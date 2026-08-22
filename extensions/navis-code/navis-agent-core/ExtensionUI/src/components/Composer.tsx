@@ -3,12 +3,7 @@ import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
 import {
-  IconSend,
   IconPlus,
-  IconCopy,
-  IconFolder,
-  IconGitBranch,
-  IconChevronDown,
   IconSparkles,
   IconPrompt,
   IconShield,
@@ -17,7 +12,7 @@ import {
   IconDollarSign,
   IconPlug,
   IconTrash,
-  IconCheck,
+  IconChevronDown,
 } from '@/components/icons';
 
 interface SlashCommand {
@@ -40,10 +35,13 @@ const slashCommands: SlashCommand[] = [
 
 export const Composer: Component<{ ctx: NavisContext }> = (props) => {
   const [text, setText] = createSignal('');
+  const [reasoningIntensity, setReasoningIntensity] = createSignal<'High' | 'Medium' | 'Low' | 'Off'>('High');
   const [permissionMode, setPermissionMode] = createSignal<'Bypass permissions' | 'Ask for confirmation' | 'Read-only'>('Bypass permissions');
-  const [reasoningIntensity, setReasoningIntensity] = createSignal<'Off' | 'Low' | 'Medium' | 'High'>('High');
-  const [activeDropdown, setActiveDropdown] = createSignal<'perm' | 'plus' | 'model' | 'reason' | 'context' | null>(null);
+  const [showModelPicker, setShowModelPicker] = createSignal(false);
   const [selectedSlashIndex, setSelectedSlashIndex] = createSignal(0);
+  const [attachments, setAttachments] = createSignal<Array<{ name: string; url?: string }>>([
+    { name: 'screenshot-uk.png' },
+  ]);
 
   // 匹配 Slash 命令
   const showSlashMenu = () => {
@@ -93,94 +91,77 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     toast.info(`已发送指令至 ${currentModel?.name || 'Agent'}`);
   };
 
-  const handleCopyContext = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText('D:\\myworkspace\\Navis Go [branch: main]');
-    }
-    toast.success('已复制上下文信息至剪贴板');
-  };
-
   onMount(() => {
-    const handleClickOutside = () => setActiveDropdown(null);
+    const handleClickOutside = () => setShowModelPicker(false);
     window.addEventListener('click', handleClickOutside);
     onCleanup(() => window.removeEventListener('click', handleClickOutside));
   });
 
+  const activeModelName = () => {
+    const m = gatewayStore.activeModel();
+    if (m?.name) return m.name.replace(/^gemini-/, 'Gemini ').replace(/-flash$/, ' Flash');
+    return 'Gemini 3.7 Flash';
+  };
+
   return (
     <div style="position: absolute; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; padding: 0 24px; z-index: 50; pointer-events: none;">
       <div
-        style="width: 100%; max-width: 760px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07); display: flex; flex-direction: column; overflow: visible; position: relative; pointer-events: auto;"
+        style="width: 100%; max-width: 780px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; overflow: visible; position: relative; pointer-events: auto;"
       >
         {/* Slash 命令浮动弹窗 */}
         <Show when={showSlashMenu() && filteredSlashCommands().length > 0}>
           <div
-            style="position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; width: 100%; max-width: 420px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.14); padding: 6px; z-index: 120; display: flex; flex-direction: column; gap: 2px;"
+            style="position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; width: 100%; max-width: 420px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 6px; z-index: 120; display: flex; flex-direction: column; gap: 2px;"
           >
             <div style="padding: 4px 8px; font-size: 11px; font-weight: 600; color: #8e8b83; border-bottom: 1px solid #f4f2ee;">
               SLASH 指令 (快捷命令)
             </div>
             <For each={filteredSlashCommands()}>
-              {(cmd, idx) => {
-                const IconComp = cmd.iconComponent;
-                return (
-                  <div
-                    onClick={() => handleSelectSlash(cmd)}
-                    onMouseEnter={() => setSelectedSlashIndex(idx())}
-                    style={`padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; transition: background 0.1s; ${
-                      selectedSlashIndex() === idx() ? 'background: #f7f6f2;' : 'background: transparent;'
-                    }`}
-                  >
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <span style="color: #ea580c; display: flex; align-items: center;">
-                        <IconComp size={14} />
-                      </span>
-                      <b style="color: #1e1d1b; font-family: monospace;">{cmd.name}</b>
-                    </div>
-                    <span style="font-size: 11.5px; color: #76736c;">{cmd.desc}</span>
+              {(cmd, idx) => (
+                <div
+                  onClick={() => handleSelectSlash(cmd)}
+                  style={`display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; ${
+                    selectedSlashIndex() === idx() ? 'background: #f4f2ee;' : 'background: transparent;'
+                  }`}
+                  onMouseEnter={() => setSelectedSlashIndex(idx())}
+                >
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ea580c; display: flex; align-items: center;">
+                      <cmd.iconComponent size={14} />
+                    </span>
+                    <span style="font-weight: 600; font-size: 12px; color: #1e1d1b;">{cmd.name}</span>
                   </div>
-                );
-              }}
+                  <span style="font-size: 11px; color: #8e8b83;">{cmd.desc}</span>
+                </div>
+              )}
             </For>
           </div>
         </Show>
 
-        {/* 顶部上下文药丸胶囊 */}
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 4px; border-bottom: 1px solid #f4f2ee;">
-          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(activeDropdown() === 'context' ? null : 'context');
-              }}
-              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750; cursor: pointer;"
-            >
-              <IconCpu size={12} color="#71717a" />
-              <span style="font-weight: 500;">Local</span>
-            </div>
-            <div
-              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
-            >
-              <IconFolder size={12} color="#71717a" />
-              <span style="font-weight: 500;">Navis Go</span>
-            </div>
-            <div
-              style="display: flex; align-items: center; gap: 5px; background: #f7f6f2; border: 1px solid #eae7e1; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; color: #5a5750;"
-            >
-              <IconGitBranch size={12} color="#71717a" />
-              <span style="font-weight: 500;">main</span>
-            </div>
-            <button
-              onClick={handleCopyContext}
-              style="background: transparent; border: none; font-size: 12px; color: #8e8b83; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
-              title="复制上下文路径"
-            >
-              <IconCopy size={12} />
-            </button>
+        {/* 附件缩略图预览区域 (如已上传图片/文件) */}
+        <Show when={attachments().length > 0}>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px 0;">
+            <For each={attachments()}>
+              {(att, idx) => (
+                <div style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 11.5px; color: #475569;">
+                  <span style="font-size: 11px;">🖼️</span>
+                  <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {att.name}
+                  </span>
+                  <button
+                    onClick={() => setAttachments(attachments().filter((_, i) => i !== idx()))}
+                    style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; padding: 0 2px;"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </For>
           </div>
-        </div>
+        </Show>
 
         {/* 核心输入区域 */}
-        <div style="display: flex; align-items: flex-end; padding: 8px 12px 4px;">
+        <div style="display: flex; align-items: flex-end; padding: 8px 14px 4px;">
           <textarea
             rows={2}
             value={text()}
@@ -210,273 +191,133 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
                 handleSend();
               }
             }}
-            placeholder="输入任务指令、提问，或键入 / 唤起快捷指令 (Enter 发送)"
-            style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; line-height: 1.5; color: #2d2b28; resize: none; min-height: 48px; max-height: 160px; font-family: inherit;"
+            placeholder="提问任何问题，使用 @ 提及，/ 执行操作"
+            style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; line-height: 1.5; color: #18181b; resize: none; min-height: 44px; max-height: 160px; font-family: inherit;"
           />
-          <button
-            onClick={handleSend}
-            disabled={!text().trim()}
-            style={`width: 28px; height: 28px; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s ease; margin-bottom: 2px; ${
-              text().trim() ? 'background: #18181b; color: #ffffff;' : 'background: #f0eee8; color: #b5b2aa; cursor: not-allowed;'
-            }`}
-            title="发送消息 (Enter)"
-          >
-            <IconSend size={13} />
-          </button>
         </div>
 
-        {/* 底部参数控制栏 */}
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 12px 8px; border-top: 1px solid #f4f2ee; font-size: 12px; color: #76736c; position: relative;">
-          {/* 左侧：权限模式与附件 */}
+        {/* 底部参数控制工具栏 (对标 Antigravity / Claude Code) */}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px 10px; position: relative;">
+          {/* 左侧：添加附件按钮 + 模型/思考等级 Pill 下拉框 */}
           <div style="display: flex; align-items: center; gap: 8px; position: relative;">
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(activeDropdown() === 'perm' ? null : 'perm');
-              }}
-              style="display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 3px 6px; border-radius: 4px;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            >
-              <span>{permissionMode()}</span>
-              <IconChevronDown size={11} color="#8e8b83" />
-            </div>
-
-            {/* 权限选择下拉菜单 */}
-            <Show when={activeDropdown() === 'perm'}>
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style="position: absolute; left: 0; bottom: 32px; width: 260px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
-              >
-                <div
-                  onClick={() => {
-                    setPermissionMode('Bypass permissions');
-                    setActiveDropdown(null);
-                    toast.info('已切换为自动执行模式');
-                  }}
-                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
-                    permissionMode() === 'Bypass permissions' ? 'background: #f7f6f2;' : ''
-                  }`}
-                >
-                  <b style="color: #2d2b28;">Bypass permissions</b>
-                  <div style="font-size: 11px; color: #8e8b83;">自动放行文件与终端命令执行</div>
-                </div>
-                <div
-                  onClick={() => {
-                    setPermissionMode('Ask for confirmation');
-                    setActiveDropdown(null);
-                    toast.info('已切换为确认审批模式');
-                  }}
-                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
-                    permissionMode() === 'Ask for confirmation' ? 'background: #f7f6f2;' : ''
-                  }`}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <b style="color: #2d2b28;">Ask for confirmation</b>
-                  <div style="font-size: 11px; color: #8e8b83;">危险操作触发弹窗人工审批</div>
-                </div>
-                <div
-                  onClick={() => {
-                    setPermissionMode('Read-only');
-                    setActiveDropdown(null);
-                    toast.info('已切换为严格只读模式');
-                  }}
-                  style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; ${
-                    permissionMode() === 'Read-only' ? 'background: #f7f6f2;' : ''
-                  }`}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <b style="color: #2d2b28;">Read-only</b>
-                  <div style="font-size: 11px; color: #8e8b83;">禁止写入任何文件与执行命令</div>
-                </div>
-              </div>
-            </Show>
-
-            {/* 附件添加按钮 */}
+            {/* + 添加附件按钮 */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(activeDropdown() === 'plus' ? null : 'plus');
+              onClick={() => {
+                setAttachments([...attachments(), { name: `upload-${Date.now().toString().slice(-4)}.png` }]);
+                toast.success('已附加图片/文件到上下文');
               }}
-              style="background: transparent; border: none; color: #76736c; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center;"
-              title="添加上下文文件或资源"
+              style="width: 26px; height: 26px; border-radius: 6px; border: 1px solid #e5e7eb; background: #ffffff; color: #64748b; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+              title="添加附件或上下文"
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
             >
               <IconPlus size={13} />
             </button>
 
-            {/* 附件选择下拉菜单 */}
-            <Show when={activeDropdown() === 'plus'}>
+            {/* 模型与思考强度胶囊按钮 (e.g. Gemini 3.7 Flash High ^) */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowModelPicker(!showModelPicker());
+              }}
+              style="display: flex; align-items: center; gap: 5px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer; transition: all 0.15s ease;"
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#cbd5e1')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
+            >
+              <span>{activeModelName()}</span>
+              <span style="color: #64748b; font-size: 11px;">{reasoningIntensity()}</span>
+              <span style="color: #94a3b8; font-size: 10px; margin-left: 2px;">^</span>
+            </div>
+
+            {/* 模型与参数弹出层 */}
+            <Show when={showModelPicker()}>
               <div
                 onClick={(e) => e.stopPropagation()}
-                style="position: absolute; left: 140px; bottom: 32px; width: 180px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
+                style="position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; width: 280px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; z-index: 120; display: flex; flex-direction: column; gap: 8px;"
               >
-                <div
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    props.ctx.commands.execute('project:open-folder');
-                    toast.info('已添加工作区文件');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; display: flex; align-items: center; gap: 6px;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <IconFolder size={13} color="#71717a" />
-                  <span>添加工作区文件...</span>
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; padding: 2px 4px;">
+                  选择模型与思考等级
                 </div>
-                <div
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    props.ctx.events.emit('settings:open', { tab: 'prompt' });
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; display: flex; align-items: center; gap: 6px;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <IconPrompt size={13} color="#71717a" />
-                  <span>插入自定义 Prompt...</span>
+
+                {/* 模型列表 */}
+                <div style="display: flex; flex-direction: column; gap: 2px; max-height: 180px; overflow-y: auto;">
+                  <For each={gatewayStore.activeProvider()?.models || []}>
+                    {(m) => (
+                      <div
+                        onClick={() => {
+                          gatewayStore.setActiveModel(m.id);
+                          setShowModelPicker(false);
+                          toast.success(`已切换模型为: ${m.name}`);
+                        }}
+                        style={`display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; ${
+                          gatewayStore.activeModelId() === m.id
+                            ? 'background: #f1f5f9; color: #0284c7; font-weight: 600;'
+                            : 'color: #334155;'
+                        }`}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.background = gatewayStore.activeModelId() === m.id ? '#f1f5f9' : 'transparent')
+                        }
+                      >
+                        <span>{m.name}</span>
+                        <span style="font-size: 10.5px; color: #94a3b8;">{m.contextWindow / 1000}k</span>
+                      </div>
+                    )}
+                  </For>
+                </div>
+
+                {/* 思考等级分段切换 */}
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-size: 10.5px; color: #64748b; font-weight: 500;">思考等级 (Reasoning)</div>
+                  <div style="display: flex; background: #f1f5f9; border-radius: 6px; padding: 2px;">
+                    <For each={['High', 'Medium', 'Low', 'Off'] as const}>
+                      {(level) => (
+                        <button
+                          onClick={() => setReasoningIntensity(level)}
+                          style={`flex: 1; border: none; border-radius: 4px; padding: 3px 0; font-size: 11px; cursor: pointer; ${
+                            reasoningIntensity() === level
+                              ? 'background: #ffffff; color: #0f172a; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);'
+                              : 'background: transparent; color: #64748b;'
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      )}
+                    </For>
+                  </div>
                 </div>
               </div>
             </Show>
           </div>
 
-          {/* 右侧：模型选择、思考强度与状态指示灯 */}
-          <div style="display: flex; align-items: center; gap: 10px; position: relative;">
-            {/* 动态模型选择器 */}
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(activeDropdown() === 'model' ? null : 'model');
-              }}
-              style="display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 3px 6px; border-radius: 4px;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          {/* 右侧：语音输入图标 + 蓝色圆形发送按钮 (➔) */}
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button
+              onClick={() => toast.info('语音输入已就绪 (Mic Active)')}
+              style="background: transparent; border: none; color: #64748b; cursor: pointer; padding: 4px; border-radius: 6px; font-size: 14px; display: flex; align-items: center;"
+              title="语音输入"
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#0284c7')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
             >
-              <span style="font-weight: 500; color: #4b4843;">{gatewayStore.activeModel()?.name || gatewayStore.activeModelId()}</span>
-              <IconChevronDown size={11} color="#8e8b83" />
-            </div>
+              🎤
+            </button>
 
-            {/* 动态模型下拉菜单 */}
-            <Show when={activeDropdown() === 'model'}>
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style="position: absolute; right: 80px; bottom: 32px; width: 260px; max-height: 280px; overflow-y: auto; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
-              >
-                <div style="padding: 4px 8px; font-size: 11px; font-weight: 600; color: #8e8b83; border-bottom: 1px solid #f0eee8;">
-                  当前 Provider: {gatewayStore.activeProvider().name}
-                </div>
-                <For each={gatewayStore.activeProvider().models}>
-                  {(m) => (
-                    <div
-                      onClick={() => {
-                        gatewayStore.setActiveModel(m.id);
-                        setActiveDropdown(null);
-                        toast.info(`已切换模型: ${m.name}`);
-                      }}
-                      style={`padding: 6px 8px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; ${
-                        gatewayStore.activeModelId() === m.id ? 'background: #f7f6f2;' : ''
-                      }`}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-                      onMouseLeave={(e) => {
-                        if (gatewayStore.activeModelId() !== m.id) e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <b style="font-size: 12px; color: #1e1d1b;">{m.name}</b>
-                        <Show when={m.capabilities.reasoning}>
-                          <span style="font-size: 9px; color: #c2410c; background: #fff7ed; padding: 1px 4px; border-radius: 3px;">
-                            Reasoning
-                          </span>
-                        </Show>
-                      </div>
-                      <span style="font-size: 10.5px; color: #8e8b83; font-family: monospace;">{m.id}</span>
-                    </div>
-                  )}
-                </For>
-                <div
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    props.ctx.events.emit('settings:open', { tab: 'models' });
-                  }}
-                  style="padding: 6px 8px; border-top: 1px solid #f0eee8; cursor: pointer; font-size: 11.5px; color: #c2410c; text-align: center; font-weight: 500;"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  ⚙️ 打开模型配置中心...
-                </div>
-              </div>
-            </Show>
-
-            {/* 思考强度选择器 */}
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveDropdown(activeDropdown() === 'reason' ? null : 'reason');
-              }}
-              style="display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 3px 6px; border-radius: 4px;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            {/* 蓝色圆形发送按钮 */}
+            <button
+              onClick={handleSend}
+              disabled={!text().trim()}
+              style={`width: 32px; height: 32px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; ${
+                text().trim()
+                  ? 'background: #0284c7; color: #ffffff; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);'
+                  : 'background: #0284c7; color: #ffffff; opacity: 0.9;'
+              }`}
+              title="发送消息 (Enter)"
             >
-              <span>{reasoningIntensity()}</span>
-              <IconChevronDown size={11} color="#8e8b83" />
-            </div>
-
-            {/* 思考强度下拉 */}
-            <Show when={activeDropdown() === 'reason'}>
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style="position: absolute; right: 20px; bottom: 32px; width: 140px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 4px; z-index: 100; display: flex; flex-direction: column; gap: 2px;"
-              >
-                <div
-                  onClick={() => {
-                    setReasoningIntensity('Off');
-                    setActiveDropdown(null);
-                    toast.info('关闭深度思考');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
-                >
-                  Off (关闭)
-                </div>
-                <div
-                  onClick={() => {
-                    setReasoningIntensity('Low');
-                    setActiveDropdown(null);
-                    toast.info('轻量思考模式');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
-                >
-                  Low (轻量)
-                </div>
-                <div
-                  onClick={() => {
-                    setReasoningIntensity('Medium');
-                    setActiveDropdown(null);
-                    toast.info('中等思考模式');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28;"
-                >
-                  Medium (中等)
-                </div>
-                <div
-                  onClick={() => {
-                    setReasoningIntensity('High');
-                    setActiveDropdown(null);
-                    toast.info('深度思考模式 (推荐)');
-                  }}
-                  style="padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; color: #2d2b28; background: #f7f6f2;"
-                >
-                  High (深度)
-                </div>
-              </div>
-            </Show>
-
-            {/* 就绪指示灯 */}
-            <span
-              onClick={() => toast.success(`当前 Provider [${gatewayStore.activeProvider().name}] 就绪`)}
-              style="width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 6px rgba(22,163,74,0.4); cursor: pointer;"
-              title="Agent 就绪"
-            />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
       </div>

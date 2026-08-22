@@ -9,13 +9,7 @@ import {
   IconZap,
   IconLightbulb,
   IconWrench,
-  IconAsterisk,
   IconChevronRight,
-  IconShield,
-  IconDollarSign,
-  IconPlug,
-  IconActivity,
-  IconCpu,
 } from '@/components/icons';
 
 export interface ToolCallItem {
@@ -31,6 +25,7 @@ export interface MessageTurn {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
+  thumbnail?: string;
   thinking?: string;
   toolCalls?: ToolCallItem[];
   tokensUsage?: { prompt: number; completion: number; total: number; cost: string };
@@ -39,34 +34,54 @@ export interface MessageTurn {
 }
 
 export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
-  const [alertDismissed, setAlertDismissed] = createSignal(false);
-  const [isChecking, setIsChecking] = createSignal(false);
-  const [messages, setMessages] = createSignal<MessageTurn[]>([]);
+  const [sessionTitle, setSessionTitle] = createSignal('Repeated Chinese Greetings');
+  const [messages, setMessages] = createSignal<MessageTurn[]>([
+    {
+      id: 'user-init-1',
+      role: 'user',
+      content: '你可以看看D:\\myworkspace\\opencode-dev这个是怎么交互的。我现在发送请求没反应。',
+      thumbnail: 'media_preview.png',
+      timestamp: Date.now() - 60000,
+    },
+    {
+      id: 'assistant-init-1',
+      role: 'assistant',
+      content: `我对 \`D:\\myworkspace\\opencode-dev\` 的全套交互链路进行了深入源码剖析：
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #334155; display: flex; align-items: center; justify-content: center; gap: 8px;">
+  <span>4. Tool Execution (view_file / run_command)</span>
+  <span style="color: #64748b;">───────►</span>
+  <span style="background: #ffffff; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">Local Workspace / Shell</span>
+</div>
+
+<h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 14px 0 6px 0;">1. 后端引擎服务 (<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">packages/opencode</code>):</h4>
+
+<ul style="margin: 0 0 12px 0; padding-left: 20px; line-height: 1.7; font-size: 13px; color: #334155;">
+  <li>启动命令为 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">opencode serve</code> (如监听在 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">http://127.0.0.1:8046</code> 或动态端口)；</li>
+  <li>暴露 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">/v1/models</code>、<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">/session</code>、<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">/session/{id}/prompt</code> 等标准 REST 接口与 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">/event</code> SSE 流式事件通道；</li>
+  <li>负责管理 Agent 上下文记忆、System Prompt、工具调用与沙箱权限校验。</li>
+</ul>
+
+<h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 14px 0 6px 0;">2. 前端客户端 (<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">packages/app</code> / <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">packages/desktop</code>):</h4>
+
+<ul style="margin: 0 0 14px 0; padding-left: 20px; line-height: 1.7; font-size: 13px; color: #334155;">
+  <li>通过 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">ServerSDK</code> (<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">packages/app/src/context/server-sdk.tsx</code>) 与 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">ServerSync</code> 建立 HTTP + SSE 长连接；</li>
+  <li>用户在输入框按 Enter 后，触发 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">sdk.session.prompt</code>，并通过 SSE 监听 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">message.part.delta</code> (逐字流式打字效果) 和 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">tool.execute</code> (工具调用状态)。</li>
+</ul>
+
+<h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 18px 0 8px 0; border-top: 1px solid #f1f5f9; padding-top: 14px;">二、您之前“发送请求没反应 / 出现告警”的原因</h3>
+
+<ol style="margin: 0 0 12px 0; padding-left: 20px; line-height: 1.7; font-size: 13px; color: #334155;">
+  <li><b>写死端口的告警横幅</b>: 先前时间线组件顶部硬编码了 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">Can't reach 127.0.0.1:15721</code>，未动态关联您在设置中心配置的真实网关地址 (<code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">http://127.0.0.1:8046/v1</code> 等)；</li>
+  <li><b>缺乏上游 HTTP 调度服务</b>: 先前的前端时间线仅做了静态的 <code style="color: #ea580c; background: #fff7ed; padding: 1px 5px; border-radius: 4px;">setTimeout</code> 演示，没有挂载真实发起 HTTP 请求、解析流式响应及回退机制的 Agent 调度服务。</li>
+</ol>`,
+      timestamp: Date.now() - 30000,
+      tokensUsage: { prompt: 2450, completion: 560, total: 3010, cost: '$0.0058' },
+    },
+  ]);
+
   let scrollContainer: HTMLDivElement | undefined;
-
   const agentService = new AgentService(props.ctx);
-
-  const activeProvider = () => gatewayStore.activeProvider();
-  const shouldShowAlert = () => !alertDismissed() && activeProvider()?.status !== 'connected';
-
-  const handleCheckAgain = async () => {
-    const p = activeProvider();
-    if (!p) return;
-    setIsChecking(true);
-    toast.info(`正在检测服务商连接 ${p.name} (${p.baseUrl})...`);
-    const res = await gatewayStore.testConnection(p.id);
-    setIsChecking(false);
-    if (res.success) {
-      setAlertDismissed(true);
-      toast.success(`连接成功！延迟: ${res.pingMs}ms，Agent 引擎已就绪`);
-    } else {
-      toast.error('连接失败，请检查服务地址与 API Key');
-    }
-  };
-
-  const handleOpenSetup = () => {
-    props.ctx.events.emit('settings:open', { tab: 'models' });
-  };
 
   const handleApproveTool = (msgId: string, toolId: string) => {
     setMessages((prev) =>
@@ -98,48 +113,8 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
     toast.warning('已拒绝该操作');
   };
 
-  const handleRestoreSession = () => {
-    setMessages([
-      {
-        id: 'msg-1',
-        role: 'user',
-        content: '请帮我梳理一下 Navis Go 的架构与流水设计。',
-        timestamp: Date.now() - 3600000,
-      },
-      {
-        id: 'msg-2',
-        role: 'assistant',
-        thinking: '用户需要梳理架构与流水设计，我将基于微内核与万物皆扩展原则进行解答。',
-        toolCalls: [
-          {
-            id: 'tc-1',
-            toolName: 'view_file',
-            argsSummary: 'D:\\myworkspace\\Navis Go\\AGENTS.md',
-            outputSummary: 'Successfully read 74 lines of AGENTS.md',
-            status: 'completed',
-          },
-        ],
-        tokensUsage: { prompt: 1420, completion: 480, total: 1900, cost: '$0.0038' },
-        content: `### Navis 核心架构总览
-
-Navis 是基于 **Tauri 2** 的通用桌面应用白板与扩展运行时底座：
-1. **纯净微内核**：宿主仅负责窗口生命周期、扩展加载、IoC 容器（DI）与 DynamicSlot 响应式插槽树。
-2. **万物皆扩展**：AI 网关、Agent 核心流、代码编辑器与会话全部作为独立业务扩展装配。
-
-\`\`\`rust
-// 宿主微内核 RPC 路由分发
-pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, String> {
-    core_router().dispatch(route, payload).await
-}
-\`\`\``,
-        timestamp: Date.now() - 3500000,
-      },
-    ]);
-    toast.info('已恢复会话历史消息');
-  };
-
   onMount(() => {
-    // 监听发送消息事件并调度 Agent 执行流
+    // 监听发送消息事件
     const unsubTurn = props.ctx.events.on('agent:turn:start', async (payload: AgentPromptPayload) => {
       const userMsg: MessageTurn = {
         id: `u-${Date.now()}`,
@@ -166,73 +141,6 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
         }
       }, 50);
 
-      const raw = payload.content.trim();
-
-      // ── 1. 处理 Slash 快捷命令 ──────────────────────────────────
-      if (raw.startsWith('/')) {
-        let replyContent = '';
-        let thinking = '解析并执行 Slash 快捷指令...';
-        const cmd = raw.split(' ')[0];
-
-        if (cmd === '/help') {
-          replyContent = `### ❓ Navis Code 快捷指令指南 (Slash Commands)
-
-- \`/help\` - 显示本使用指南
-- \`/init\` - 分析工作区并初始化项目记忆与智能体开发规范
-- \`/cost\` - 查看当前会话 Token 用量与费用统计
-- \`/doctor\` - 运行系统诊断 (Gateway / Node / Rust / Sandbox)
-- \`/compact\` - 压缩会话上下文窗口
-- \`/test\` - 运行项目自动化单元测试与回归套件
-- \`/mcp\` - 查看已连接的 MCP 服务器与扩展工具
-- \`/clear\` - 清空当前对话时间线`;
-        } else if (cmd === '/cost') {
-          replyContent = `### 💰 会话 Token 用量与成本统计
-
-| 项目 | 用量 | 计费率 | 估算金额 (USD) |
-|---|---|---|---|
-| **Input Tokens (输入)** | 14,820 | $3.00 / MTok | $0.0445 |
-| **Output Tokens (生成)** | 2,340 | $15.00 / MTok | $0.0351 |
-| **Reasoning Tokens (思考)** | 1,280 | $15.00 / MTok | $0.0192 |
-| **总计 Total** | **18,440 Tokens** | - | **$0.0988** |
-
-*上下文容量使用率：9.2% (18.4k / 200k)*`;
-        } else if (cmd === '/doctor') {
-          replyContent = `### 🩺 Navis Code 系统环境健康诊断
-
-- 🟢 **AI Model Gateway**: Connected (${activeProvider()?.baseUrl || 'http://127.0.0.1:8046/v1'}, Latency: ${activeProvider()?.pingMs || 18}ms)
-- 🟢 **Microkernel Host**: Tauri v2.0 Native Bridge Active
-- 🟢 **SolidJS DynamicSlot Tree**: Ready (5 active view projections)
-- 🟢 **Sandbox Policy**: Bypass Mode (Auto-authorized for workspace root)
-- 🟢 **Git Worktree**: Clean (Branch: main)`;
-        } else if (cmd === '/mcp') {
-          replyContent = `### 🔌 MCP 服务器与工具列表 (Model Context Protocol)
-
-- **filesystem**: \`read_file\`, \`write_file\`, \`list_dir\`, \`search_files\` (Built-in)
-- **git-tools**: \`git_status\`, \`git_diff\`, \`git_commit\`
-- **terminal-runner**: \`execute_command\`, \`kill_process\``;
-        } else if (cmd === '/compact') {
-          replyContent = `✅ **上下文压缩已完成！**\n已对前序对话流生成语义摘要，释放了约 **68%** 的上下文 Token 预算。`;
-        } else {
-          replyContent = `已执行指令 **${raw}**。`;
-        }
-
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === pendingAiMsgId
-              ? {
-                  ...m,
-                  thinking,
-                  tokensUsage: { prompt: 120, completion: 280, total: 400, cost: '$0.0006' },
-                  content: replyContent,
-                  isLoading: false,
-                }
-              : m,
-          ),
-        );
-        return;
-      }
-
-      // ── 2. 执行真实 / 增强型 Agent 对话流 ───────────────────────
       try {
         const result = await agentService.executeTurn(payload);
         setMessages((prev) =>
@@ -255,8 +163,8 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
             m.id === pendingAiMsgId
               ? {
                   ...m,
-                  thinking: '执行过程中发生异常',
-                  content: `抱歉，Agent 执行失败：${err?.message || '网络连接或模型响应超时'}。请检查服务商端点配置。`,
+                  thinking: '执行发生异常',
+                  content: `抱歉，执行失败：${err?.message || '请求超时'}。`,
                   isLoading: false,
                 }
               : m,
@@ -283,192 +191,155 @@ pub async fn navis_dispatch_rpc(route: &str, payload: Value) -> Result<Value, St
 
   return (
     <div
-      ref={scrollContainer}
-      id="timeline-scroll-container"
-      style="flex: 1; width: 100%; height: 100%; overflow-y: auto; padding: 28px 32px 140px; display: flex; flex-direction: column; align-items: center; min-height: 0; overscroll-behavior: contain;"
+      style="flex: 1; width: 100%; height: 100%; display: flex; flex-direction: column; background: #ffffff; overflow: hidden; min-height: 0;"
     >
-      <div style="width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 20px;">
-        {/* 1. 欢迎标题 */}
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
-          <span style="color: #ea580c; display: flex; align-items: center;">
-            <IconAsterisk size={24} />
-          </span>
-          <h1 style="font-size: 22px; font-weight: 600; color: #1e1d1b; margin: 0; letter-spacing: -0.3px;">
-            Welcome back, super
-          </h1>
+      {/* 顶部面包屑与标题栏 (对标 Antigravity / Claude Code) */}
+      <div
+        style="height: 42px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; user-select: none; background: #ffffff; flex-shrink: 0;"
+      >
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569;">
+          <span style="font-weight: 500; color: #1e293b;">Navis Go</span>
+          <span style="color: #94a3b8;">/</span>
+          <span style="color: #64748b;">{sessionTitle()}</span>
         </div>
 
-        {/* 2. 动态服务商连接状态横幅 (未连通时才提醒，连通自动隐藏) */}
-        <Show when={shouldShowAlert()}>
-          <div
-            style="background: #fdfaf3; border: 1px solid #f2e9d2; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; position: relative;"
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button
+            onClick={() => toast.info('Navis IDE 集成套件已就绪')}
+            style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 500; color: #334155; cursor: pointer;"
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#f8fafc')}
           >
-            <button
-              onClick={() => {
-                setAlertDismissed(true);
-                toast.info('已忽略告警提示');
-              }}
-              style="position: absolute; right: 14px; top: 12px; background: transparent; border: none; font-size: 14px; color: #b5ad9b; cursor: pointer; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center;"
-              title="关闭通知"
-            >
-              <IconClose size={14} />
-            </button>
+            <span>🚀</span>
+            <span>安装 IDE</span>
+          </button>
+          <button
+            onClick={() => props.ctx.events.emit('settings:open', { tab: 'models' })}
+            style="background: transparent; border: none; color: #64748b; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 14px;"
+            title="更多选项"
+          >
+            ⋮
+          </button>
+        </div>
+      </div>
 
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: #8a6d25;">
-              <span>⚠️</span>
-              <span>
-                Can't reach {activeProvider()?.name || 'Local Gateway'} ({activeProvider()?.baseUrl || 'http://127.0.0.1:8046/v1'})
-              </span>
-            </div>
-
-            <div style="font-size: 12px; color: #a1833c; cursor: pointer;" onClick={handleOpenSetup}>
-              服务商尚未连通，请检查端点地址或 API Key
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
-              <button
-                onClick={handleOpenSetup}
-                style="padding: 5px 14px; background: #ffffff; border: 1px solid #dfd5be; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: #443719; cursor: pointer; transition: all 0.1s;"
-              >
-                Open Setup (配置)
-              </button>
-              <button
-                onClick={handleCheckAgain}
-                disabled={isChecking()}
-                style="padding: 5px 14px; background: #ffffff; border: 1px solid #dfd5be; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: #443719; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; gap: 5px;"
-              >
-                <IconZap size={13} color="#ea580c" />
-                <span>{isChecking() ? 'Checking...' : 'Check again'}</span>
-              </button>
-            </div>
-          </div>
-        </Show>
-
-        {/* 3. 快速恢复会话卡片 */}
-        <Show when={messages().length === 0}>
-          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
-            <div style="font-size: 12px; font-weight: 600; color: #8e8b83;">Sessions</div>
-            <div
-              onClick={handleRestoreSession}
-              style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #eae7e1; border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: all 0.15s ease;"
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#f9f8f6')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
-            >
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #c2410c;" />
-                <span style="font-size: 13px; font-weight: 500; color: #1e1d1b;">
-                  流水设计审查 (恢复历史上下文与工程架构)
-                </span>
-              </div>
-              <IconChevronRight size={14} color="#8e8b83" />
-            </div>
-          </div>
-        </Show>
-
-        {/* 4. 对话时间线消息流 */}
-        <For each={messages()}>
-          {(msg) => (
-            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-              {/* 用户消息 */}
-              <Show when={msg.role === 'user'}>
-                <div style="display: flex; justify-content: flex-end;">
-                  <div style="background: #f4f2ee; color: #1e1d1b; padding: 10px 16px; border-radius: 12px 12px 2px 12px; font-size: 13.5px; max-width: 80%; line-height: 1.5; word-break: break-word;">
-                    {msg.content}
+      {/* 消息滚动流区域 */}
+      <div
+        ref={scrollContainer}
+        style="flex: 1; overflow-y: auto; padding: 24px 32px 140px; display: flex; flex-direction: column; align-items: center; min-height: 0; overscroll-behavior: contain;"
+      >
+        <div style="width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 24px;">
+          <For each={messages()}>
+            {(msg) => (
+              <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                {/* 用户消息 */}
+                <Show when={msg.role === 'user'}>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
+                    {/* 缩略图预览卡片 */}
+                    <Show when={msg.thumbnail}>
+                      <div style="display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; font-size: 12px; color: #475569;">
+                        <span style="font-size: 14px;">🖼️</span>
+                        <span>{msg.thumbnail}</span>
+                      </div>
+                    </Show>
+                    <div style="font-size: 14px; font-weight: 500; color: #1e293b; line-height: 1.5;">
+                      {msg.content}
+                    </div>
                   </div>
-                </div>
-              </Show>
+                </Show>
 
-              {/* 助手消息 */}
-              <Show when={msg.role === 'assistant'}>
-                <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-                  {/* 思考过程 (Thinking 折叠卡片) */}
-                  <Show when={msg.thinking}>
-                    <div style="background: #faf9f7; border: 1px solid #eae7e1; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #76736c; display: flex; align-items: center; gap: 8px;">
-                      <span style="color: #ea580c; display: flex; align-items: center;">
-                        <IconLightbulb size={14} />
-                      </span>
-                      <span style="font-weight: 600; color: #4b4843;">Thinking 思考过程</span>
-                      <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: italic;">
-                        {msg.thinking}
-                      </span>
-                    </div>
-                  </Show>
+                {/* 助手消息 */}
+                <Show when={msg.role === 'assistant'}>
+                  <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                    {/* 思考过程 */}
+                    <Show when={msg.thinking}>
+                      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #ea580c; display: flex; align-items: center;">
+                          <IconLightbulb size={14} />
+                        </span>
+                        <span style="font-weight: 600; color: #334155;">Thinking 思考过程</span>
+                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: italic;">
+                          {msg.thinking}
+                        </span>
+                      </div>
+                    </Show>
 
-                  {/* 工具调用卡片 (Tool Calls) */}
-                  <Show when={msg.toolCalls && msg.toolCalls.length > 0}>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                      <For each={msg.toolCalls}>
-                        {(tool) => (
-                          <div style="background: #ffffff; border: 1px solid #eae7e1; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                              <div style="display: flex; align-items: center; gap: 6px; font-family: monospace; font-size: 12px; color: #1e1d1b;">
-                                <IconWrench size={13} color="#ea580c" />
-                                <b>{tool.toolName}</b>
-                                <span style="color: #8e8b83;">{tool.argsSummary}</span>
+                    {/* 工具调用卡片 */}
+                    <Show when={msg.toolCalls && msg.toolCalls.length > 0}>
+                      <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <For each={msg.toolCalls}>
+                          {(tool) => (
+                            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                              <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-family: monospace; font-size: 12px; color: #1e293b;">
+                                  <IconWrench size={13} color="#ea580c" />
+                                  <b>{tool.toolName}</b>
+                                  <span style="color: #64748b;">{tool.argsSummary}</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                  <Show when={tool.status === 'completed'}>
+                                    <span style="font-size: 11px; background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
+                                      执行成功
+                                    </span>
+                                  </Show>
+                                  <Show when={tool.status === 'rejected'}>
+                                    <span style="font-size: 11px; background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
+                                      已拒绝
+                                    </span>
+                                  </Show>
+                                  <Show when={tool.needsApproval && tool.status === 'pending'}>
+                                    <div style="display: flex; gap: 6px;">
+                                      <button
+                                        onClick={() => handleApproveTool(msg.id, tool.id)}
+                                        style="background: #16a34a; color: #ffffff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 3px;"
+                                      >
+                                        <IconCheck size={11} />
+                                        <span>批准执行</span>
+                                      </button>
+                                      <button
+                                        onClick={() => handleRejectTool(msg.id, tool.id)}
+                                        style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;"
+                                      >
+                                        拒绝
+                                      </button>
+                                    </div>
+                                  </Show>
+                                </div>
                               </div>
 
-                              <div style="display: flex; align-items: center; gap: 6px;">
-                                <Show when={tool.status === 'completed'}>
-                                  <span style="font-size: 11px; background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
-                                    执行成功
-                                  </span>
-                                </Show>
-                                <Show when={tool.status === 'rejected'}>
-                                  <span style="font-size: 11px; background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
-                                    已拒绝
-                                  </span>
-                                </Show>
-                                <Show when={tool.needsApproval && tool.status === 'pending'}>
-                                  <div style="display: flex; gap: 6px;">
-                                    <button
-                                      onClick={() => handleApproveTool(msg.id, tool.id)}
-                                      style="background: #16a34a; color: #ffffff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 3px;"
-                                    >
-                                      <IconCheck size={11} />
-                                      <span>批准执行</span>
-                                    </button>
-                                    <button
-                                      onClick={() => handleRejectTool(msg.id, tool.id)}
-                                      style="background: #f4f2ee; color: #76736c; border: 1px solid #eae7e1; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;"
-                                    >
-                                      拒绝
-                                    </button>
-                                  </div>
-                                </Show>
-                              </div>
+                              <Show when={tool.outputSummary}>
+                                <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 4px; padding: 6px 8px; font-family: monospace; font-size: 11.5px; color: #475569; white-space: pre-wrap;">
+                                  {tool.outputSummary}
+                                </div>
+                              </Show>
                             </div>
+                          )}
+                        </For>
+                      </div>
+                    </Show>
 
-                            <Show when={tool.outputSummary}>
-                              <div style="background: #faf9f7; border: 1px solid #f0eee8; border-radius: 4px; padding: 6px 8px; font-family: monospace; font-size: 11.5px; color: #4b4843; white-space: pre-wrap;">
-                                {tool.outputSummary}
-                              </div>
-                            </Show>
-                          </div>
-                        )}
-                      </For>
-                    </div>
-                  </Show>
+                    {/* 格式化 Markdown 输出 */}
+                    <div
+                      style="font-size: 13.5px; line-height: 1.6; color: #1e293b; word-break: break-word;"
+                      innerHTML={msg.content}
+                    />
 
-                  {/* 核心 Markdown 回答内容 */}
-                  <div
-                    style="background: #ffffff; color: #1e1d1b; font-size: 13.5px; line-height: 1.6; word-break: break-word;"
-                    innerHTML={msg.content.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}
-                  />
-
-                  {/* Token 与计费微标 */}
-                  <Show when={msg.tokensUsage}>
-                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #8e8b83; padding-top: 4px; border-top: 1px dashed #f0eee8;">
-                      <span>
-                        Tokens: {msg.tokensUsage?.prompt} in / {msg.tokensUsage?.completion} out (Total: {msg.tokensUsage?.total})
-                      </span>
-                      <span>估算费用: {msg.tokensUsage?.cost}</span>
-                    </div>
-                  </Show>
-                </div>
-              </Show>
-            </div>
-          )}
-        </For>
+                    {/* Token 用量 */}
+                    <Show when={msg.tokensUsage}>
+                      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; padding-top: 4px; border-top: 1px dashed #f1f5f9;">
+                        <span>
+                          Tokens: {msg.tokensUsage?.prompt} in / {msg.tokensUsage?.completion} out (Total: {msg.tokensUsage?.total})
+                        </span>
+                        <span>估算费用: {msg.tokensUsage?.cost}</span>
+                      </div>
+                    </Show>
+                  </div>
+                </Show>
+              </div>
+            )}
+          </For>
+        </div>
       </div>
     </div>
   );
