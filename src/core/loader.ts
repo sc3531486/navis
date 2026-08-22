@@ -1,9 +1,9 @@
 // 运行时扩展装载器：开发期通过 Vite import.meta.glob 自动发现并装载扩展 UI 入口。
-// 新增扩展只需在 extensions/ 下新建目录，无需修改任何宿主源码（构建期自动打包进产物）。
+// 支持按产品套件与共享目录多层分组（extensions/**/ExtensionUI/src/index.tsx），无需修改任何宿主源码。
 import type { NavisPlugin } from './context';
 
-// 扫描 extensions/*/ExtensionUI/src/index.ts(x)，导出默认 NavisPlugin
-const modules = import.meta.glob('../../extensions/*/ExtensionUI/src/index.{ts,tsx}', {
+// 递归扫描 extensions/**/ExtensionUI/src/index.ts(x)，导出默认 NavisPlugin
+const modules = import.meta.glob('../../extensions/**/ExtensionUI/src/index.{ts,tsx}', {
   eager: false,
 });
 

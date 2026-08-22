@@ -9,6 +9,7 @@ use tokio::io::AsyncWriteExt;
 use tokio::process::{Child, ChildStdin, Command};
 use tokio::sync::{Mutex, oneshot};
 use tokio::time::{Duration, timeout};
+use tracing::info;
 
 use serde_json::Value;
 
@@ -87,7 +88,7 @@ impl ProcessSupervisor {
                 pending: Arc::new(Mutex::new(HashMap::new())),
             },
         );
-        println!("[Navis Process] spawned plugin process: {plugin_id} ({main})");
+        info!("[Navis Process] spawned plugin process: {plugin_id} ({main})");
         Ok(())
     }
 
@@ -152,7 +153,7 @@ impl ProcessSupervisor {
         if let Some(mut proc) = lock.remove(plugin_id) {
             let _ = proc.child.kill().await;
             let _ = proc.child.wait().await;
-            println!("[Navis Process] killed plugin process: {plugin_id}");
+            info!("[Navis Process] killed plugin process: {plugin_id}");
         }
         Ok(())
     }
@@ -162,7 +163,7 @@ impl ProcessSupervisor {
         let mut lock = self.processes.lock().await;
         for (id, mut proc) in lock.drain() {
             let _ = proc.child.kill().await;
-            println!("[Navis Process] shutdown plugin process: {id}");
+            info!("[Navis Process] shutdown plugin process: {id}");
         }
     }
 

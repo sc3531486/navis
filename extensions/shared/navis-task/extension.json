@@ -1,0 +1,20 @@
+{
+  "id": "navis-task",
+  "name": "Navis Task",
+  "version": "0.1.0",
+  "displayName": "Task",
+  "publisher": "navis",
+  "description": "任务扩展：任务看板与执行状态管理。",
+  "permissions": {
+    "fs.read": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-task.panel", "target": "navis-code.viewport.task", "component": "TaskBoard", "priority": 10 }
+    ],
+    "tools": [
+      { "name": "task.create", "description": "创建任务", "parameters": { "type": "object" } },
+      { "name": "task.list", "description": "列出任务", "parameters": { "type": "object" } }
+    ]
+  }
+}

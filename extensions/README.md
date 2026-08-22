@@ -1,50 +1,82 @@
 # 扩展统一根目录（extensions/）
 
-> 权威规范见 `design/36-extension-development.md` 与 `design/35-whiteboard-container.md` §三。
+> 权威规范请参见 `design/36-扩展开发指南.md` 与 `智能体开发规范.md`。
 
-## 固定目录契约
+## 一、产品分组与共享池组织结构
 
-每个扩展是一个独立分发单元，目录名必须等于 `extension.json` 中的 `id`。仓库中的产品扩展使用一层产品目录包装，因此开发期路径是 `extensions/<product>/<extension-id>/`；安装到运行时后统一落在 `<app_data>/extensions/<extension-id>/`：
+为了支持多产品形态（如 Navis Code、银行柜面系统、双录系统等）并实现公共能力最大化复用，`extensions/` 采用 **“产品专属套件（Product Suites）+ 跨行业共享池（Shared Extensions）”** 分组体系：
 
 ```text
-extensions/<product>/<extension-id>/
-├── extension.json                 # manifest（唯一扩展元数据入口）
+extensions/
+├── navis-code/                     # 【Navis Code 产品专属套件】
+│   ├── navis-code/                 # Navis Code 产品壳主布局 (root/overlay 挂载点)
+│   ├── navis-agent-core/           # Agent 执行流、Composer 对话区与时间线
+│   ├── navis-editor/               # 代码编辑器与 Diff 视图
+│   └── navis-terminal/             # PTY 终端与 Shell 命令行
+│
+├── teller-system/                  # 【银行柜面产品专属套件】（多产品形态示例）
+│   └── README.md                   # 柜面系统套件说明
+│
+└── shared/                         # 【跨产品通用共享扩展池】（所有产品清单自由组装）
+    ├── navis-ai-platform/          # 统一 AI 网关、模型管理与 ToolRegistry
+    ├── navis-session/              # 会话管理与历史列表
+    ├── navis-project/              # 工作区与项目目录管理
+    ├── navis-knowledge/            # 业务知识库与本地 RAG 检索
+    ├── navis-memory/               # 长期记忆与偏好配置
+    ├── navis-settings/             # 系统与扩展参数配置弹窗
+    ├── navis-task/                 # 任务看板与计划跟踪
+    └── navis-demo/                 # 标准全链路示例扩展
+```
+
+## 二、扩展固定目录契约
+
+每个扩展是一个独立的分发单元，内部遵循统一物理结构：
+
+```text
+extensions/<suite>/<extension-id>/
+├── extension.json                 # 扩展清单（唯一扩展元数据与能力声明入口）
+├── README.md                      # 扩展说明文档
 ├── ExtensionUI/                   # 全部前端扩展代码、样式和资源
-│   ├── index.html                 # html:sandbox 视图入口（如有）
-│   ├── assets/                    # 静态资源
-│   ├── scripts/                   # 前端胶水 worker / 前端逻辑组件
-│   └── locales/                   # i18n 资源
+│   ├── src/
+│   │   ├── index.tsx              # 前端入口（导出 NavisPlugin）
+│   │   ├── components/            # 扩展专属 SolidJS 组件
+│   │   └── stores/                # 扩展自持状态
+│   └── styles/                    # 扩展专属 CSS 样式
 └── ExtensionBackend/              # 全部后端扩展点代码
-    ├── src/                       # Rust 扩展源码（如有）
-    ├── logic/                     # 容器内逻辑组件
-    └── native/                    # 协议子进程服务（可选）
+    ├── src/                       # 后端业务源码
+    └── main.mjs (或可执行文件)     # 后端进程入口（stdio JSON-RPC）
 ```
 
-## 产品组合契约
+## 三、产品组装契约
 
-产品不是宿主层的特判，而是扩展组合：
+产品形态不是宿主层的硬编码，而是由根级产品清单 `<product>.json`（如 `navis-code.json`、`teller-system.json`）声明组装的扩展集合：
 
-```text
-extensions/<product>/
-├── product.json                   # id/name/version/entry，可选 default
-├── <product>-ui.tsx               # 导出 ProductDefinition
-└── <extension-id>/                 # 业务扩展集合
+```json
+{
+  "id": "navis-code",
+  "name": "Navis Code",
+  "shell": "navis-code",
+  "description": "Navis Code AI Agent IDE",
+  "extensions": [
+    "navis-agent-core",
+    "navis-ai-platform",
+    "navis-editor",
+    "navis-knowledge",
+    "navis-memory",
+    "navis-project",
+    "navis-session",
+    "navis-settings",
+    "navis-task",
+    "navis-terminal",
+    "navis-demo"
+  ]
+}
 ```
 
-通用入口 `src/index.tsx` 只扫描产品清单并动态加载被选中的入口。没有产品清单时只显示 Navis 白板。新增产品不修改 `src/`、`src-tauri/src/` 或宿主产品选择代码。
+通用宿主（`src/` 与 `src-tauri/`）在启动时递归扫描 `extensions/**/extension.json`，并依据当前激活的产品清单动态装配。没有产品清单时显示纯 Navis 白板。新增产品（如银行柜面系统）无需修改底层框架源码。
 
-## 当前业务扩展清单
+## 四、关键准则
 
-- `navis-demo`：白板容器最小扩展骨架和全链路示例。
-- `navis-code/`：Navis Code 产品扩展套件。
-  - `navis-ai-platform`：AI 平台服务扩展（Gateway / MCP / LSP / Skills）。
-  - `navis-agent-core`：Agent 引擎扩展（编排、上下文和行为模式）。
-  - `navis-session` / `navis-project` / `navis-task` / `navis-knowledge` / `navis-memory`：会话、项目、任务、知识库、记忆业务扩展。
-  - `navis-terminal` / `navis-editor` / `navis-settings`：终端、编辑器、文件工具、Git、剪贴板和设置扩展。
-
-## 说明
-
-- 仓库 `extensions/` 是开发期分发源；扫描器递归查找 `extension.json`，运行时从 `<app_data>/extensions/<extension-id>/` 装载。
-- 所有业务领域都走同一 manifest、桥、生命周期和沙箱契约，官方扩展无特权。
-- 扩展后端源码不得反向引用宿主已经移除的业务命名空间；跨扩展通信只能使用公开能力端口、Kernel EventBus、IPC、stream 和权限契约。
-- `src/` 与 `src-tauri/src/` 是通用 Navis 宿主；不得把 Navis Code 或其他产品业务写回框架目录。
+- 所有业务领域均遵循统一的 manifest、Cordis 上下文、插槽投影、IPC 通信与权限沙箱契约，官方扩展无任何特权。
+- 扩展间通信统一通过 `ctx.views`、`ctx.events`、`ctx.commands`、`ctx.services` 与 IPC 桥，禁止跨扩展直接侵入私有 store。
+- 框架源码（`src/` 与 `src-tauri/`）严禁写入任何特定业务代码。

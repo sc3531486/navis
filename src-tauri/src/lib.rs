@@ -1,5 +1,5 @@
 // 通用宿主入口：只暴露通用命令（发现 + 统一路由 + 产品信息），
-// 所有业务能力通过扩展的进程/插件实现，宿主不出现 Git/Terminal/LSP/File 专有命令。
+// 所有业务能力通过扩展的进程/插件实现，宿主不出现特定业务专有命令。
 pub mod core;
 pub mod kernel;
 
@@ -10,6 +10,7 @@ use kernel::{ExtensionRegistry, manifest::ExtensionManifest};
 use serde_json::Value;
 use std::sync::Arc;
 use tauri::{AppHandle, State};
+use tracing::{info, warn};
 
 // 在进程内注册的动态 RPC 路由（Rust 原生扩展插件用）
 #[tauri::command]
@@ -139,7 +140,7 @@ fn active_product() -> Option<ProductConfig> {
     if let Some(p) = dev_path {
         if p.exists() {
             if let Ok(cfg) = ProductConfig::load_from_file(&p) {
-                println!("[Navis Kernel] Active product: {name} (from repo root)");
+                info!("[Navis Kernel] Active product: {name} (from repo root)");
                 return Some(cfg);
             }
         }
@@ -151,27 +152,57 @@ fn active_product() -> Option<ProductConfig> {
         .join(format!("{name}.json"));
     if app_path.exists() {
         if let Ok(cfg) = ProductConfig::load_from_file(&app_path) {
-            println!("[Navis Kernel] Active product: {name} (from app data)");
+            info!("[Navis Kernel] Active product: {name} (from app data)");
             return Some(cfg);
         }
     }
 
-    println!("[Navis Kernel] No product config found for '{name}', loading all extensions");
+    info!("[Navis Kernel] No product config found for '{name}', loading all extensions");
+    None
+}
+
+/// 递归查找 plugin_id 对应的扩展根目录
+fn find_extension_dir(dir: &std::path::Path, plugin_id: &str, depth: usize) -> Option<std::path::PathBuf> {
+    if depth > 3 || !dir.exists() {
+        return None;
+    }
+    let manifest_path = dir.join("extension.json");
+    if manifest_path.exists() {
+        if let Ok(content) = std::fs::read_to_string(&manifest_path) {
+            if let Ok(manifest) = serde_json::from_str::<ExtensionManifest>(&content) {
+                if manifest.plugin_id() == plugin_id {
+                    return Some(dir.to_path_buf());
+                }
+            }
+        }
+        return None;
+    }
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let p = entry.path();
+            if p.is_dir() {
+                if let Some(found) = find_extension_dir(&p, plugin_id, depth + 1) {
+                    return Some(found);
+                }
+            }
+        }
+    }
     None
 }
 
 /// 定位扩展目录：优先开发目录（仓库 extensions/），否则运行期安装目录
 fn manifest_dir_for(plugin_id: &str, dirs: &[std::path::PathBuf]) -> Option<std::path::PathBuf> {
     for dir in dirs {
-        let candidate = dir.join(plugin_id);
-        if candidate.join("extension.json").exists() {
-            return Some(candidate);
+        if let Some(found) = find_extension_dir(dir, plugin_id, 0) {
+            return Some(found);
         }
     }
     None
 }
 
 pub fn run() {
+    let _ = tracing_subscriber::fmt::try_init();
+
     let registry = ExtensionRegistry::new();
     let transport = Arc::new(TransportRouter::new());
     let sandbox = Arc::new(Sandbox::new());
@@ -199,13 +230,13 @@ pub fn run() {
         if manifest.main.is_some() {
             continue;
         }
-        for cmd in &manifest.contributes.commands {
+        for cmd in manifest.commands() {
             let route = format!("{plugin_id}:{}", cmd.id);
             let cmd_name = cmd.title.clone();
             registry_clone.register_route(
                 &route,
                 Arc::new(move |_app, _payload| {
-                    println!("[Navis Kernel] Command '{}' invoked", cmd_name);
+                    info!("[Navis Kernel] Command '{}' invoked", cmd_name);
                     Ok(serde_json::json!({"status": "ok", "command": cmd_name}))
                 }),
             );
@@ -239,11 +270,11 @@ pub fn run() {
                     let plugin_id = manifest.plugin_id();
                     let cwd = manifest_dir_for(&plugin_id, &ext_dirs);
                     if let Err(e) = setup_transport.ensure_plugin_process(&plugin_id, main, cwd.as_deref()) {
-                        println!("[Navis Kernel] failed to start backend for '{plugin_id}': {e}");
+                        warn!("[Navis Kernel] failed to start backend for '{plugin_id}': {e}");
                     }
                 }
             }
-            println!(
+            info!(
                 "[Navis Kernel] Generic runtime shell initialized, product loaded {} extensions",
                 manifests.len()
             );

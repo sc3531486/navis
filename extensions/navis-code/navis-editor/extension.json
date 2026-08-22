@@ -1,0 +1,28 @@
+{
+  "id": "navis-editor",
+  "name": "Navis Editor",
+  "version": "0.1.0",
+  "displayName": "Editor",
+  "publisher": "navis",
+  "description": "编辑器扩展：代码编辑、文件操作、Git、Diff 视图。",
+  "permissions": {
+    "fs.read": true,
+    "fs.write": true,
+    "shell.exec": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-editor.view", "target": "navis-code.viewport.editor", "component": "EditorView", "priority": 10 }
+    ],
+    "providesSlots": [
+      "navis-editor.tabs",
+      "navis-editor.diff"
+    ],
+    "tools": [
+      { "name": "file.read", "description": "读取文件内容", "parameters": { "type": "object" } },
+      { "name": "file.write", "description": "写入文件内容", "parameters": { "type": "object" } },
+      { "name": "git.status", "description": "获取 Git 仓库状态", "parameters": { "type": "object" } },
+      { "name": "git.commit", "description": "创建 Git 提交", "parameters": { "type": "object" } }
+    ]
+  }
+}

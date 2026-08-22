@@ -1,0 +1,27 @@
+{
+  "id": "navis-knowledge",
+  "name": "Navis Knowledge",
+  "version": "0.1.0",
+  "displayName": "Knowledge",
+  "publisher": "navis",
+  "description": "知识库扩展（骨架）：文档检索、索引与知识注入。",
+  "permissions": {
+    "fs.read": true,
+    "network": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-knowledge.panel", "target": "navis-code.sidebar.knowledge", "component": "KnowledgePanel", "priority": 40 }
+    ],
+    "providesSlots": [
+      "navis-knowledge.panel"
+    ],
+    "tools": [
+      { "name": "knowledge.search", "description": "检索知识库", "parameters": { "type": "object" } },
+      { "name": "knowledge.add", "description": "添加知识条目", "parameters": { "type": "object" } }
+    ],
+    "pipelineHooks": [
+      { "hook": "assembleContext", "handler": "injectKnowledge" }
+    ]
+  }
+}

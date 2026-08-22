@@ -1,27 +1,32 @@
 # Navis Go
 
-Navis Go 是一个基于 Tauri 2 的通用桌面应用白板与扩展运行时。框架只提供窗口宿主、扩展发现与生命周期、Cordis 装配、能力注册、事件、权限、存储、IPC、流式通道和 UI 投影。
+Navis Go 是一个基于 Tauri 2 的通用桌面应用白板与扩展运行时底座（基于 Cordis 扩展体系设计）。框架层只提供窗口宿主、扩展发现/加载/生命周期、IoC 服务容器、事件流分发、响应式插槽树、权限沙箱、多路复用 IPC 与流式通道。
 
-## 产品与扩展
+## 产品形态与扩展
 
-Navis Code 是第一个产品，入口为 `extensions/navis-code/navis-code-ui.tsx`。其 Agent、AI 平台、会话、项目、任务、编辑器、终端、设置、知识库和记忆全部位于 `extensions/navis-code/<extension-id>/`，每个扩展包含 `extension.json`、`ExtensionUI/` 和 `ExtensionBackend/`。
+- **Navis Code**：Navis 上的第一个产品形态（AI Agent IDE），由 `navis-code.json` 声明装配 `extensions/` 下的各个业务扩展（Agent Core、AI Platform、Session、Project、Editor、Terminal、Settings、Knowledge、Memory、Task 等）。
+- **扩展目录**：每个扩展遵循统一规范 `extensions/<extension-id>/`（包含 `extension.json`、`ExtensionUI/`、`ExtensionBackend/`）。
+- **行业形态扩展**：未来开发银行柜面系统、双录系统等业务时，仅需新增扩展并在对应 `<product>.json`（如 `teller-system.json`）中声明装配，**无需修改任何底层框架代码（`src/` 与 `src-tauri/`）**。
 
-`extensions/navis-demo/` 是独立的最小扩展示例。柜面系统、双录系统等其他产品应以新的扩展组合实现，不修改 Navis 通用框架来承载行业业务。
+## 目录划分
 
-## 目录边界
+- `src/`：Navis 通用宿主前端（应用白板、Cordis DI 上下文、插槽树、扩展加载器与桥接）。
+- `src-tauri/src/`：Navis 通用宿主后端（清单扫描、动态路由、产品过滤、多路复用 IPC 路由器、插件进程管理、安全沙箱）。
+- `extensions/`：业务扩展套件与示例扩展。
 
-- `src/`：通用宿主前端和扩展视图投影。
-- `src-tauri/src/`：通用宿主后端和扩展运行时。
-- `extensions/`：产品扩展和示例扩展的开发期分发源。
-
-当前 `src/router/`、`src/layouts/`、部分 `src/stores/` 和 HostView 内置投影仍有 Navis Code 产品壳过渡代码；新的业务不得继续放入这些位置，迁移状态见 `ARCHITECTURE_REVIEW.md` 和 `MIGRATION-PLAN.md`。
-
-## 开发
+## 开发与构建
 
 ```bash
+# 前端构建
 npm run dev
 npm run build
+
+# Tauri 宿主运行
 npx tauri dev
-cd src-tauri && cargo check
-cd src-tauri && cargo test
+npx tauri build
+
+# 后端检查与测试
+cd src-tauri
+cargo check
+cargo test
 ```

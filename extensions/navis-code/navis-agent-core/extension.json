@@ -1,0 +1,28 @@
+{
+  "id": "navis-agent-core",
+  "name": "Navis Agent Core",
+  "version": "0.1.0",
+  "displayName": "Agent Core",
+  "publisher": "navis",
+  "description": "核心 Agent 能力扩展：对话 Composer、会话时间线、工具运行时。",
+  "permissions": {
+    "network": true,
+    "fs.read": true,
+    "fs.write": true
+  },
+  "contributes": {
+    "slots": [
+      { "id": "navis-agent-core.workspace", "target": "navis-code.viewport.main", "component": "AgentWorkspace", "priority": 10 }
+    ],
+    "providesSlots": [
+      "navis-agent.timeline"
+    ],
+    "tools": [
+      { "name": "agent.run", "description": "发起一轮 Agent 对话", "parameters": { "type": "object" } },
+      { "name": "agent.status", "description": "查询 Agent 运行状态", "parameters": { "type": "object" } }
+    ],
+    "pipelineHooks": [
+      { "hook": "beforeToolExecute", "handler": "toolGuard" }
+    ]
+  }
+}

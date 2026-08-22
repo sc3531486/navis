@@ -13,13 +13,15 @@ async function getInvoke() {
 export async function initBridge(ctx: NavisContext): Promise<void> {
   // 注册命令桥：前端 executeCommand 自动调用后端 RPC
   const originalExecute = ctx.executeCommand.bind(ctx);
-  ctx.executeCommand = async (id: string, args?: any) => {
+  ctx.executeCommand = async (id: string, args?: any): Promise<any> => {
     // 先尝试本地命令
     try {
-      await originalExecute(id, args);
-      return;
+      const localResult = await originalExecute(id, args);
+      if (localResult !== undefined) {
+        return localResult;
+      }
     } catch (_) {
-      // 本地没有，调用后端
+      // 本地没有，继续调用后端
     }
     try {
       const invokeFn = await getInvoke();
@@ -28,8 +30,10 @@ export async function initBridge(ctx: NavisContext): Promise<void> {
         payload: args || {},
       });
       ctx.emit(`command:${id}:result`, result);
+      return result;
     } catch (err) {
       console.error(`[Tauri Bridge] Command "${id}" failed:`, err);
+      return undefined;
     }
   };
 

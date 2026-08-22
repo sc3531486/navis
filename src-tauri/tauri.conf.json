@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2.11.2",
-  "productName": "Navis Go",
+  "productName": "Navis",
   "version": "0.1.0",
   "identifier": "com.navis.app",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Navis Go - AI Development Tool",
+        "title": "Navis",
         "width": 1200,
         "height": 800,
         "resizable": true,
@@ -26,7 +26,7 @@
         "enable": true,
         "scope": {
           "allow": [
-            "$APPDATA/extensions/*/ui/**",
+            "$APPDATA/navis/extensions/**",
             "$APPDATA/extensions/*/ExtensionUI/**"
           ]
         }

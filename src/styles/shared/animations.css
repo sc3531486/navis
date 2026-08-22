@@ -29,7 +29,7 @@
   }
 }
 
-@keyframes navis-thinking-text-shimmer {
+@keyframes navis-text-shimmer {
   0% {
     background-position: -120% 0;
   }
@@ -57,72 +57,7 @@
   background-clip: text;
   color: transparent;
   display: inline-block;
-  animation: navis-thinking-text-shimmer var(--navis-shimmer-duration) ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .navis-shimmer-text {
-    animation: none;
-    background: none;
-    color: currentColor;
-  }
-
-  .navis-thinking-mark,
-  .navis-agent-prelude-mark.is-status-active,
-  .navis-agent-trace-step-group-mark.is-thinking,
-  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph,
-  .navis-agent-trace-row.is-status-queued .navis-agent-trace-glyph,
-  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph,
-  .navis-agent-trace-row.is-status-waiting .navis-agent-trace-glyph,
-  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph.is-reasoning::before,
-  .navis-agent-trace-row.is-status-queued .navis-agent-trace-glyph.is-reasoning::before,
-  .navis-agent-trace-row.is-status-active .navis-agent-trace-glyph.is-reasoning::before {
-    animation: none;
-  }
-}
-
-@keyframes navis-trace-count-add-old {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-}
-
-@keyframes navis-trace-count-add-new {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes navis-trace-count-delete-old {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-}
-
-@keyframes navis-trace-count-delete-new {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: navis-text-shimmer var(--navis-shimmer-duration) ease-in-out infinite;
 }
 
 @keyframes navis-running-pulse {
@@ -134,5 +69,13 @@
   45% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navis-shimmer-text {
+    animation: none;
+    background: none;
+    color: currentColor;
   }
 }

@@ -2,70 +2,60 @@
  * ============================================================
  * Navis 暗色主题
  * ============================================================
- *
- * 暗色主题通过 [data-theme="dark"] 选择器覆盖 :root 中的颜色变量。
- * 仅覆盖与颜色相关的变量，间距、字体、圆角等保持不变。
- *
- * 使用方式：
- *   <html data-theme="dark"> 或由 ThemeProvider 自动管理
- * ============================================================
  */
 
 [data-theme='dark'] {
-  /* ── 颜色：暗色模式 ─────────────────────────────────── */
   --color-bg-primary: #0d1117;
   --color-bg-secondary: #161b22;
   --color-bg-elevated: #1c2128;
   --color-bg-tertiary: #21262d;
-  --color-text-primary: #e6edf3;
-  --color-text-secondary: #c9d1d9;
-  --color-text-tertiary: #8b949e;
-  --color-text-muted: #6e7681;
-  --color-accent: #58a6ff;
-  --color-accent-hover: #79c0ff;
-  --color-primary: #1f6feb;
+  --color-text-primary: #f0f6fc;
+  --color-text-secondary: #8b949e;
+  --color-text-tertiary: #6e7681;
+  --color-text-muted: #484f58;
+  --color-accent: #388bfd;
+  --color-accent-hover: #58a6ff;
+  --color-primary: #f0f6fc;
   --color-border: #30363d;
-  --color-error: #ff7b72;
+  --color-error: #f85149;
   --color-warning: #d29922;
   --color-success: #3fb950;
   --color-info: #58a6ff;
-  --color-gateway: #f0883e;
-  --color-bubble-user: #1f3a5f;
-  --color-bubble-agent: #21262d;
-  --color-code-bg: #010409;
-  --color-code-text: #79c0ff;
-  --gateway-icon-color: var(--color-gateway);
 
-  --navis-light-panel: var(--color-bg-primary);
-  --navis-light-surface: var(--color-bg-elevated);
-  --navis-light-cowork-tab: var(--color-bg-tertiary);
-  --navis-light-cowork-tab-selected: var(--color-bg-elevated);
-  --navis-light-sidebar-selected: var(--color-bg-tertiary);
-  --navis-light-shell: var(--color-code-bg);
-  --navis-light-permission: color-mix(in srgb, var(--color-warning) 14%, var(--color-bg-tertiary));
-  --navis-light-card: var(--color-bg-secondary);
-  --navis-light-hover: var(--color-bg-tertiary);
-  --navis-light-line: var(--color-border);
-  --navis-light-line-strong: color-mix(in srgb, var(--color-border) 74%, var(--color-text-muted));
+  --navis-panel-bg: var(--color-bg-primary);
+  --navis-surface-bg: var(--color-bg-elevated);
+  --navis-tab-bg: var(--color-bg-tertiary);
+  --navis-tab-active-bg: var(--color-bg-elevated);
+  --navis-sidebar-active-bg: var(--color-bg-tertiary);
+  --navis-shell-bg: #010409;
+  --navis-card-bg: var(--color-bg-secondary);
+  --navis-hover-bg: var(--color-bg-tertiary);
+  --navis-line-border: var(--color-border);
+  --navis-line-border-strong: #3b434d;
 
-  --navis-dialog-scrim: rgba(0, 0, 0, 0.56);
+  --navis-light-panel: var(--navis-panel-bg);
+  --navis-light-surface: var(--navis-surface-bg);
+  --navis-light-card: var(--navis-card-bg);
+  --navis-light-hover: var(--navis-hover-bg);
+  --navis-light-line: var(--navis-line-border);
+
+  --navis-dialog-scrim: rgba(0, 0, 0, 0.72);
   --navis-dialog-surface: #161b22;
-  --navis-dialog-border: rgba(240, 246, 252, 0.1);
+  --navis-dialog-border: #30363d;
   --navis-dialog-title: #f0f6fc;
-  --navis-dialog-text: #c9d1d9;
+  --navis-dialog-text: #8b949e;
   --navis-dialog-strong: #f0f6fc;
-  --navis-dialog-muted: #8b949e;
-  --navis-dialog-subtle: #21262d;
+  --navis-dialog-muted: #6e7681;
+  --navis-dialog-subtle: #1c2128;
   --navis-dialog-line: #30363d;
   --navis-dialog-hover: #262c36;
   --navis-dialog-field-bg: #0d1117;
-  --navis-dialog-primary: #f0f6fc;
-  --navis-dialog-primary-hover: #ffffff;
-  --navis-dialog-on-primary: #0d1117;
-  --navis-dialog-danger: #f85149;
-  --navis-dialog-danger-hover: #ff7b72;
+  --navis-dialog-primary: #238636;
+  --navis-dialog-primary-hover: #2ea043;
+  --navis-dialog-on-primary: #ffffff;
+  --navis-dialog-danger: #da3633;
+  --navis-dialog-danger-hover: #f85149;
   --navis-dialog-on-danger: #ffffff;
-  --navis-dialog-shadow: 0 18px 42px rgba(1, 4, 9, 0.56), 0 2px 8px rgba(1, 4, 9, 0.28);
-  --navis-dialog-focus: rgba(88, 166, 255, 0.24);
+  --navis-dialog-focus: rgba(56, 139, 253, 0.35);
+  --navis-dialog-shadow: 0 20px 52px rgba(0, 0, 0, 0.48);
 }
-

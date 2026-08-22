@@ -1,6 +1,7 @@
 import { Component, type JSX } from 'solid-js';
 import { NavisContext } from '../core/context';
 import { DynamicSlot } from '../core/slots/DynamicSlot';
+import { ToastContainer } from '../core/toast/ToastContainer';
 import './WhiteboardShell.css';
 
 interface WhiteboardShellProps {
@@ -34,6 +35,9 @@ export const WhiteboardShell: Component<WhiteboardShellProps> = (props) => {
         }
       />
       <DynamicSlot name="overlay" class="navis-overlay-layer" />
+      <ToastContainer />
     </div>
   );
 };
+
+export default WhiteboardShell;

@@ -1,6 +1,7 @@
-// 统一扩展协议：extension.json 清单解析。
-// 字段对齐通用运行时外壳规范：id/name/version/main/ui + contributes 贡献点。
-use serde::Deserialize;
+// 通用扩展协议：extension.json 泛型清单解析。
+// 字段对齐通用运行时规范：id/name/version/main/ui + contributes 泛型贡献点。
+// 框架核心不做业务字段硬编码，所有贡献点通过 JSON Map 泛型透传给前端或运行时。
+use serde::{Deserialize, Serialize};
 use serde::ser::SerializeStruct;
 use std::path::Path;
 
@@ -10,170 +11,112 @@ pub struct ExtensionManifest {
     pub id: Option<String>,
     pub name: String,
     pub version: String,
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    pub publisher: Option<String>,
+    pub description: Option<String>,
     /// 后端进程入口（.mjs/.js/.cjs/.py 或可执行文件）
     pub main: Option<String>,
     /// 前端 UI 入口（打包后的 ESM 模块路径）
     pub ui: Option<String>,
     #[serde(default)]
-    pub contributes: ContributionPoints,
+    pub contributes: serde_json::Value,
     #[serde(default)]
     pub permissions: serde_json::Value,
 }
 
-// 兼容旧清单：只有 name 时视为 id
 impl ExtensionManifest {
     pub fn plugin_id(&self) -> String {
         self.id.clone().unwrap_or_else(|| self.name.clone())
     }
 
-    /// 加载目录下所有 extension.json；目录直接子级各为一个扩展
+    /// 获取清单中声明的命令列表（通用机制）
+    pub fn commands(&self) -> Vec<CommandContribution> {
+        if let Some(commands_val) = self.contributes.get("commands") {
+            if let Ok(cmds) = serde_json::from_value::<Vec<CommandContribution>>(commands_val.clone()) {
+                return cmds;
+            }
+        }
+        Vec::new()
+    }
+
+    /// 获取清单中声明的插槽列表（通用机制）
+    pub fn slots(&self) -> Vec<SlotContribution> {
+        if let Some(slots_val) = self.contributes.get("slots") {
+            if let Ok(slots) = serde_json::from_value::<Vec<SlotContribution>>(slots_val.clone()) {
+                return slots;
+            }
+        }
+        Vec::new()
+    }
+
+    /// 递归加载目录下所有 extension.json（支持单层扁平与多层套件分组目录结构）
     pub fn load_from_dir(dir: &Path) -> Vec<Self> {
         let mut manifests = Vec::new();
-        if let Ok(entries) = std::fs::read_dir(dir) {
-            for entry in entries.flatten() {
-                let manifest_path = entry.path().join("extension.json");
-                if manifest_path.exists() {
-                    if let Ok(content) = std::fs::read_to_string(&manifest_path) {
-                        if let Ok(manifest) = serde_json::from_str::<Self>(&content) {
-                            manifests.push(manifest);
-                        }
-                    }
+        Self::collect_manifests(dir, 0, 3, &mut manifests);
+        manifests
+    }
+
+    fn collect_manifests(dir: &Path, depth: usize, max_depth: usize, out: &mut Vec<Self>) {
+        if depth > max_depth || !dir.exists() {
+            return;
+        }
+        let manifest_path = dir.join("extension.json");
+        if manifest_path.exists() {
+            if let Ok(content) = std::fs::read_to_string(&manifest_path) {
+                if let Ok(manifest) = serde_json::from_str::<Self>(&content) {
+                    out.push(manifest);
+                    return;
                 }
             }
         }
-        manifests
+        if let Ok(entries) = std::fs::read_dir(dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    Self::collect_manifests(&path, depth + 1, max_depth, out);
+                }
+            }
+        }
     }
 }
 
 // 手动实现 Serialize 以让 navis_list_extensions 返回完整清单
-impl serde::Serialize for ExtensionManifest {
+impl Serialize for ExtensionManifest {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        let mut s = serializer.serialize_struct("ExtensionManifest", 6)?;
+        let mut s = serializer.serialize_struct("ExtensionManifest", 9)?;
         s.serialize_field("id", &self.plugin_id())?;
         s.serialize_field("name", &self.name)?;
         s.serialize_field("version", &self.version)?;
+        s.serialize_field("displayName", &self.display_name)?;
+        s.serialize_field("publisher", &self.publisher)?;
+        s.serialize_field("description", &self.description)?;
         s.serialize_field("main", &self.main)?;
         s.serialize_field("ui", &self.ui)?;
         s.serialize_field("contributes", &self.contributes)?;
+        s.serialize_field("permissions", &self.permissions)?;
         s.end()
     }
 }
 
-#[derive(Debug, Deserialize, Clone, Default)]
-pub struct ContributionPoints {
-    /// 声明挂载到宿主插槽的条目（组件名由 UI 插件 apply() 绑定）
-    #[serde(default)]
-    pub slots: Vec<SlotContribution>,
-    /// 扩展向系统发布的新插槽名（供其他扩展挂载）
-    #[serde(default, rename = "providesSlots")]
-    pub provides_slots: Vec<String>,
-    /// 传统命令贡献点
-    #[serde(default)]
-    pub commands: Vec<CommandContribution>,
-    /// 工具能力声明（供 Agent 网关注册）
-    #[serde(default)]
-    pub tools: Vec<ToolContribution>,
-    /// Agent 管线拦截钩子声明
-    #[serde(default, rename = "pipelineHooks")]
-    pub pipeline_hooks: Vec<PipelineHookContribution>,
-}
-
-impl serde::Serialize for ContributionPoints {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("ContributionPoints", 5)?;
-        s.serialize_field("slots", &self.slots)?;
-        s.serialize_field("providesSlots", &self.provides_slots)?;
-        s.serialize_field("commands", &self.commands)?;
-        s.serialize_field("tools", &self.tools)?;
-        s.serialize_field("pipelineHooks", &self.pipeline_hooks)?;
-        s.end()
-    }
-}
-
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct SlotContribution {
     pub id: String,
     pub target: String,
-    /// 组件名，由 ExtensionUI 的组件注册表解析
     pub component: Option<String>,
     #[serde(default = "default_priority")]
     pub priority: u32,
 }
 
-fn default_priority() -> u32 { 100 }
-
-impl serde::Serialize for SlotContribution {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("SlotContribution", 4)?;
-        s.serialize_field("id", &self.id)?;
-        s.serialize_field("target", &self.target)?;
-        s.serialize_field("component", &self.component)?;
-        s.serialize_field("priority", &self.priority)?;
-        s.end()
-    }
+fn default_priority() -> u32 {
+    100
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CommandContribution {
     pub id: String,
     pub title: String,
-}
-
-impl serde::Serialize for CommandContribution {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("CommandContribution", 2)?;
-        s.serialize_field("id", &self.id)?;
-        s.serialize_field("title", &self.title)?;
-        s.end()
-    }
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct ToolContribution {
-    pub name: String,
-    pub description: Option<String>,
-    pub parameters: Option<serde_json::Value>,
-}
-
-impl serde::Serialize for ToolContribution {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("ToolContribution", 3)?;
-        s.serialize_field("name", &self.name)?;
-        s.serialize_field("description", &self.description)?;
-        s.serialize_field("parameters", &self.parameters)?;
-        s.end()
-    }
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct PipelineHookContribution {
-    pub hook: String,
-    pub handler: String,
-}
-
-impl serde::Serialize for PipelineHookContribution {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("PipelineHookContribution", 2)?;
-        s.serialize_field("hook", &self.hook)?;
-        s.serialize_field("handler", &self.handler)?;
-        s.end()
-    }
 }

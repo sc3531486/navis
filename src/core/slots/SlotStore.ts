@@ -22,7 +22,14 @@ class SlotStore {
       ...contribution,
       priority: contribution.priority ?? 100,
     };
-    list.push(entry);
+    const existingIndex = list.findIndex(
+      (s) => s.id === entry.id && s.pluginId === entry.pluginId,
+    );
+    if (existingIndex !== -1) {
+      list[existingIndex] = entry;
+    } else {
+      list.push(entry);
+    }
     list.sort((a, b) => a.priority - b.priority);
     this.slots.set(slotName, list);
     this.notify();

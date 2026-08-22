@@ -32,7 +32,7 @@ export type ResolvedTheme = 'light' | 'dark';
  * 用户的主题偏好。
  * 'system' 表示跟随操作系统设置。
  */
-const [themePreference, setThemePreference] = createSignal<ThemePreference>('system');
+const [themePreference, setThemePreference] = createSignal<ThemePreference>('light');
 
 /**
  * 实际生效的主题（已解析 system 为具体值）。

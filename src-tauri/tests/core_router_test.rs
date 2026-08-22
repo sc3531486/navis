@@ -14,37 +14,38 @@ fn extensions_root() -> PathBuf {
 }
 
 fn demo_extension_dir() -> PathBuf {
-    extensions_root().join("navis-demo")
+    extensions_root().join("shared").join("navis-demo")
 }
 
 #[test]
 fn manifest_parses_new_protocol() {
     let dir = extensions_root();
-    // 目录下应能发现 navis-demo（含新协议字段）
+    // 递归目录下应能发现 navis-demo（含泛型清单字段）
     let manifests = ExtensionManifest::load_from_dir(&dir);
     let m = manifests
         .iter()
         .find(|m| m.plugin_id() == "navis-demo")
         .expect("navis-demo manifest not found");
     assert!(m.main.as_deref().is_some());
-    assert_eq!(m.contributes.tools.len(), 2);
-    assert_eq!(m.contributes.slots.len(), 1);
-    assert_eq!(m.contributes.pipeline_hooks.len(), 1);
-    assert_eq!(m.contributes.provides_slots.len(), 1);
-    // Serialize 应输出 id 字段（前端发现依赖完整清单）
+    assert_eq!(m.contributes["tools"].as_array().unwrap().len(), 2);
+    assert_eq!(m.slots().len(), 1);
+    assert_eq!(m.contributes["pipelineHooks"].as_array().unwrap().len(), 1);
+    assert_eq!(m.contributes["providesSlots"].as_array().unwrap().len(), 1);
+
+    // Serialize 应输出完整清单结构（前端发现依赖完整清单）
     let json = serde_json::to_value(m).unwrap();
     assert_eq!(json["id"].as_str().unwrap(), "navis-demo");
     assert!(json["contributes"]["tools"].as_array().is_some());
     assert_eq!(json["contributes"]["pipelineHooks"].as_array().unwrap().len(), 1);
 
-    // 展平后的业务扩展清单也应能被新协议解析（navis-editor）
+    // 套件下的业务扩展清单也应能递归解析（navis-editor）
     let editor = manifests
         .iter()
         .find(|m| m.plugin_id() == "navis-editor")
         .expect("navis-editor manifest not found");
-    assert_eq!(editor.contributes.tools.len(), 4);
-    assert_eq!(editor.contributes.slots.len(), 1);
-    assert_eq!(editor.contributes.provides_slots.len(), 2);
+    assert_eq!(editor.contributes["tools"].as_array().unwrap().len(), 4);
+    assert_eq!(editor.slots().len(), 1);
+    assert_eq!(editor.contributes["providesSlots"].as_array().unwrap().len(), 2);
 }
 
 #[test]
@@ -55,8 +56,7 @@ fn product_config_parses() {
     assert_eq!(cfg.shell.as_deref(), Some("navis-code"));
     let active = cfg.active_extension_ids();
     assert!(active.contains(&"navis-code".to_string()));
-    assert!(active.contains(&"navis-agent-core".to_string()));
-    assert!(active.contains(&"navis-demo".to_string()));
+    assert!(active.contains(&"navis-session".to_string()));
 
     // teller-system 示例：新产品只需一个配置 + extensions/ 下新增扩展，宿主零改动
     let teller = ProductConfig::load_from_file(&root.join("teller-system.json")).unwrap();

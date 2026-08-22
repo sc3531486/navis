@@ -2,27 +2,9 @@
   background: var(--navis-light-panel);
   border: 1px solid var(--navis-light-line);
   display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: hidden;
-}
-
-.navis-host-view-surface-chatAside {
-  border-bottom: 0;
-  border-top: 0;
-  flex: 0 0 320px;
-  max-width: 360px;
-}
-
-.navis-host-view-surface-bottomDrawer {
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 0;
-  flex: 0 0 220px;
-}
-
-.navis-host-view-surface-settingsSection {
-  border: 0;
-  flex: 1;
 }
 
 .navis-host-view-surface-header {
@@ -33,10 +15,6 @@
   gap: 8px;
   min-height: 32px;
   padding: 0 8px;
-}
-
-.navis-host-view-surface {
-  flex-direction: column;
 }
 
 .navis-host-view-surface-title {

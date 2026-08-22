@@ -2,19 +2,9 @@
  * ============================================================
  * Navis 亮色主题
  * ============================================================
- *
- * 亮色主题是默认主题，变量值已在 variables.css 的 :root 中定义。
- * 此文件的作用：
- *   1. 显式声明亮色主题的语义，便于维护和切换
- *   2. 通过 [data-theme="light"] 选择器确保优先级覆盖
- *
- * 使用方式：
- *   <html data-theme="light"> 或由 ThemeProvider 自动管理
- * ============================================================
  */
 
 [data-theme='light'] {
-  /* ── 颜色：亮色模式 ─────────────────────────────────── */
   --color-bg-primary: #fdfdfc;
   --color-bg-secondary: #f3f3f2;
   --color-bg-elevated: #ffffff;
@@ -31,24 +21,23 @@
   --color-warning: #f59e0b;
   --color-success: #22c55e;
   --color-info: #3b82f6;
-  --color-gateway: #f0883e;
-  --color-bubble-user: #f1f1f0;
-  --color-bubble-agent: #fdfdfc;
-  --color-code-bg: #efefee;
-  --color-code-text: #1f2937;
-  --gateway-icon-color: var(--color-gateway);
 
-  --navis-light-panel: #fdfdfc;
-  --navis-light-surface: #ffffff;
-  --navis-light-cowork-tab: #f1f1f0;
-  --navis-light-cowork-tab-selected: #ffffff;
-  --navis-light-sidebar-selected: #e4e4e3;
-  --navis-light-shell: #efefee;
-  --navis-light-permission: rgb(255 254 255);
-  --navis-light-card: #f3f3f2;
-  --navis-light-hover: #eeeeed;
-  --navis-light-line: #e8e8e5;
-  --navis-light-line-strong: #ddddda;
+  --navis-panel-bg: #fdfdfc;
+  --navis-surface-bg: #ffffff;
+  --navis-tab-bg: #f1f1f0;
+  --navis-tab-active-bg: #ffffff;
+  --navis-sidebar-active-bg: #e4e4e3;
+  --navis-shell-bg: #efefee;
+  --navis-card-bg: #f3f3f2;
+  --navis-hover-bg: #eeeeed;
+  --navis-line-border: #e8e8e5;
+  --navis-line-border-strong: #ddddda;
+
+  --navis-light-panel: var(--navis-panel-bg);
+  --navis-light-surface: var(--navis-surface-bg);
+  --navis-light-card: var(--navis-card-bg);
+  --navis-light-hover: var(--navis-hover-bg);
+  --navis-light-line: var(--navis-line-border);
 
   --navis-dialog-scrim: rgba(0, 0, 0, 0.34);
   --navis-dialog-surface: #ffffff;
@@ -67,7 +56,6 @@
   --navis-dialog-danger: #df3f45;
   --navis-dialog-danger-hover: #ca3338;
   --navis-dialog-on-danger: #ffffff;
-  --navis-dialog-shadow: 0 18px 42px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
-  --navis-dialog-focus: rgba(17, 17, 17, 0.14);
+  --navis-dialog-focus: rgba(37, 99, 235, 0.28);
+  --navis-dialog-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
 }
-

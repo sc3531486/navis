@@ -33,13 +33,3 @@
 .navis-resize-handle.is-resizing:active::after {
   background: #242424;
 }
-
-.navis-sidebar-resizer {
-  margin-left: -2px;
-  margin-right: -3px;
-}
-
-.navis-right-workspace-resizer {
-  margin-left: -3px;
-  margin-right: -2px;
-}

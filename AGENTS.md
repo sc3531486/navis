@@ -1,14 +1,14 @@
 # AGENTS.md
 
-本文件是 `D:\myworkspace\Navis Go` 的开发约束。文档中的“框架”默认指通用 Navis 宿主；文档中的“产品”默认指由扩展组合出的 Navis Code，不能把二者混为一谈。
+本文件是 `D:\myworkspace\Navis Go` 的核心架构与开发约束。文档中的“框架”默认指通用 Navis 白板宿主与扩展运行时；文档中的“产品”默认指由产品清单组合出的具体应用形态（如 Navis Code、柜面系统、双录系统等），不能把二者混为一谈。
 
 ## 项目定位
 
-Navis 是基于 Tauri 2 的通用桌面应用白板和扩展运行时。Navis 只负责窗口与宿主生命周期、扩展发现/加载/启停、能力注册、事件、权限、存储、IPC、流式通道和 UI 投影等通用机制。
+Navis 是基于 Tauri 2 的通用桌面应用白板与扩展运行时（灵感源自 Cordis 扩展体系）。Navis 框架只负责窗口与宿主生命周期、扩展发现/加载/启停、IoC 服务容器（DI）、事件总线（emit/waterfall/serial/parallel）、响应式插槽树（DynamicSlot）、通用命令、沙箱权限、存储、多路复用 IPC 与流式通道等通用基础设施。
 
-AI、Agent、会话、项目、编辑器、终端、知识库、记忆、任务、设置，以及柜面系统、双录系统等垂直业务，全部属于扩展，不得写入通用框架层。
+AI、Agent、会话、项目、编辑器、终端、知识库、记忆、任务、设置，以及银行柜面系统、双录系统等所有垂直业务，**全部属于扩展（Extensions）**，严禁写入底层框架层（`src/` 与 `src-tauri/`）。
 
-Navis Code 是 Navis 的第一个产品，由 `extensions/navis-code/` 下的业务扩展和产品入口组合而成。未来增加其他产品时，应新增产品目录或独立扩展组合，不修改 Navis 的业务实现。
+Navis Code 是在 Navis 框架上装配的第一个产品形态，由 `navis-code.json` 声明装配的套件扩展组合而成。未来增加其他产品形态（如银行柜面系统、双录系统）时，只需新增扩展目录并在其产品清单（如 `teller-system.json`）中声明装配，**无需修改 Navis 通用框架任何一行源码**。
 
 ## 常用命令
 
@@ -25,76 +25,78 @@ cd src-tauri && cargo test
 
 ```text
 Navis Go/
-├── src/                              # 通用宿主前端；不得新增产品业务
-│   ├── components/HostView/          # 扩展视图投影
-│   ├── components/CommandPalette/    # 通用命令面板壳
-│   ├── components/Dialog/            # 通用对话框壳
-│   ├── components/ui/                # 通用原子组件
-│   ├── stores/                       # 宿主状态、扩展桥和通用投影
-│   ├── lib/                          # 热键、流、状态等通用工具
-│   ├── styles/ theme/ i18n/          # 通用视觉、主题和国际化基础设施
-│   └── bootstrap.ts                  # 宿主启动生命周期
-├── src-tauri/src/                    # 通用宿主后端；不得新增产品业务
-│   ├── kernel/                       # Kernel、Cordis 原语、事件、注册表、策略
-│   ├── extension/                    # 扩展清单、加载、生命周期、组件和技能
-│   ├── foundation/                   # 配置、IPC、存储、日志、流等基础能力
-│   ├── security/                     # 认证、沙箱、权限和审计
-│   ├── app/                          # Tauri 启动与基础设施装配
-│   └── ui/                           # 通用扩展桥、路由、存储、网络和 UI 命令
-└── extensions/
-    ├── navis-code/                   # Navis Code 产品套件
-    │   ├── navis-agent-core/         # Agent 业务扩展
-    │   ├── navis-ai-platform/        # Gateway / MCP / LSP 等 AI 平台扩展
-    │   ├── navis-session/            # 会话业务扩展
-    │   ├── navis-project/            # 项目与工作树业务扩展
-    │   ├── navis-task/               # 任务业务扩展
-    │   ├── navis-editor/             # 编辑器、文件、Git、剪贴板扩展
-    │   ├── navis-terminal/           # 终端扩展
-    │   ├── navis-settings/           # 设置扩展
-    │   ├── navis-knowledge/          # 知识库扩展
-    │   ├── navis-memory/             # 记忆扩展
-    │   ├── ExtensionUI/              # Navis Code 产品入口和产品壳（迁移完成前的组合层）
-    │   └── navis-code-ui.tsx         # Navis Code 产品入口
-    └── navis-demo/                   # 通用扩展示例
+├── navis-code.json                   # Navis Code 产品组装清单
+├── teller-system.json                # 柜面系统产品组装清单（示例）
+├── src/                              # Navis 通用宿主前端（纯净框架层，禁止业务逻辑）
+│   ├── app/                          # 通用应用白板外壳 (WhiteboardShell)
+│   ├── core/                         # Cordis 上下文、插槽树、清单泛型分发、IPC 桥接
+│   │   ├── context.ts                # NavisContext (DI, Events, Views, Commands, Services)
+│   │   ├── bootstrap.ts              # 宿主启动生命周期编排
+│   │   ├── loader.ts                 # 扩展 UI 插件动态加载器
+│   │   ├── tauri-bridge.ts           # 前后端 IPC/Stream 通信桥
+│   │   ├── slots/                    # 响应式插槽树 (DynamicSlot, SlotStore)
+│   │   ├── manifest/                 # 泛型贡献点分发中心 (ContributionRegistry, handlers)
+│   │   └── components/               # 延迟组件解析注册表 (ComponentRegistry)
+│   ├── styles/                       # 通用基础重置、滚动条、白板表面与布局样式
+│   ├── theme/                        # 通用主题变量与模式定义
+│   └── index.tsx                     # 宿主统一渲染入口
+├── src-tauri/src/                    # Navis 通用宿主后端（纯净框架层，禁止业务逻辑）
+│   ├── kernel/                       # 清单解析、扩展注册表、产品装配配置 (ProductConfig)
+│   │   ├── mod.rs                    # 扩展注册表与 RPC 分发
+│   │   ├── manifest.rs               # 通用 ExtensionManifest 清单解析
+│   │   └── product.rs                # 产品形态装配清单解析与过滤
+│   ├── core/                         # 通用 IPC、进程管理与安全沙箱
+│   │   ├── ipc_bridge.rs             # 通用多路复用 JSON-RPC stdio 路由器与流式 Channel
+│   │   ├── process_supervisor.rs     # Node/Python/可执行文件插件后端进程生命周期管理
+│   │   ├── sandbox.rs                # 细粒度权限控制与审计日志
+│   │   └── mod.rs
+│   ├── lib.rs                        # Tauri 命令注册与宿主初始化
+│   └── main.rs
+└── extensions/                       # 业务扩展目录（万物皆扩展）
+    ├── navis-code/                   # 【Navis Code 产品专属套件】
+    │   ├── navis-code/               # 产品壳扩展（声明根布局与公共子插槽）
+    │   ├── navis-agent-core/         # Agent 执行流、Composer 与时间线扩展
+    │   ├── navis-editor/             # 代码编辑器与 Diff 视图扩展
+    │   └── navis-terminal/           # 终端与 PTY 扩展
+    ├── teller-system/                # 【银行柜面专属套件】（示例形态）
+    │   └── README.md                 # 柜面系统套件说明
+    └── shared/                       # 【跨产品通用共享扩展池】（各产品清单按需装配）
+        ├── navis-ai-platform/        # 统一 AI 网关、模型管理与 ToolRegistry
+        ├── navis-session/            # 会话管理与历史列表扩展
+        ├── navis-project/            # 项目工作区与文件树扩展
+        ├── navis-knowledge/          # 知识库与 RAG 扩展
+        ├── navis-memory/             # 长期记忆扩展
+        ├── navis-settings/           # 设置面板与配置扩展
+        ├── navis-task/               # 任务看板与计划跟踪扩展
+        └── navis-demo/               # 通用独立扩展示例
 ```
-
-### 产品组合入口契约
-
-产品入口不属于通用宿主。每个产品目录可声明：
-
-```text
-extensions/<product>/
-├── product.json
-├── <product>-ui.tsx
-└── <extension-id>/
-```
-
-`product.json` 至少包含 `id`、`name`、`version`、`entry`；入口导出通用 `ProductDefinition`。`src/index.tsx` 只负责扫描并动态加载产品入口，无产品时显示纯白板。新增产品只能新增 `extensions/<product>/`，不得修改 `src/`、`src-tauri/src/` 或宿主中的产品 ID 特判。
-### 前端产品壳迁移说明
-
-当前 `src/router/`、`src/layouts/`、部分 `src/stores/` 聚合导出和少量 HostView 内置投影仍承载 Navis Code 工作台组合逻辑，这是历史过渡状态，不是通用框架契约。新的业务不得继续放入这些目录；最终应迁入 `extensions/navis-code/` 的产品壳或具体扩展，并由产品入口组合宿主能力。
 
 ## 扩展固定契约
 
-每个扩展目录必须包含：
+每个扩展目录必须遵循统一物理结构：
 
 ```text
-extensions/<product>/<extension-id>/
-├── extension.json
-├── ExtensionUI/                   # 全部前端扩展代码、样式和资源
-└── ExtensionBackend/              # 全部后端扩展点代码、逻辑组件或 native 服务
+extensions/<extension-id>/
+├── extension.json                    # 扩展清单（元数据、权限声明、contributes 贡献点）
+├── README.md                         # 扩展说明
+├── ExtensionUI/                      # 全部前端扩展代码、样式与资源
+│   ├── src/
+│   │   ├── index.tsx                 # 扩展入口（导出 NavisPlugin）
+│   │   └── components/               # 扩展专属 SolidJS 组件
+│   └── styles/                       # 扩展专属 CSS 样式
+└── ExtensionBackend/                 # 全部后端扩展点代码
+    ├── src/                          # 逻辑实现代码
+    └── main.mjs (或可执行文件)        # 后端进程入口（通过 stdio 承接 JSON-RPC）
 ```
 
-开发期扫描支持 `extensions/<product>/<extension>/extension.json`；运行时安装目录为 `<app_data>/extensions/<extension-id>/`。扩展目录名必须与 manifest 的 `id` 一致。
-
-扩展通过 manifest、HostView、命令/菜单/快捷键、能力端口、Kernel EventBus、IPC/流和权限契约与宿主或其他扩展通信，不直接依赖其他扩展的内部 store 或实现。
+- **开发期扫描**：自动扫描 `extensions/*/extension.json`，并按激活产品清单过滤。
+- **运行期安装**：位于 `<app_data>/navis/extensions/<extension-id>/`。
+- **扩展通信**：扩展通过 `ctx.views.register` 投影 UI 到插槽、通过 `ctx.events` 发布/订阅事件、通过 `ctx.commands` 注册/执行命令、通过 `ctx.services` 注入/获取服务，严禁直接跨扩展侵入对方内部私有模块。
 
 ## 关键约定
 
-- Rust 使用 `tracing`，不使用 `log`。
-- 前端到后端统一使用 Tauri `invoke`、事件或通用 stream。
-- Store 使用 `createStore` 和 `set*` action；业务 store 归属对应扩展。
-- 框架层不出现 Agent、Session、Project、Terminal 等业务实现或产品 ID 特判。
-- 每个 Rust 模块用中文注释说明职责边界；新增代码注释使用中文。
-- 修改文档时以当前代码和 manifest 为事实来源；目标态必须明确标注，不能冒充已完成。
-
+- **Rust 日志**：统一使用 `tracing`，严禁使用 `log` 或直接 `println!`。
+- **前后端通信**：统一通过通用 IPC `navis_dispatch`、`core_route_ipc`、`core_route_stream`，宿主不暴露 Git/Terminal/LSP 等任何专有命令。
+- **前端状态管理**：扩展自持 SolidJS store，宿主只维护通用插槽树与服务容器。
+- **框架纯净化**：`src/` 与 `src-tauri/src/` 中绝对禁止出现 Agent、Session、Project、Terminal 等特定业务实现或产品 ID 硬编码特判。
+- **注释与文档**：每个 Rust 与 TypeScript 核心模块均需提供清晰中文职责说明。

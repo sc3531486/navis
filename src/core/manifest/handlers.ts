@@ -1,14 +1,8 @@
-// 默认贡献点处理器：把清单声明接入插槽注册中心、命令桥、工具网关、Agent 管线。
+// 通用宿主默认贡献点处理器：把清单声明接入通用插槽注册中心与命令桥。
+// 垂直业务贡献点（如 tools/pipelineHooks）由对应扩展插件在运行时自行调用 contributionRegistry.registerHandler 注册。
 import { contributionRegistry } from './ContributionRegistry';
-import type {
-  SlotContribution,
-  CommandContribution,
-  ToolContribution,
-  PipelineHookContribution,
-} from './types';
+import type { SlotContribution, CommandContribution } from './types';
 import { componentRegistry } from '../components/ComponentRegistry';
-import { toolRegistry } from '../tools/ToolRegistry';
-import { globalAgentPipeline, type PipelineHookName } from '../pipeline/AgentPipeline';
 import { navisDispatch } from '../tauri-bridge';
 import type { NavisContext } from '../context';
 
@@ -41,33 +35,6 @@ export function installDefaultHandlers(ctx: NavisContext): void {
       const commandId = `${context.pluginId}:${cmd.id}`;
       ctx.registerCommand(commandId, async (args?: any) => {
         return navisDispatch(context.pluginId, cmd.id, args ?? {});
-      });
-    }
-  });
-
-  // tools：注册到统一工具网关（执行路由到声明它的插件进程）
-  contributionRegistry.registerHandler('tools', (data, { pluginId }) => {
-    for (const tool of (data as ToolContribution[]) ?? []) {
-      toolRegistry.register({
-        pluginId,
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.parameters,
-      });
-    }
-  });
-
-  // pipelineHooks：把具名 handler 挂到 Agent 管线钩子上（由插件组件注册表解析）
-  contributionRegistry.registerHandler('pipelineHooks', (data, { pluginId }) => {
-    for (const h of (data as PipelineHookContribution[]) ?? []) {
-      const hookName = h.hook as PipelineHookName;
-      if (!(hookName in globalAgentPipeline.hooks)) {
-        console.warn(`[Navis] Unknown pipeline hook '${h.hook}' from '${pluginId}'`);
-        continue;
-      }
-      globalAgentPipeline.tap(hookName, `${pluginId}:${h.handler}`, (payload: any) => {
-        const fn = componentRegistry.get(pluginId, h.handler);
-        return fn ? fn(payload) : undefined;
       });
     }
   });

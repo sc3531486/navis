@@ -1,8 +1,10 @@
+// 通用扩展注册表与动态路由分发
 use crate::kernel::manifest::ExtensionManifest;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use tauri::AppHandle;
+use tracing::info;
 
 pub mod manifest;
 pub mod product;
@@ -24,7 +26,7 @@ impl ExtensionRegistry {
     pub fn register_route(&self, route: &str, handler: DynamicRpcHandler) {
         let mut map = self.routes.write().unwrap();
         map.insert(route.to_string(), handler);
-        println!("[Navis Kernel] Dynamic route registered: {}", route);
+        info!("[Navis Kernel] Dynamic route registered: {}", route);
     }
 
     pub fn dispatch(&self, app: &AppHandle, route: &str, payload: Value) -> Result<Value, String> {
@@ -52,9 +54,18 @@ pub trait NavisBackendPlugin: Send + Sync {
 }
 
 /// 扫描扩展目录并返回所有清单
-pub fn scan_extensions(app_data_dir: &std::path::Path) -> Vec<ExtensionManifest> {
-    let extensions_dir = app_data_dir.join("extensions");
-    ExtensionManifest::load_from_dir(&extensions_dir)
+pub fn scan_extensions(dir: &std::path::Path) -> Vec<ExtensionManifest> {
+    if !dir.exists() {
+        return Vec::new();
+    }
+    if dir.join("extension.json").exists() {
+        if let Ok(content) = std::fs::read_to_string(dir.join("extension.json")) {
+            if let Ok(manifest) = serde_json::from_str::<ExtensionManifest>(&content) {
+                return vec![manifest];
+            }
+        }
+    }
+    ExtensionManifest::load_from_dir(dir)
 }
 
 /// 后端扩展激活入口
@@ -64,15 +75,15 @@ pub fn activate_extensions(
     manifests: &[ExtensionManifest],
 ) {
     for manifest in manifests {
-        println!("[Navis Kernel] Extension '{}' v{} found", manifest.name, manifest.version);
+        info!("[Navis Kernel] Extension '{}' v{} found", manifest.name, manifest.version);
         // 注册扩展声明的命令为 RPC 路由
-        for cmd in &manifest.contributes.commands {
-            let route = format!("{}:{}", manifest.name, cmd.id);
+        for cmd in manifest.commands() {
+            let route = format!("{}:{}", manifest.plugin_id(), cmd.id);
             let cmd_name = cmd.title.clone();
             registry.register_route(
                 &route,
                 Arc::new(move |_app, _payload| {
-                    println!("[Navis Kernel] Command '{}' invoked", cmd_name);
+                    info!("[Navis Kernel] Command '{}' invoked", cmd_name);
                     Ok(serde_json::json!({"status": "ok", "command": cmd_name}))
                 }),
             );
