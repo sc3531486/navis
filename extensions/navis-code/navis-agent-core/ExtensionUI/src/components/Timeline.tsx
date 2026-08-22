@@ -36,7 +36,9 @@ export interface MessageTurn {
 
 export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
   const [messages, setMessages] = createSignal<MessageTurn[]>([]);
-  let scrollContainer: HTMLDivElement | undefined;
+  const [editingMsgId, setEditingMsgId] = createSignal<string | null>(null);
+  const [editText, setEditText] = createSignal<string>('');
+
   const agentService = new AgentService(props.ctx);
 
   const scrollToBottom = () => {
@@ -48,34 +50,115 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
     }, 20);
   };
 
-  const handleApproveTool = (msgId: string, toolId: string) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id === msgId && msg.toolCalls) {
-          const toolCalls = msg.toolCalls.map((tc) =>
-            tc.id === toolId ? { ...tc, status: 'completed' as const, needsApproval: false } : tc,
-          );
-          return { ...msg, toolCalls };
-        }
-        return msg;
-      }),
-    );
-    toast.success('已批准工具调用并成功执行！');
+  const formatTimestamp = (ts: number) => {
+    const d = new Date(ts);
+    const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const dayStr = days[d.getDay()];
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    return `${dayStr} ${hours}:${minutes}`;
   };
 
-  const handleRejectTool = (msgId: string, toolId: string) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id === msgId && msg.toolCalls) {
-          const toolCalls = msg.toolCalls.map((tc) =>
-            tc.id === toolId ? { ...tc, status: 'rejected' as const, needsApproval: false } : tc,
-          );
-          return { ...msg, toolCalls };
-        }
-        return msg;
-      }),
-    );
-    toast.warning('已拒绝该操作');
+  const handleCopyText = (content: string, label = '内容') => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(content);
+      toast.success(`已复制${label}`);
+    }
+  };
+
+  const handleStartEdit = (msg: MessageTurn) => {
+    setEditingMsgId(msg.id);
+    setEditText(msg.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMsgId(null);
+    setEditText('');
+  };
+
+  const handleConfirmEditAndResend = async (msgId: string) => {
+    const newContent = editText().trim();
+    if (!newContent) return;
+
+    const currentMsgs = messages();
+    const targetIdx = currentMsgs.findIndex((m) => m.id === msgId);
+    if (targetIdx === -1) return;
+
+    // 保留该消息之前的所有历史记录
+    const prevHistory = currentMsgs.slice(0, targetIdx).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    // 更新当前 User 消息
+    const updatedUserMsg: MessageTurn = {
+      ...currentMsgs[targetIdx],
+      content: newContent,
+      timestamp: Date.now(),
+    };
+
+    // 新建待填充的 Assistant 消息
+    const pendingAiMsgId = `a-${Date.now()}`;
+    const pendingAiMsg: MessageTurn = {
+      id: pendingAiMsgId,
+      role: 'assistant',
+      thinking: '',
+      content: '',
+      timestamp: Date.now(),
+      isLoading: true,
+    };
+
+    // 截断此轮之后的全部消息，并追加新的回复轮次
+    setMessages([...currentMsgs.slice(0, targetIdx), updatedUserMsg, pendingAiMsg]);
+    setEditingMsgId(null);
+    setEditText('');
+    scrollToBottom();
+    toast.info('正在根据修改后的提示词重新请求模型...');
+
+    const payload: AgentPromptPayload = {
+      content: newContent,
+      model: gatewayStore.activeModel()?.name || gatewayStore.activeModelId(),
+      modelId: gatewayStore.activeModelId(),
+      provider: gatewayStore.activeProvider()?.name,
+      timestamp: Date.now(),
+    };
+
+    await agentService.streamTurn(payload, prevHistory, {
+      onThinkingDelta: (delta) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === pendingAiMsgId ? { ...m, thinking: (m.thinking || '') + delta } : m)),
+        );
+        scrollToBottom();
+      },
+      onContentDelta: (delta) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === pendingAiMsgId ? { ...m, content: m.content + delta } : m)),
+        );
+        scrollToBottom();
+      },
+      onComplete: (result) => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === pendingAiMsgId
+              ? {
+                  ...m,
+                  content: result.content || m.content || '(模型未返回文本内容)',
+                  thinking: result.thinking || m.thinking,
+                  tokensUsage: result.tokensUsage,
+                  isLoading: false,
+                }
+              : m,
+          ),
+        );
+        scrollToBottom();
+      },
+      onError: (err) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === pendingAiMsgId ? { ...m, isLoading: false, error: err.message } : m)),
+        );
+        scrollToBottom();
+      },
+    });
   };
 
   const formatMarkdown = (content: string) => {
@@ -191,7 +274,7 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
   });
 
   return (
-    <div style="width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 24px;">
+    <div style="width: 100%; max-width: 820px; display: flex; flex-direction: column; gap: 28px;">
       {/* 初始空白欢迎占位 */}
       <Show when={messages().length === 0}>
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0 20px; color: #64748b; gap: 12px;">
@@ -212,28 +295,91 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
       {/* 消息对话流 */}
       <For each={messages()}>
         {(msg) => (
-          <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-            {/* 用户消息 */}
+          <div style="display: flex; flex-direction: column; width: 100%;">
+            {/* ══════════════════════════════════════════════════════════════════
+                1. 用户消息：右侧气泡框 + 时间 + 复制 + 编辑重新发送
+               ══════════════════════════════════════════════════════════════════ */}
             <Show when={msg.role === 'user'}>
-              <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
+              <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%; gap: 6px;">
                 <Show when={msg.thumbnail}>
                   <div style="display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #475569;">
                     <span style="font-size: 12px;">🖼️</span>
                     <span>{msg.thumbnail}</span>
                   </div>
                 </Show>
-                <div style="font-size: 13.5px; font-weight: 500; color: #1e293b; line-height: 1.5;">
-                  {msg.content}
+
+                {/* 气泡框模式 vs 在线编辑模式 */}
+                <Show
+                  when={editingMsgId() === msg.id}
+                  fallback={
+                    /* 用户提示词气泡框 (1:1 像素级复刻参考图) */
+                    <div
+                      style="max-width: 82%; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 14px; padding: 12px 16px; font-size: 13.5px; line-height: 1.65; color: #18181b; word-break: break-word; white-space: pre-wrap; box-shadow: 0 1px 2px rgba(0,0,0,0.02);"
+                    >
+                      {msg.content}
+                    </div>
+                  }
+                >
+                  {/* 编辑模式输入框与操作条 */}
+                  <div
+                    style="width: 85%; background: #ffffff; border: 1px solid #0284c7; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);"
+                  >
+                    <textarea
+                      rows={4}
+                      value={editText()}
+                      onInput={(e) => setEditText(e.currentTarget.value)}
+                      style="width: 100%; border: none; outline: none; background: transparent; font-size: 13.5px; line-height: 1.6; color: #18181b; resize: vertical; font-family: inherit;"
+                    />
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-top: 1px solid #f1f5f9; padding-top: 8px;">
+                      <button
+                        onClick={handleCancelEdit}
+                        style="padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; color: #64748b; cursor: pointer;"
+                      >
+                        取消
+                      </button>
+                      <button
+                        onClick={() => handleConfirmEditAndResend(msg.id)}
+                        style="padding: 4px 12px; background: #0284c7; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; color: #ffffff; cursor: pointer;"
+                      >
+                        确认并重新发送
+                      </button>
+                    </div>
+                  </div>
+                </Show>
+
+                {/* 气泡框下方：时间戳 + 复制 + 编辑图标 */}
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: #9ca3af; padding-right: 4px; user-select: none;">
+                  <span>{formatTimestamp(msg.timestamp)}</span>
+                  <button
+                    onClick={() => handleCopyText(msg.content, '提示词')}
+                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
+                    title="复制提示词"
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#3b82f6')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+                  >
+                    📋
+                  </button>
+                  <button
+                    onClick={() => handleStartEdit(msg)}
+                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
+                    title="编辑提示词并重新发送"
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#0284c7')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+                  >
+                    ✏️
+                  </button>
                 </div>
               </div>
             </Show>
 
-            {/* 助手消息 */}
+            {/* ══════════════════════════════════════════════════════════════════
+                2. 助手回复：左侧流式输出 + 思考过程 + 异常诊断 + Token 费用
+               ══════════════════════════════════════════════════════════════════ */}
             <Show when={msg.role === 'assistant'}>
-              <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+              <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; margin-top: 4px;">
                 {/* 思考过程流 (Thinking 动态卡片) */}
                 <Show when={msg.thinking}>
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px; width: 100%;">
                     <span style="color: #ea580c; display: flex; align-items: center;">
                       <IconLightbulb size={14} />
                     </span>
@@ -256,12 +402,12 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
 
                 {/* 真实异常报错卡片 (带一键打开设置与诊断) */}
                 <Show when={msg.error}>
-                  <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #b91c1c;">
                       <span>⚠️</span>
                       <span>上游模型请求失败</span>
                     </div>
-                    <div style="font-size: 12.5px; color: #7f1d1d; line-height: 1.5;">
+                    <div style="font-size: 12.5px; color: #7f1d1d; line-height: 1.5; word-break: break-word;">
                       {msg.error}
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
@@ -278,14 +424,14 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
                 {/* 真实流式输出内容 */}
                 <Show when={msg.content}>
                   <div
-                    style="font-size: 13.5px; line-height: 1.65; color: #1e293b; word-break: break-word;"
+                    style="font-size: 13.5px; line-height: 1.65; color: #1e293b; word-break: break-word; width: 100%;"
                     innerHTML={formatMarkdown(msg.content)}
                   />
                 </Show>
 
                 {/* Token 用量与统计 */}
                 <Show when={msg.tokensUsage && !msg.isLoading}>
-                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; padding-top: 6px; border-top: 1px dashed #f1f5f9;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; padding-top: 6px; border-top: 1px dashed #f1f5f9; width: 100%;">
                     <span>
                       Tokens: {msg.tokensUsage?.prompt} in / {msg.tokensUsage?.completion} out (Total: {msg.tokensUsage?.total})
                     </span>
