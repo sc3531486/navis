@@ -268,8 +268,17 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
       setShowPermMenu(false);
     };
     window.addEventListener('click', handleGlobalClick);
+
+    const unsubGoalUpdate = props.ctx.events.on('goal:title:updated', (payload: { title: string }) => {
+      const g = activeGoal();
+      if (g) {
+        setActiveGoal({ ...g, title: payload.title });
+      }
+    });
+
     onCleanup(() => {
       window.removeEventListener('click', handleGlobalClick);
+      unsubGoalUpdate();
     });
   });
 
@@ -541,17 +550,15 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               </Show>
             </div>
 
-            {/* 3. 编辑目标按钮 */}
+            {/* 3. 编辑目标按钮 (唤起右侧目标编辑区域) */}
             <div style="position: relative;">
               <button
                 id="goal-btn-expand"
                 onClick={() => {
                   const g = activeGoal();
-                  if (g) {
-                    setText(g.title);
-                    setActiveSpecialMode('goal');
-                    toast.info('已将目标载入输入框进行编辑');
-                  }
+                  const targetTitle = g?.title || text() || '我们的目标是做一个万物皆扩展的底座';
+                  props.ctx.events.emit('goal:editor:open', { title: targetTitle });
+                  toast.info('已在右侧展开目标编辑区域');
                 }}
                 onMouseEnter={() => setHoverGoalBtn('expand')}
                 onMouseLeave={() => setHoverGoalBtn(null)}

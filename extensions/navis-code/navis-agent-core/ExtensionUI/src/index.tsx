@@ -1,15 +1,31 @@
-// Navis Agent Core 业务扩展入口
-import { createSignal } from 'solid-js';
+import { createSignal, onMount, onCleanup, Show } from 'solid-js';
 import type { NavisContext, NavisPlugin } from '@/core/context';
 import { componentRegistry } from '@/core/components/ComponentRegistry';
 import { Composer } from './components/Composer';
 import { Timeline } from './components/Timeline';
 import { ContextDrawer } from './components/ContextDrawer';
+import { GoalEditorDrawer } from './components/GoalEditorDrawer';
 import { agentPipeline } from './pipeline/AgentPipeline';
 import { toast } from '@/core/toast/ToastStore';
 
 const AgentWorkspace = (props: { ctx: NavisContext }) => {
   const [sessionTitle] = createSignal('Repeated Chinese Greetings');
+  const [goalEditorOpen, setGoalEditorOpen] = createSignal(false);
+  const [editingGoalTitle, setEditingGoalTitle] = createSignal('我们的目标是做一个万物皆扩展的底座');
+
+  onMount(() => {
+    const unsubOpen = props.ctx.events.on('goal:editor:open', (payload: { title?: string }) => {
+      if (payload?.title) setEditingGoalTitle(payload.title);
+      setGoalEditorOpen(true);
+    });
+    const unsubClose = props.ctx.events.on('goal:editor:close', () => {
+      setGoalEditorOpen(false);
+    });
+    onCleanup(() => {
+      unsubOpen();
+      unsubClose();
+    });
+  });
 
   return (
     <div style="display: flex; flex-direction: row; height: 100%; width: 100%; background: #ffffff; overflow: hidden;">
@@ -59,8 +75,24 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
         </div>
       </div>
 
-      {/* 右侧上下文与交付件抽屉 */}
-      <ContextDrawer ctx={props.ctx} />
+      {/* 4. 活跃目标编辑右侧区域 (1:1 像素级复刻参考图) */}
+      <Show when={goalEditorOpen()}>
+        <GoalEditorDrawer
+          ctx={props.ctx}
+          open={goalEditorOpen()}
+          goalTitle={editingGoalTitle()}
+          onClose={() => setGoalEditorOpen(false)}
+          onSave={(newTitle) => {
+            setEditingGoalTitle(newTitle);
+            props.ctx.events.emit('goal:title:updated', { title: newTitle });
+          }}
+        />
+      </Show>
+
+      {/* 5. 默认右侧上下文与交付件抽屉 (当目标编辑打开时平滑让位) */}
+      <Show when={!goalEditorOpen()}>
+        <ContextDrawer ctx={props.ctx} />
+      </Show>
     </div>
   );
 };
