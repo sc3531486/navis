@@ -9,7 +9,7 @@ import { agentPipeline } from './pipeline/AgentPipeline';
 import { toast } from '@/core/toast/ToastStore';
 
 const AgentWorkspace = (props: { ctx: NavisContext }) => {
-  const [sessionTitle] = createSignal('Repeated Chinese Greetings');
+  const [sessionTitle, setSessionTitle] = createSignal('流水设计审查');
   const [goalEditorOpen, setGoalEditorOpen] = createSignal(false);
   const [editingGoalTitle, setEditingGoalTitle] = createSignal('我们的目标是做一个万物皆扩展的底座');
 
@@ -21,9 +21,18 @@ const AgentWorkspace = (props: { ctx: NavisContext }) => {
     const unsubClose = props.ctx.events.on('goal:editor:close', () => {
       setGoalEditorOpen(false);
     });
+    const unsubSession = props.ctx.events.on('session:switched', (payload: { title?: string }) => {
+      if (payload?.title) setSessionTitle(payload.title);
+    });
+    const unsubSessionCreated = props.ctx.events.on('session:created', (payload: { title?: string }) => {
+      if (payload?.title) setSessionTitle(payload.title);
+    });
+
     onCleanup(() => {
       unsubOpen();
       unsubClose();
+      unsubSession();
+      unsubSessionCreated();
     });
   });
 

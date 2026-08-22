@@ -8,9 +8,78 @@ import {
   IconPrompt,
   IconFolder,
   IconChevronRight,
+  IconChevronDown,
   IconSparkles,
   IconTrash,
 } from '@/components/icons';
+
+// ══════════════════════════════════════════════════════════════════════════
+// 1:1 对齐图二、图三的精致纯矢量线性图标 (Monochrome Linear SVG Icons)
+// ══════════════════════════════════════════════════════════════════════════
+const IconPin = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="17" x2="12" y2="22"></line>
+    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+  </svg>
+);
+
+const IconEditLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20h9"></path>
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+  </svg>
+);
+
+const IconFolderLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+  </svg>
+);
+
+const IconArchiveLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="5" rx="1"></rect>
+    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
+    <path d="M10 12h4"></path>
+  </svg>
+);
+
+const IconRemoveLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+
+const IconEyeLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+);
+
+const IconShareLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+    <polyline points="16 6 12 2 8 6"></polyline>
+    <line x1="12" y1="2" x2="12" y2="15"></line>
+  </svg>
+);
+
+const IconCopyLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+);
+
+const IconOpenNewWindowLinear = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
+  </svg>
+);
 
 interface SessionItem {
   id: string;
@@ -21,6 +90,7 @@ interface SessionItem {
 }
 
 const STORAGE_KEY = 'navis_sessions_list_v2';
+const COLLAPSED_STORAGE_KEY = 'navis_collapsed_projects_v1';
 
 const DEFAULT_SESSIONS: SessionItem[] = [
   { id: '1', title: '流水设计审查', group: '设计文档', updatedAt: 'yesterday', active: true },
@@ -39,6 +109,27 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
   const [showGatewayMenu, setShowGatewayMenu] = createSignal(false);
   const [hoveredSessionId, setHoveredSessionId] = createSignal<string | null>(null);
   const [hoveredGroup, setHoveredGroup] = createSignal<string | null>(null);
+
+  // 折叠/展开的项目分组集合
+  const getInitialCollapsed = (): Record<string, boolean> => {
+    try {
+      const saved = localStorage.getItem(COLLAPSED_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return {};
+  };
+  const [collapsedGroups, setCollapsedGroupsState] = createSignal<Record<string, boolean>>(getInitialCollapsed());
+
+  const toggleGroupCollapse = (group: string, e?: MouseEvent) => {
+    if (e) e.stopPropagation();
+    setCollapsedGroupsState((prev) => {
+      const next = { ...prev, [group]: !prev[group] };
+      try {
+        localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+  };
 
   // 初始化会话列表（支持持久化存储）
   const getInitialSessions = (): SessionItem[] => {
@@ -64,7 +155,7 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
     });
   };
 
-  // 右键菜单与重命名弹窗状态
+  // 右键菜单状态
   const [contextMenu, setContextMenu] = createSignal<{
     type: 'session' | 'project';
     id?: string;
@@ -73,18 +164,14 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
     y: number;
   } | null>(null);
 
+  // 重命名状态
   const [editingItem, setEditingItem] = createSignal<{
     type: 'session' | 'project';
     id?: string;
     currentName: string;
     group?: string;
   } | null>(null);
-
   const [renameInput, setRenameInput] = createSignal('');
-
-  // 新建项目弹窗
-  const [showNewProjectModal, setShowNewProjectModal] = createSignal(false);
-  const [newProjectName, setNewProjectName] = createSignal('');
 
   const handleTabChange = (mode: 'cowork' | 'code') => {
     setActiveTab(mode);
@@ -103,13 +190,15 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
       updatedAt: 'just now',
       active: true,
     };
+    // 确保所属分组展开
+    setCollapsedGroupsState((prev) => ({ ...prev, [targetGroup]: false }));
     setSessions((prev) => [newSess, ...prev.map((s) => ({ ...s, active: false }))]);
     props.ctx.events.emit('session:created', { id: newId, title: newTitle, group: targetGroup });
     props.ctx.events.emit('session:switched', { id: newId, title: newTitle, group: targetGroup });
     toast.success(`已新建会话: ${newTitle}`);
   };
 
-  /** 选中切换会话 */
+  /** 选中切换会话并联动主时间线 */
   const handleSelectSession = (id: string) => {
     setSessions((prev) =>
       prev.map((s) => ({
@@ -198,18 +287,6 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
     setEditingItem(null);
   };
 
-  /** 确认创建新项目 */
-  const handleConfirmCreateProject = () => {
-    const name = newProjectName().trim();
-    if (!name) {
-      setShowNewProjectModal(false);
-      return;
-    }
-    handleNewSession(name);
-    setShowNewProjectModal(false);
-    setNewProjectName('');
-  };
-
   onMount(() => {
     const handleClickOutside = () => {
       setShowGatewayMenu(false);
@@ -276,20 +353,38 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
         <For each={sessions()}>
           {(sess, index) => {
             const isFirstInGroup = () => index() === 0 || sessions()[index() - 1]?.group !== sess.group;
+            const isCollapsed = () => !!collapsedGroups()[sess.group];
+
             return (
               <>
-                {/* 项目/分组表头 (带删除项目与新建会话按钮) */}
+                {/* 项目/分组表头 (点击支持折叠/展开，带删除项目与新建会话按钮) */}
                 <Show when={isFirstInGroup()}>
                   <div
-                    onMouseEnter={() => setHoveredGroup(sess.group)}
-                    onMouseLeave={() => setHoveredGroup(null)}
+                    id={`project-header-${sess.group}`}
+                    onClick={() => toggleGroupCollapse(sess.group)}
+                    onMouseEnter={(e) => {
+                      setHoveredGroup(sess.group);
+                      e.currentTarget.style.background = '#f0eee8';
+                    }}
+                    onMouseLeave={(e) => {
+                      setHoveredGroup(null);
+                      e.currentTarget.style.background = 'transparent';
+                    }}
                     onContextMenu={(e) => {
                       e.preventDefault();
                       setContextMenu({ type: 'project', group: sess.group, x: e.clientX, y: e.clientY });
                     }}
-                    style="padding: 10px 8px 3px; font-size: 11px; font-weight: 600; color: #8e8b83; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: space-between; border-radius: 4px; transition: background 0.1s ease;"
+                    style="padding: 10px 8px 3px; font-size: 11.5px; font-weight: 600; color: #8e8b83; text-transform: uppercase; letter-spacing: 0.3px; display: flex; align-items: center; justify-content: space-between; border-radius: 4px; cursor: pointer; user-select: none; transition: background 0.1s ease;"
                   >
                     <div style="display: flex; align-items: center; gap: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      {/* 折叠箭头指示器 */}
+                      <span
+                        style={`display: flex; align-items: center; transform: ${
+                          isCollapsed() ? 'rotate(-90deg)' : 'rotate(0deg)'
+                        }; transition: transform 0.15s ease; color: #a1a1aa;`}
+                      >
+                        <IconChevronDown size={11} />
+                      </span>
                       <IconFolder size={12} />
                       <span style="overflow: hidden; text-overflow: ellipsis;">{sess.group}</span>
                     </div>
@@ -333,74 +428,174 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
                   </div>
                 </Show>
 
-                {/* 单个会话项 (带删除会话按钮与右键菜单) */}
-                <div
-                  id={`session-item-${sess.id}`}
-                  onClick={() => handleSelectSession(sess.id)}
-                  onMouseEnter={(e) => {
-                    setHoveredSessionId(sess.id);
-                    if (!sess.active) e.currentTarget.style.background = '#f0eee8';
-                  }}
-                  onMouseLeave={(e) => {
-                    setHoveredSessionId(null);
-                    if (!sess.active) e.currentTarget.style.background = 'transparent';
-                  }}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    setContextMenu({ type: 'session', id: sess.id, group: sess.group, x: e.clientX, y: e.clientY });
-                  }}
-                  style={`display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s ease; position: relative; ${
-                    sess.active ? 'background: #eae7e1; color: #1e1d1b; font-weight: 500;' : 'background: transparent; color: #4b4843;'
-                  }`}
-                >
-                  <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1;">
-                    <span style={`width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; ${sess.active ? 'background: #c2410c;' : 'background: transparent;'}`} />
-                    <span style="overflow: hidden; text-overflow: ellipsis; font-size: 12.5px;">{sess.title}</span>
-                  </div>
+                {/* 单个会话项 (受折叠状态控制，带删除会话按钮与右键菜单) */}
+                <Show when={!isCollapsed()}>
+                  <div
+                    id={`session-item-${sess.id}`}
+                    onClick={() => handleSelectSession(sess.id)}
+                    onMouseEnter={(e) => {
+                      setHoveredSessionId(sess.id);
+                      if (!sess.active) e.currentTarget.style.background = '#f0eee8';
+                    }}
+                    onMouseLeave={(e) => {
+                      setHoveredSessionId(null);
+                      if (!sess.active) e.currentTarget.style.background = 'transparent';
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setContextMenu({ type: 'session', id: sess.id, group: sess.group, x: e.clientX, y: e.clientY });
+                    }}
+                    style={`display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s ease; position: relative; ${
+                      sess.active ? 'background: #eae7e1; color: #1e1d1b; font-weight: 500;' : 'background: transparent; color: #4b4843;'
+                    }`}
+                  >
+                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1;">
+                      <span style={`width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; ${sess.active ? 'background: #c2410c;' : 'background: transparent;'}`} />
+                      <span style="overflow: hidden; text-overflow: ellipsis; font-size: 12.5px;">{sess.title}</span>
+                    </div>
 
-                  {/* 悬停出现删除会话图标 / 激活态箭头 */}
-                  <div style="display: flex; align-items: center; gap: 2px;">
-                    <Show
-                      when={hoveredSessionId() === sess.id}
-                      fallback={
-                        <Show when={sess.active}>
-                          <IconChevronRight size={12} color="#8e8b83" />
-                        </Show>
-                      }
-                    >
-                      <button
-                        id={`delete-session-${sess.id}`}
-                        onClick={(e) => handleDeleteSession(sess.id, e)}
-                        style="background: transparent; border: none; padding: 2px 4px; border-radius: 4px; color: #71717a; cursor: pointer; display: flex; align-items: center; transition: all 0.15s ease;"
-                        title={`删除会话: ${sess.title}`}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = '#ef4444';
-                          e.currentTarget.style.background = '#fee2e2';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = '#71717a';
-                          e.currentTarget.style.background = 'transparent';
-                        }}
+                    {/* 悬停出现删除会话图标 / 激活态箭头 */}
+                    <div style="display: flex; align-items: center; gap: 2px;">
+                      <Show
+                        when={hoveredSessionId() === sess.id}
+                        fallback={
+                          <Show when={sess.active}>
+                            <IconChevronRight size={12} color="#8e8b83" />
+                          </Show>
+                        }
                       >
-                        <IconTrash size={12} />
-                      </button>
-                    </Show>
+                        <button
+                          id={`delete-session-${sess.id}`}
+                          onClick={(e) => handleDeleteSession(sess.id, e)}
+                          style="background: transparent; border: none; padding: 2px 4px; border-radius: 4px; color: #71717a; cursor: pointer; display: flex; align-items: center; transition: all 0.15s ease;"
+                          title={`删除会话: ${sess.title}`}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#ef4444';
+                            e.currentTarget.style.background = '#fee2e2';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#71717a';
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <IconTrash size={12} />
+                        </button>
+                      </Show>
+                    </div>
                   </div>
-                </div>
+                </Show>
               </>
             );
           }}
         </For>
       </div>
 
-      {/* 右键上下文菜单 */}
+      {/* ══════════════════════════════════════════════════════════════════════════
+          右键上下文菜单 (1:1 像素级对齐图二、图三纯黑白线性矢量图标与质感)
+         ══════════════════════════════════════════════════════════════════════════ */}
       <Show when={contextMenu()}>
         {(menu) => (
           <div
             onClick={(e) => e.stopPropagation()}
-            style={`position: fixed; top: ${menu().y}px; left: ${menu().x}px; width: 170px; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 4px; z-index: 1000; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px;`}
+            style={`position: fixed; top: ${menu().y}px; left: ${menu().x}px; width: 175px; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 5px; z-index: 1000; display: flex; flex-direction: column; gap: 1px; font-size: 13px; color: #18181b; user-select: none;`}
           >
+            {/* 项目右键菜单 (1:1 对齐图二) */}
+            <Show when={menu().type === 'project'}>
+              <div
+                onClick={() => {
+                  toast.info(`已置顶项目: ${menu().group}`);
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconPin />
+                <span>置顶</span>
+              </div>
+
+              <div
+                onClick={() => {
+                  if (menu().group) {
+                    setEditingItem({ type: 'project', currentName: menu().group!, group: menu().group });
+                    setRenameInput(menu().group!);
+                  }
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconEditLinear />
+                <span>编辑</span>
+              </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
+              <div
+                onClick={() => {
+                  toast.info(`已在资源管理器中定位: ${menu().group}`);
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconFolderLinear />
+                <span>在资源管理器中打开</span>
+              </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
+              <div
+                onClick={() => {
+                  toast.info(`已归档项目: ${menu().group}`);
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconArchiveLinear />
+                <span>归档聊天</span>
+              </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
+              <div
+                id="context-menu-delete-project"
+                onClick={() => menu().group && handleDeleteProject(menu().group!)}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px; color: #18181b;"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f4f4f5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <IconRemoveLinear />
+                <span>移除项目</span>
+              </div>
+            </Show>
+
+            {/* 会话右键菜单 (1:1 对齐图三) */}
             <Show when={menu().type === 'session'}>
+              <div
+                onClick={() => {
+                  toast.info('已置顶会话');
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconPin />
+                <span>置顶</span>
+              </div>
+
               <div
                 onClick={() => {
                   const target = sessions().find((s) => s.id === menu().id);
@@ -410,60 +605,118 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
                   }
                   setContextMenu(null);
                 }}
-                style="padding: 6px 10px; border-radius: 5px; cursor: pointer; color: #3f3f46; display: flex; align-items: center; gap: 6px;"
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <span>✏️</span>
-                <span>重命名会话</span>
+                <IconEditLinear />
+                <span>重命名</span>
               </div>
-              <div
-                onClick={() => menu().id && handleDeleteSession(menu().id!)}
-                style="padding: 6px 10px; border-radius: 5px; cursor: pointer; color: #ef4444; display: flex; align-items: center; gap: 6px;"
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#fee2e2')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                <span>🗑️</span>
-                <span>删除会话</span>
-              </div>
-            </Show>
 
-            <Show when={menu().type === 'project'}>
               <div
                 onClick={() => {
-                  if (menu().group) handleNewSession(menu().group!);
+                  toast.info('已标记为未读');
                   setContextMenu(null);
                 }}
-                style="padding: 6px 10px; border-radius: 5px; cursor: pointer; color: #3f3f46; display: flex; align-items: center; gap: 6px;"
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <span>➕</span>
-                <span>在此项目下新建会话</span>
+                <IconEyeLinear />
+                <span>标记为未读</span>
               </div>
+
               <div
                 onClick={() => {
-                  if (menu().group) {
-                    setEditingItem({ type: 'project', currentName: menu().group!, group: menu().group });
-                    setRenameInput(menu().group!);
-                  }
+                  toast.info('已归档');
                   setContextMenu(null);
                 }}
-                style="padding: 6px 10px; border-radius: 5px; cursor: pointer; color: #3f3f46; display: flex; align-items: center; gap: 6px;"
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <span>✏️</span>
-                <span>重命名项目</span>
+                <IconArchiveLinear />
+                <span>归档</span>
               </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
               <div
-                onClick={() => menu().group && handleDeleteProject(menu().group!)}
-                style="padding: 6px 10px; border-radius: 5px; cursor: pointer; color: #ef4444; display: flex; align-items: center; gap: 6px;"
+                onClick={() => {
+                  toast.info('移动至项目');
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <div style="display: flex; align-items: center; gap: 9px;">
+                  <IconFolderLinear />
+                  <span>项目</span>
+                </div>
+                <IconChevronRight size={12} color="#a1a1aa" />
+              </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
+              <div
+                onClick={() => {
+                  toast.info('已生成分享链接');
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconShareLinear />
+                <span>分享</span>
+              </div>
+
+              <div
+                onClick={() => {
+                  toast.info('已复制会话内容');
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <div style="display: flex; align-items: center; gap: 9px;">
+                  <IconCopyLinear />
+                  <span>复制</span>
+                </div>
+                <IconChevronRight size={12} color="#a1a1aa" />
+              </div>
+
+              {/* 分割线 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+
+              <div
+                onClick={() => {
+                  toast.info('已在新窗口中打开');
+                  setContextMenu(null);
+                }}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px;"
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f4f4f5')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <IconOpenNewWindowLinear />
+                <span>在新窗口中打开</span>
+              </div>
+
+              {/* 删除会话 */}
+              <div style="height: 1px; background: #f1f5f9; margin: 3px 0;" />
+              <div
+                id="context-menu-delete-session"
+                onClick={() => menu().id && handleDeleteSession(menu().id!)}
+                style="padding: 7px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 9px; color: #ef4444;"
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#fee2e2')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <span>🗑️</span>
-                <span>删除项目及所有会话</span>
+                <IconRemoveLinear />
+                <span>删除会话</span>
               </div>
             </Show>
           </div>

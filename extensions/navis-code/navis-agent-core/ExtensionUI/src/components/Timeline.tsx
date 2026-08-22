@@ -48,8 +48,98 @@ export interface MessageTurn {
   error?: string;
 }
 
+const TIMELINE_STORAGE_KEY = 'navis_timeline_session_messages_v2';
+
+const DEFAULT_SESSION_MESSAGES: Record<string, MessageTurn[]> = {
+  '1': [
+    {
+      id: 'u-1',
+      role: 'user',
+      content: '我们的目标是做一个万物皆扩展的底座',
+      timestamp: Date.now() - 3600000 * 24,
+    },
+    {
+      id: 'a-1',
+      role: 'assistant',
+      content: '已为您分析架构方案：\n\n- **微内核设计**：框架层纯净无业务代码（零业务硬编码）；\n- **泛型贡献点分发中心**：通过 manifests 与 DynamicSlot 动态插槽树投影；\n- **多路复用 IPC 路由器**：支持 Stdio JSON-RPC 进程隔离与流式 Channel 通信。',
+      thinking: '正在对齐万物皆扩展的底座微内核架构规范...',
+      timestamp: Date.now() - 3600000 * 24 + 4000,
+    },
+  ],
+  '2': [
+    {
+      id: 'u-2',
+      role: 'user',
+      content: '编写流水设计规范文档的架构大纲。',
+      timestamp: Date.now() - 3600000 * 48,
+    },
+    {
+      id: 'a-2',
+      role: 'assistant',
+      content: '## 流水设计规范大纲\n\n1. **设计原则与边界定义**\n2. **生命周期阶段划分（Pre-check / Execute / Verify / Deliver）**\n3. **异常重试与回滚策略**',
+      timestamp: Date.now() - 3600000 * 48 + 3000,
+    },
+  ],
+  '3': [
+    {
+      id: 'u-3',
+      role: 'user',
+      content: '梳理 message-center 架构文档中的事件总线设计。',
+      timestamp: Date.now() - 3600000 * 72,
+    },
+    {
+      id: 'a-3',
+      role: 'assistant',
+      content: '`message-center` 采用多层事件路由模型，支持广播 (Emit)、瀑布流 (Waterfall) 与串行管道 (Serial/Parallel)。',
+      timestamp: Date.now() - 3600000 * 72 + 2000,
+    },
+  ],
+  '4': [
+    {
+      id: 'u-4',
+      role: 'user',
+      content: '压测方案设计与并发指标预期。',
+      timestamp: Date.now() - 3600000 * 96,
+    },
+    {
+      id: 'a-4',
+      role: 'assistant',
+      content: '压测目标设定为 10,000 QPS 并发 RPC 调度，P99 延迟控制在 5ms 以内。',
+      timestamp: Date.now() - 3600000 * 96 + 4000,
+    },
+  ],
+};
+
 export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
-  const [messages, setMessages] = createSignal<MessageTurn[]>([]);
+  const getInitialSessionStore = (): Record<string, MessageTurn[]> => {
+    try {
+      const saved = localStorage.getItem(TIMELINE_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return DEFAULT_SESSION_MESSAGES;
+  };
+
+  const [activeSessionId, setActiveSessionId] = createSignal('1');
+  const [sessionStore, setSessionStore] = createSignal<Record<string, MessageTurn[]>>(getInitialSessionStore());
+  const [messages, setMessagesState] = createSignal<MessageTurn[]>(
+    getInitialSessionStore()['1'] || [],
+  );
+
+  const setMessages = (updater: MessageTurn[] | ((prev: MessageTurn[]) => MessageTurn[])) => {
+    setMessagesState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      const curId = activeSessionId();
+      setSessionStore((store) => {
+        const updated = { ...store, [curId]: next };
+        try {
+          localStorage.setItem(TIMELINE_STORAGE_KEY, JSON.stringify(updated));
+        } catch (_) {}
+        return updated;
+      });
+      return next;
+    });
+  };
+
   const [editingMsgId, setEditingMsgId] = createSignal<string | null>(null);
   const [editText, setEditText] = createSignal<string>('');
 
@@ -297,14 +387,40 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
       scrollToBottom();
     });
 
-    const unsubSession = props.ctx.events.on('session:created', () => {
+    const unsubSwitched = props.ctx.events.on('session:switched', (payload: { id: string; title: string }) => {
+      if (!payload?.id) return;
+      setActiveSessionId(payload.id);
+      const store = sessionStore();
+      const current = store[payload.id] || [];
+      setMessagesState(current);
+      scrollToBottom();
+    });
+
+    const unsubSession = props.ctx.events.on('session:created', (payload: { id?: string }) => {
+      if (payload?.id) {
+        setActiveSessionId(payload.id);
+      }
       setMessages([]);
+    });
+
+    const unsubDeleted = props.ctx.events.on('session:deleted', (payload: { id?: string }) => {
+      if (!payload?.id) return;
+      setSessionStore((store) => {
+        const updated = { ...store };
+        delete updated[payload.id!];
+        try {
+          localStorage.setItem(TIMELINE_STORAGE_KEY, JSON.stringify(updated));
+        } catch (_) {}
+        return updated;
+      });
     });
 
     onCleanup(() => {
       unsubTurn();
       unsubGoalStep();
+      unsubSwitched();
       unsubSession();
+      unsubDeleted();
     });
   });
 
