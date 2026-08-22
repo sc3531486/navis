@@ -182,38 +182,43 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
         >
           <IconSettings size={14} color="#18181b" />
           <span style="font-size: 13px; font-weight: 400; color: #18181b; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            {gatewayStore.activeModel()?.name || gatewayStore.activeModelId() || 'custom'}
+            {gatewayStore.activeProvider()?.name.split(' (')[0] || 'custom'}
           </span>
         </div>
 
-        {/* 弹出菜单 */}
+        {/* 弹出 Provider 快速切换菜单 */}
         <Show when={showGatewayMenu()}>
           <div
             onClick={(e) => e.stopPropagation()}
-            style="position: absolute; bottom: 44px; left: 10px; width: 220px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 6px; z-index: 100; display: flex; flex-direction: column; gap: 4px;"
+            style="position: absolute; bottom: 44px; left: 10px; width: 230px; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); padding: 6px; z-index: 100; display: flex; flex-direction: column; gap: 3px;"
           >
             <div style="font-size: 11px; font-weight: 600; color: #8e8b83; padding: 2px 6px;">
-              当前 Provider: {gatewayStore.activeProvider()?.name}
+              切换 Provider (服务商)
             </div>
-            <For each={gatewayStore.activeProvider()?.models}>
-              {(m) => (
+            <For each={gatewayStore.providers()}>
+              {(p) => (
                 <div
                   onClick={() => {
-                    gatewayStore.setActiveModel(m.id);
+                    gatewayStore.setActiveProvider(p.id);
                     setShowGatewayMenu(false);
-                    toast.info(`已切换默认模型为: ${m.name}`);
+                    toast.info(`已切换当前 Provider 为: ${p.name.split(' (')[0]}`);
                   }}
-                  style={`padding: 5px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; ${
-                    gatewayStore.activeModelId() === m.id ? 'background: #f7f6f2; font-weight: 600;' : ''
+                  style={`padding: 6px 8px; border-radius: 6px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; ${
+                    gatewayStore.activeProviderId() === p.id ? 'background: #f1f5f9; font-weight: 600; color: #0284c7;' : 'color: #334155;'
                   }`}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f7f6f2')}
+                  onMouseEnter={(e) => {
+                    if (gatewayStore.activeProviderId() !== p.id) e.currentTarget.style.background = '#f8fafc';
+                  }}
                   onMouseLeave={(e) => {
-                    if (gatewayStore.activeModelId() !== m.id) e.currentTarget.style.background = 'transparent';
+                    if (gatewayStore.activeProviderId() !== p.id) e.currentTarget.style.background = 'transparent';
                   }}
                 >
-                  <span>{m.name}</span>
-                  <Show when={gatewayStore.activeModelId() === m.id}>
-                    <span style="font-size: 10px; color: #16a34a;">●</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <IconSettings size={13} />
+                    <span>{p.name.split(' (')[0]}</span>
+                  </div>
+                  <Show when={gatewayStore.activeProviderId() === p.id}>
+                    <span style="font-size: 10px; background: #dcfce7; color: #15803d; padding: 1px 5px; border-radius: 4px;">Active</span>
                   </Show>
                 </div>
               )}
@@ -223,9 +228,10 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
                 setShowGatewayMenu(false);
                 props.ctx.events.emit('settings:open', { tab: 'models' });
               }}
-              style="border-top: 1px solid #f4f2ee; padding: 5px 8px; font-size: 11.5px; color: #c2410c; cursor: pointer; margin-top: 2px;"
+              style="border-top: 1px solid #f1f5f9; padding: 6px 8px; font-size: 12px; color: #ea580c; cursor: pointer; margin-top: 2px; display: flex; align-items: center; gap: 5px; font-weight: 500;"
             >
-              配置更多 Provider...
+              <span>⚙️</span>
+              <span>管理与添加 Provider...</span>
             </div>
           </div>
         </Show>

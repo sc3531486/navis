@@ -55,6 +55,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
   });
 
   onMount(() => {
+    (window as any).__openNavisSettings = (tab?: string) => props.ctx.events.emit('settings:open', { tab: tab || 'models' });
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && open()) {
         if (showAddProviderModal()) {
@@ -67,6 +68,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
     window.addEventListener('keydown', handleKeyDown);
     onCleanup(() => {
       window.removeEventListener('keydown', handleKeyDown);
+      delete (window as any).__openNavisSettings;
     });
   });
 
@@ -266,11 +268,29 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                             <b style={`font-size: 12.5px; ${isSelected() ? 'color: #18181b;' : 'color: #3f3f46;'}`}>
                               {p.name.split(' (')[0]}
                             </b>
-                            <Show when={isGlobalActive()}>
-                              <span style="font-size: 10px; background: #dcfce7; color: #15803d; padding: 1px 5px; border-radius: 4px; font-weight: 600;">
-                                Active
-                              </span>
-                            </Show>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                              <Show when={isGlobalActive()}>
+                                <span style="font-size: 10px; background: #dcfce7; color: #15803d; padding: 1px 5px; border-radius: 4px; font-weight: 600;">
+                                  Active
+                                </span>
+                              </Show>
+                              <Show when={gatewayStore.providers().length > 1}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    gatewayStore.deleteProvider(p.id);
+                                    setSelectedProviderId(gatewayStore.activeProviderId());
+                                    toast.info(`已删除服务商: ${p.name.split(' (')[0]}`);
+                                  }}
+                                  style="background: transparent; border: none; color: #a1a1aa; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
+                                  title="删除此 Provider"
+                                  onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                                  onMouseLeave={(e) => (e.currentTarget.style.color = '#a1a1aa')}
+                                >
+                                  <IconTrash size={12} />
+                                </button>
+                              </Show>
+                            </div>
                           </div>
                           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #71717a;">
                             <span>{p.models.length} 个模型</span>
@@ -302,7 +322,7 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
           <div style="flex: 1; display: flex; flex-direction: column; background: #ffffff; overflow: hidden; min-height: 0;">
             {/* 顶栏标题与关闭 ✕ */}
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #f0eee8; flex-shrink: 0;">
-              <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
                 <span style="font-size: 15px; font-weight: 600; color: #18181b;">
                   {activeMainTab() === 'models'
                     ? `${currentProvider()?.name.split(' (')[0]} · 配置详情`
@@ -312,6 +332,23 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
                     ? 'System Instructions & Custom Prompts'
                     : 'General Settings'}
                 </span>
+                <Show when={activeMainTab() === 'models' && gatewayStore.providers().length > 1}>
+                  <button
+                    onClick={() => {
+                      const p = currentProvider();
+                      if (p) {
+                        gatewayStore.deleteProvider(p.id);
+                        setSelectedProviderId(gatewayStore.activeProviderId());
+                        toast.info(`已删除服务商: ${p.name.split(' (')[0]}`);
+                      }
+                    }}
+                    style="display: flex; align-items: center; gap: 4px; padding: 3px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px; font-size: 11.5px; color: #dc2626; cursor: pointer;"
+                    title="删除当前选中的 Provider"
+                  >
+                    <IconTrash size={12} />
+                    <span>删除 Provider</span>
+                  </button>
+                </Show>
               </div>
               <button
                 onClick={() => setOpen(false)}

@@ -457,6 +457,19 @@ export const gatewayStore = {
       setActiveModelId(provider.defaultModelId);
     }
   },
+
+  deleteProvider(providerId: string) {
+    const prevList = providers();
+    if (prevList.length <= 1) return; // 至少保留一个 Provider
+    const remaining = prevList.filter((p) => p.id !== providerId);
+    setProviders(remaining);
+    if (activeProviderId() === providerId && remaining.length > 0) {
+      setActiveProviderId(remaining[0].id);
+      if (remaining[0].defaultModelId) {
+        setActiveModelId(remaining[0].defaultModelId);
+      }
+    }
+  },
 };
 
 export default gatewayStore;
