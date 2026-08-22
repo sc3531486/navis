@@ -73,6 +73,35 @@ const IconHandSVG = () => (
   </svg>
 );
 
+const IconTrashSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
+const IconPlayCircleSVG = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
+  </svg>
+);
+
+const IconPauseCircleSVG = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="10" y1="15" x2="10" y2="9"></line>
+    <line x1="14" y1="15" x2="14" y2="9"></line>
+  </svg>
+);
+
+const IconExpandCornersSVG = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+  </svg>
+);
+
 interface SlashCommand {
   id: string;
   name: string;
@@ -105,6 +134,39 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
 
   const [activeSpecialMode, setActiveSpecialMode] = createSignal<'normal' | 'goal' | 'plan'>('normal');
   const [isHoveringModeChip, setIsHoveringModeChip] = createSignal(false);
+
+  interface ActiveGoal {
+    id: string;
+    title: string;
+    status: 'running' | 'paused' | 'stagnant';
+    createdAt: number;
+  }
+
+  const [activeGoal, setActiveGoal] = createSignal<ActiveGoal | null>(null);
+  const [hoverGoalBtn, setHoverGoalBtn] = createSignal<'trash' | 'play' | 'expand' | null>(null);
+  const [nowTs, setNowTs] = createSignal(Date.now());
+
+  onMount(() => {
+    const timer = setInterval(() => setNowTs(Date.now()), 1000);
+    onCleanup(() => clearInterval(timer));
+  });
+
+  const getGoalElapsed = () => {
+    const g = activeGoal();
+    if (!g) return '2s';
+    const diffSec = Math.max(1, Math.floor((nowTs() - g.createdAt) / 1000));
+    if (diffSec < 60) return `${diffSec}s`;
+    const diffMin = Math.floor(diffSec / 60);
+    return `${diffMin}m`;
+  };
+
+  const getGoalStatusText = () => {
+    const g = activeGoal();
+    if (!g) return '已暂停的目标';
+    if (g.status === 'paused') return '已暂停的目标';
+    if (g.status === 'stagnant') return '目标已停滞';
+    return '进行中的目标';
+  };
 
   const placeholderText = () => {
     if (activeSpecialMode() === 'goal') {
@@ -156,6 +218,16 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
       mode: mode,
       timestamp: Date.now(),
     });
+
+    if (mode === 'goal') {
+      setActiveGoal({
+        id: `g-${Date.now()}`,
+        title: content,
+        status: 'paused',
+        createdAt: Date.now(),
+      });
+      setActiveSpecialMode('normal');
+    }
 
     // 模拟增加本次交互的 Token 消耗
     setUsedTokens((prev) => prev + Math.floor(content.length * 1.5 + 400));
@@ -373,6 +445,135 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
               </div>
             )}
           </For>
+        </div>
+      </Show>
+
+      {/* 活跃目标横幅 (1:1 像素级复刻参考图 1-5) */}
+      <Show when={activeGoal()}>
+        <div
+          id="active-goal-banner"
+          style="border-bottom: 1px solid #f1f5f9; background: #fafafa; border-radius: 13px 13px 0 0; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;"
+        >
+          {/* 左侧：目标图标 + 状态文本 + 目标描述 + 耗时 */}
+          <div style="display: flex; align-items: center; gap: 7px; overflow: hidden; flex: 1;">
+            <div style="color: #94a3b8; display: flex; align-items: center; flex-shrink: 0;">
+              <IconTargetSVG />
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: #18181b; white-space: nowrap; flex-shrink: 0;">
+              {getGoalStatusText()}
+            </span>
+            <span
+              style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+              title={activeGoal()?.title}
+            >
+              {activeGoal()?.title}
+            </span>
+            <span style="font-size: 12px; color: #94a3b8; white-space: nowrap; flex-shrink: 0;">
+              • {getGoalElapsed()}
+            </span>
+          </div>
+
+          {/* 右侧：操作按钮组 (清除目标 / 恢复或暂停目标 / 编辑目标) */}
+          <div style="display: flex; align-items: center; gap: 6px; position: relative;">
+            {/* 1. 清除目标按钮 */}
+            <div style="position: relative;">
+              <button
+                id="goal-btn-trash"
+                onClick={() => {
+                  setActiveGoal(null);
+                  toast.info('已清除目标');
+                }}
+                onMouseEnter={() => setHoverGoalBtn('trash')}
+                onMouseLeave={() => setHoverGoalBtn(null)}
+                style={`width: 26px; height: 26px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; ${
+                  hoverGoalBtn() === 'trash'
+                    ? 'background: #f1f5f9; color: #18181b;'
+                    : 'background: transparent; color: #71717a;'
+                }`}
+              >
+                <IconTrashSVG />
+              </button>
+
+              {/* 清除目标 Tooltip (图二) */}
+              <Show when={hoverGoalBtn() === 'trash'}>
+                <div
+                  style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px; background: #18181b; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; z-index: 150; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
+                >
+                  清除目标
+                </div>
+              </Show>
+            </div>
+
+            {/* 2. 播放/暂停 状态切换按钮 */}
+            <div style="position: relative;">
+              <button
+                id="goal-btn-play-pause"
+                onClick={() => {
+                  const g = activeGoal();
+                  if (!g) return;
+                  const newStatus = g.status === 'running' ? 'paused' : 'running';
+                  setActiveGoal({ ...g, status: newStatus });
+                  toast.info(newStatus === 'running' ? '已恢复目标运行' : '已暂停目标');
+                }}
+                onMouseEnter={() => setHoverGoalBtn('play')}
+                onMouseLeave={() => setHoverGoalBtn(null)}
+                style={`width: 26px; height: 26px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; ${
+                  hoverGoalBtn() === 'play'
+                    ? 'background: #f1f5f9; color: #18181b;'
+                    : 'background: transparent; color: #71717a;'
+                }`}
+              >
+                <Show
+                  when={activeGoal()?.status === 'running'}
+                  fallback={<IconPlayCircleSVG />}
+                >
+                  <IconPauseCircleSVG />
+                </Show>
+              </button>
+
+              {/* 恢复目标 / 暂停目标 Tooltip (图三/图四) */}
+              <Show when={hoverGoalBtn() === 'play'}>
+                <div
+                  style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px; background: #18181b; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; z-index: 150; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
+                >
+                  {activeGoal()?.status === 'running' ? '暂停目标' : '恢复目标'}
+                </div>
+              </Show>
+            </div>
+
+            {/* 3. 编辑目标按钮 */}
+            <div style="position: relative;">
+              <button
+                id="goal-btn-expand"
+                onClick={() => {
+                  const g = activeGoal();
+                  if (g) {
+                    setText(g.title);
+                    setActiveSpecialMode('goal');
+                    toast.info('已将目标载入输入框进行编辑');
+                  }
+                }}
+                onMouseEnter={() => setHoverGoalBtn('expand')}
+                onMouseLeave={() => setHoverGoalBtn(null)}
+                style={`width: 26px; height: 26px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; ${
+                  hoverGoalBtn() === 'expand'
+                    ? 'background: #f1f5f9; color: #18181b;'
+                    : 'background: transparent; color: #71717a;'
+                }`}
+              >
+                <IconExpandCornersSVG />
+              </button>
+
+              {/* 编辑目标 Tooltip (图五) */}
+              <Show when={hoverGoalBtn() === 'expand'}>
+                <div
+                  style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px; background: #18181b; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; z-index: 150; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
+                >
+                  编辑目标
+                </div>
+              </Show>
+            </div>
+          </div>
         </div>
       </Show>
 
