@@ -146,32 +146,8 @@ export const Composer: Component<{ ctx: NavisContext }> = (props) => {
     const activeModel = gatewayStore.activeModel();
     const mode = activeSpecialMode();
 
-    let finalContent = content;
-    if (mode === 'goal') {
-      finalContent = `[GOAL ORIENTED TASK EXECUTION]:
-Objective / Target: ${content}
-
-Please break down this goal and execute:
-1. 🎯 核心目标与可衡量成果 (Key Deliverables & Acceptance Criteria)
-2. 📋 阶段性拆解与执行里程碑 (Milestones & Execution Roadmap)
-3. ⚡ 自动化执行步骤与自测检验 (Autonomous Actions & Validation)
-
-Provide clear, structured autonomous progress toward achieving this goal.`;
-    } else if (mode === 'plan') {
-      finalContent = `[PLANNING & STRATEGY GENERATION]:
-Task: ${content}
-
-Please generate an end-to-end plan package:
-1. 💡 任务架构与方案分析 (Architectural Analysis)
-2. 📦 完整实现套餐与步骤清单 (Step-by-Step Implementation Package)
-3. ⚠️ 风险评估与回滚策略 (Risk Assessment & Fallback)
-4. 🔍 验证与交付标准 (Verification Criteria)
-
-Output the structured plan package for user approval.`;
-    }
-
     props.ctx.events.emit('agent:turn:start', {
-      content: finalContent,
+      content,
       model: activeModel?.name || gatewayStore.activeModelId() || 'gemini-3.7-flash',
       modelId: gatewayStore.activeModelId(),
       provider: activeProvider?.name,
@@ -684,6 +660,7 @@ Output the structured plan package for user approval.`;
 
           {/* 发送按钮 */}
           <button
+            id="composer-send-btn"
             onClick={handleSend}
             disabled={!text().trim()}
             style={`width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; ${

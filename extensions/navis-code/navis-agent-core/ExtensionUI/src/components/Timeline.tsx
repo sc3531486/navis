@@ -12,6 +12,20 @@ import {
   IconChevronRight,
 } from '@/components/icons';
 
+const IconCopyClean = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+);
+
+const IconEditClean = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20h9"></path>
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+  </svg>
+);
+
 export interface ToolCallItem {
   id: string;
   toolName: string;
@@ -52,11 +66,11 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
 
   const formatTimestamp = (ts: number) => {
     const d = new Date(ts);
-    const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-    const dayStr = days[d.getDay()];
-    const hours = d.getHours().toString().padStart(2, '0');
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const hours = d.getHours();
     const minutes = d.getMinutes().toString().padStart(2, '0');
-    return `${dayStr} ${hours}:${minutes}`;
+    return `${month}月${date}日 ${hours}:${minutes}`;
   };
 
   const handleCopyText = (content: string, label = '内容') => {
@@ -347,26 +361,26 @@ export const Timeline: Component<{ ctx: NavisContext }> = (props) => {
                   </div>
                 </Show>
 
-                {/* 气泡框下方：时间戳 + 复制 + 编辑图标 */}
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: #9ca3af; padding-right: 4px; user-select: none;">
-                  <span>{formatTimestamp(msg.timestamp)}</span>
+                {/* 气泡框下方：时间戳 + 复制 + 编辑图标 (1:1 像素级复刻参考图二) */}
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #a1a1aa; padding-right: 4px; user-select: none;">
+                  <span style="font-size: 11.5px; color: #9ca3af;">{formatTimestamp(msg.timestamp)}</span>
                   <button
                     onClick={() => handleCopyText(msg.content, '提示词')}
-                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
+                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px; border-radius: 4px; display: flex; align-items: center; transition: color 0.15s ease;"
                     title="复制提示词"
                     onMouseEnter={(e) => (e.currentTarget.style.color = '#3b82f6')}
                     onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
                   >
-                    📋
+                    <IconCopyClean />
                   </button>
                   <button
                     onClick={() => handleStartEdit(msg)}
-                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px 4px; border-radius: 4px; display: flex; align-items: center;"
+                    style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 2px; border-radius: 4px; display: flex; align-items: center; transition: color 0.15s ease;"
                     title="编辑提示词并重新发送"
                     onMouseEnter={(e) => (e.currentTarget.style.color = '#0284c7')}
                     onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
                   >
-                    ✏️
+                    <IconEditClean />
                   </button>
                 </div>
               </div>

@@ -66,8 +66,14 @@ export class AgentService {
       (provider.type === 'anthropic' ? 'anthropic_messages' : 'chat_completions');
 
     // 格式化历史消息上下文
-    const systemPrompt =
+    let systemPrompt =
       'You are Navis Code, an expert agentic AI software engineer. Provide high quality, concise, and structured answers.';
+    if (payload.mode === 'goal') {
+      systemPrompt += '\n\n[GOAL DIRECTIVE]: The user has set an active goal. Break down the goal into measurable milestones, acceptance criteria, and execute autonomous step-by-step progress.';
+    } else if (payload.mode === 'plan') {
+      systemPrompt += '\n\n[PLANNING DIRECTIVE]: The user wants a structured execution package before taking action. Provide architectural analysis, step-by-step implementation package, risk assessment, and verification standards.';
+    }
+
     const messages = [
       { role: 'system', content: systemPrompt },
       ...history
