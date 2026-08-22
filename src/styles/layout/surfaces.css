@@ -5,7 +5,10 @@
   box-shadow: none;
 }
 
-.navis-slot-container {
+.navis-slot-container,
+.navis-main-slot,
+.navis-sidebar-slot,
+[data-navis-slot] {
   width: 100%;
   height: 100%;
   display: flex;
