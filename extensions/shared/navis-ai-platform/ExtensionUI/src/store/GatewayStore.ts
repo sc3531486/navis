@@ -9,12 +9,13 @@ export interface ModelCapability {
 }
 
 export interface ModelItem {
-  id: string;
-  name: string;
+  id: string; // 实际请求模型
+  name: string; // 菜单显示名
   providerId: string;
-  apiProtocol: 'chat_completions' | 'anthropic_messages' | 'responses';
-  contextWindow: number;
+  apiProtocol?: 'chat_completions' | 'anthropic_messages' | 'responses';
+  contextWindow: number; // 上下文窗口 (如 128000, 1000000, 200000)
   maxOutputTokens: number;
+  thinkingLevel?: 'none' | 'low' | 'medium' | 'high'; // 思考等级
   capabilities: ModelCapability;
   isDefault?: boolean;
 }
@@ -23,12 +24,14 @@ export interface ProviderItem {
   id: string;
   name: string;
   type: 'anthropic' | 'openai' | 'gateway' | 'deepseek' | 'ollama' | 'custom';
+  upstreamProtocol?: 'responses' | 'chat_completions' | 'anthropic_messages'; // 上游模式
   baseUrl: string;
   apiKey: string;
   status: 'connected' | 'offline' | 'checking' | 'unconfigured';
   pingMs?: number;
   models: ModelItem[];
   defaultModelId: string;
+  fetchedModelIds?: string[]; // 远端接口获取到的候选模型 ID 列表
 }
 
 const initialProviders: ProviderItem[] = [
@@ -36,38 +39,62 @@ const initialProviders: ProviderItem[] = [
     id: 'gateway-local',
     name: 'Local Gateway (本地统一网关)',
     type: 'gateway',
-    baseUrl: 'http://127.0.0.1:15721',
+    upstreamProtocol: 'responses',
+    baseUrl: 'http://127.0.0.1:8046/v1',
     apiKey: 'sk-gateway-local-token',
     status: 'connected',
     pingMs: 16,
     defaultModelId: 'gemini-3.7-flash',
+    fetchedModelIds: [
+      'gemini-3.7-flash',
+      'gemini-3.1-pro-high',
+      'gemini-3-pro-image',
+      'gemini-3.7',
+      'gemini-2.5-flash',
+      'deepseek-chat',
+      'deepseek-reasoner',
+      'qwen2.5-coder-32b',
+    ],
     models: [
       {
-        id: 'gemini-3.7-flash',
-        name: 'Google Gemini 3.7 Flash',
+        id: 'gemini-3-pro-image',
+        name: 'gemini-3-pro-image',
         providerId: 'gateway-local',
-        apiProtocol: 'chat_completions',
-        contextWindow: 1048576,
+        apiProtocol: 'responses',
+        contextWindow: 128000,
         maxOutputTokens: 8192,
+        thinkingLevel: 'none',
+        capabilities: { tools: true, streaming: true, vision: true, reasoning: false },
+      },
+      {
+        id: 'gemini-3.1-pro-high',
+        name: 'gemini-3.1-pro-high',
+        providerId: 'gateway-local',
+        apiProtocol: 'responses',
+        contextWindow: 1000000,
+        maxOutputTokens: 16384,
+        thinkingLevel: 'high',
+        capabilities: { tools: true, streaming: true, vision: true, reasoning: true },
+      },
+      {
+        id: 'gemini-3.7-flash',
+        name: 'gemini-3.7-flash',
+        providerId: 'gateway-local',
+        apiProtocol: 'responses',
+        contextWindow: 1000000,
+        maxOutputTokens: 8192,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: true, reasoning: true },
         isDefault: true,
       },
       {
-        id: 'deepseek-r1',
-        name: 'DeepSeek R1 (Full Reasoning)',
+        id: 'gemini-3.7',
+        name: 'gemini-3.7',
         providerId: 'gateway-local',
-        apiProtocol: 'chat_completions',
-        contextWindow: 128000,
-        maxOutputTokens: 16384,
-        capabilities: { tools: true, streaming: true, vision: false, reasoning: true },
-      },
-      {
-        id: 'qwen2.5-coder-32b',
-        name: 'Qwen 2.5 Coder 32B Instruct',
-        providerId: 'gateway-local',
-        apiProtocol: 'chat_completions',
-        contextWindow: 65536,
+        apiProtocol: 'responses',
+        contextWindow: 1000000,
         maxOutputTokens: 8192,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: false, reasoning: false },
       },
     ],
@@ -76,37 +103,42 @@ const initialProviders: ProviderItem[] = [
     id: 'anthropic-direct',
     name: 'Anthropic Direct (官方直连)',
     type: 'anthropic',
+    upstreamProtocol: 'anthropic_messages',
     baseUrl: 'https://api.anthropic.com/v1',
-    apiKey: '',
-    status: 'unconfigured',
-    defaultModelId: 'claude-3-7-sonnet',
+    apiKey: 'sk-ant-api03-sample-key-token',
+    status: 'connected',
+    pingMs: 24,
+    defaultModelId: 'claude-3-7-sonnet-20250219',
     models: [
       {
-        id: 'claude-3-7-sonnet',
-        name: 'Claude 3.7 Sonnet (Hybrid Reasoning)',
+        id: 'claude-3-7-sonnet-20250219',
+        name: 'Claude 3.7 Sonnet',
         providerId: 'anthropic-direct',
         apiProtocol: 'anthropic_messages',
         contextWindow: 200000,
         maxOutputTokens: 16384,
+        thinkingLevel: 'high',
         capabilities: { tools: true, streaming: true, vision: true, reasoning: true },
         isDefault: true,
       },
       {
-        id: 'claude-3-5-sonnet',
+        id: 'claude-3-5-sonnet-20241022',
         name: 'Claude 3.5 Sonnet v2',
         providerId: 'anthropic-direct',
         apiProtocol: 'anthropic_messages',
         contextWindow: 200000,
         maxOutputTokens: 8192,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: true, reasoning: false },
       },
       {
-        id: 'claude-3-5-haiku',
-        name: 'Claude 3.5 Haiku (Fast Inline)',
+        id: 'claude-3-5-haiku-20241022',
+        name: 'Claude 3.5 Haiku',
         providerId: 'anthropic-direct',
         apiProtocol: 'anthropic_messages',
         contextWindow: 200000,
         maxOutputTokens: 8192,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: true, reasoning: false },
       },
     ],
@@ -115,6 +147,7 @@ const initialProviders: ProviderItem[] = [
     id: 'openai-direct',
     name: 'OpenAI / Codex API',
     type: 'openai',
+    upstreamProtocol: 'chat_completions',
     baseUrl: 'https://api.openai.com/v1',
     apiKey: '',
     status: 'unconfigured',
@@ -127,75 +160,74 @@ const initialProviders: ProviderItem[] = [
         apiProtocol: 'chat_completions',
         contextWindow: 128000,
         maxOutputTokens: 16384,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: true, reasoning: false },
         isDefault: true,
       },
       {
         id: 'o3-mini',
-        name: 'o3-mini (High Effort Coding)',
+        name: 'o3-mini (High Effort)',
         providerId: 'openai-direct',
         apiProtocol: 'responses',
         contextWindow: 200000,
         maxOutputTokens: 65536,
+        thinkingLevel: 'high',
         capabilities: { tools: true, streaming: true, vision: false, reasoning: true },
-      },
-      {
-        id: 'o1',
-        name: 'o1 (Full Reasoning)',
-        providerId: 'openai-direct',
-        apiProtocol: 'responses',
-        contextWindow: 200000,
-        maxOutputTokens: 32768,
-        capabilities: { tools: true, streaming: true, vision: true, reasoning: true },
       },
     ],
   },
   {
     id: 'deepseek-direct',
-    name: 'DeepSeek Direct (深度求索)',
+    name: 'DeepSeek Direct',
     type: 'deepseek',
+    upstreamProtocol: 'chat_completions',
     baseUrl: 'https://api.deepseek.com/v1',
     apiKey: '',
     status: 'unconfigured',
-    defaultModelId: 'deepseek-reasoner',
+    defaultModelId: 'deepseek-chat',
     models: [
       {
-        id: 'deepseek-reasoner',
-        name: 'DeepSeek R1 (Reasoner)',
+        id: 'deepseek-chat',
+        name: 'DeepSeek-V3',
         providerId: 'deepseek-direct',
         apiProtocol: 'chat_completions',
-        contextWindow: 128000,
-        maxOutputTokens: 16384,
-        capabilities: { tools: true, streaming: true, vision: false, reasoning: true },
+        contextWindow: 65536,
+        maxOutputTokens: 8192,
+        thinkingLevel: 'none',
+        capabilities: { tools: true, streaming: true, vision: false, reasoning: false },
         isDefault: true,
       },
       {
-        id: 'deepseek-chat',
-        name: 'DeepSeek V3 (Chat)',
+        id: 'deepseek-reasoner',
+        name: 'DeepSeek-R1 (Reasoner)',
         providerId: 'deepseek-direct',
         apiProtocol: 'chat_completions',
-        contextWindow: 128000,
+        contextWindow: 65536,
         maxOutputTokens: 8192,
-        capabilities: { tools: true, streaming: true, vision: false, reasoning: false },
+        thinkingLevel: 'high',
+        capabilities: { tools: false, streaming: true, vision: false, reasoning: true },
       },
     ],
   },
   {
     id: 'ollama-local',
-    name: 'Ollama (本地离线推理)',
+    name: 'Ollama (本地私有化)',
     type: 'ollama',
+    upstreamProtocol: 'chat_completions',
     baseUrl: 'http://localhost:11434',
-    apiKey: 'ollama-local',
-    status: 'unconfigured',
-    defaultModelId: 'qwen2.5-coder:latest',
+    apiKey: '',
+    status: 'connected',
+    pingMs: 4,
+    defaultModelId: 'qwen2.5-coder:32b',
     models: [
       {
-        id: 'qwen2.5-coder:latest',
-        name: 'qwen2.5-coder:latest',
+        id: 'qwen2.5-coder:32b',
+        name: 'qwen2.5-coder:32b',
         providerId: 'ollama-local',
         apiProtocol: 'chat_completions',
-        contextWindow: 32768,
+        contextWindow: 65536,
         maxOutputTokens: 8192,
+        thinkingLevel: 'none',
         capabilities: { tools: true, streaming: true, vision: false, reasoning: false },
         isDefault: true,
       },
@@ -206,6 +238,7 @@ const initialProviders: ProviderItem[] = [
         apiProtocol: 'chat_completions',
         contextWindow: 65536,
         maxOutputTokens: 8192,
+        thinkingLevel: 'high',
         capabilities: { tools: false, streaming: true, vision: false, reasoning: true },
       },
     ],
@@ -234,6 +267,8 @@ export const gatewayStore = {
     const p = providers().find((item) => item.id === id);
     if (p && p.defaultModelId) {
       setActiveModelId(p.defaultModelId);
+    } else if (p && p.models.length > 0) {
+      setActiveModelId(p.models[0].id);
     }
   },
 
@@ -268,12 +303,37 @@ export const gatewayStore = {
     return { success: true, pingMs: ping };
   },
 
-  async fetchModels(id: string): Promise<ModelItem[]> {
+  async fetchModels(id: string): Promise<string[]> {
     const p = providers().find((item) => item.id === id);
     if (!p) return [];
 
-    await new Promise((r) => setTimeout(r, 700));
-    return p.models;
+    await new Promise((r) => setTimeout(r, 600));
+
+    let remoteIds: string[] = [];
+    if (p.type === 'anthropic') {
+      remoteIds = ['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229'];
+    } else if (p.type === 'openai') {
+      remoteIds = ['gpt-4o', 'gpt-4o-mini', 'o3-mini', 'o1', 'gpt-4-turbo', 'gpt-3.5-turbo'];
+    } else if (p.type === 'deepseek') {
+      remoteIds = ['deepseek-chat', 'deepseek-reasoner', 'deepseek-coder'];
+    } else if (p.type === 'ollama') {
+      remoteIds = ['qwen2.5-coder:32b', 'deepseek-r1:14b', 'llama3.3:70b', 'mistral-small:24b'];
+    } else {
+      remoteIds = [
+        'gemini-3.7-flash',
+        'gemini-3.1-pro-high',
+        'gemini-3-pro-image',
+        'gemini-3.7',
+        'gemini-2.5-flash',
+        'deepseek-chat',
+        'deepseek-reasoner',
+        'qwen2.5-coder-32b',
+      ];
+    }
+
+    const merged = Array.from(new Set([...(p.fetchedModelIds || []), ...remoteIds, ...p.models.map((m) => m.id)]));
+    this.updateProvider(id, { fetchedModelIds: merged });
+    return merged;
   },
 
   addModel(providerId: string, model: ModelItem) {
@@ -291,13 +351,45 @@ export const gatewayStore = {
     );
   },
 
-  deleteModel(providerId: string, modelId: string) {
+  addEmptyModel(providerId: string) {
+    const newId = `custom-model-${Date.now().toString().slice(-4)}`;
+    const newModel: ModelItem = {
+      id: newId,
+      name: newId,
+      providerId,
+      apiProtocol: 'chat_completions',
+      contextWindow: 128000,
+      maxOutputTokens: 8192,
+      thinkingLevel: 'none',
+      capabilities: { tools: true, streaming: true, vision: false, reasoning: false },
+    };
+    this.addModel(providerId, newModel);
+  },
+
+  updateModel(providerId: string, modelId: string, updates: Partial<ModelItem>) {
     setProviders((prev) =>
       prev.map((p) => {
         if (p.id === providerId) {
           return {
             ...p,
-            models: p.models.filter((m) => m.id !== modelId),
+            models: p.models.map((m) => (m.id === modelId ? { ...m, ...updates } : m)),
+          };
+        }
+        return p;
+      }),
+    );
+  },
+
+  deleteModel(providerId: string, modelId: string) {
+    setProviders((prev) =>
+      prev.map((p) => {
+        if (p.id === providerId) {
+          const filtered = p.models.filter((m) => m.id !== modelId);
+          const newDefault = p.defaultModelId === modelId ? (filtered[0]?.id || '') : p.defaultModelId;
+          return {
+            ...p,
+            models: filtered,
+            defaultModelId: newDefault,
           };
         }
         return p;
