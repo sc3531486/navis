@@ -1,6 +1,7 @@
 import { Component, createSignal, onCleanup, onMount, For, Show } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
+import { IconSearch } from '@/components/icons';
 
 export interface CommandPaletteProps {
   ctx: NavisContext;
@@ -79,15 +80,17 @@ export const CommandPalette: Component<CommandPaletteProps> = (props) => {
     <Show when={open()}>
       <div
         onClick={handleClose}
-        style="position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 100px;"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 100px; pointer-events: auto;"
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          style="width: 540px; max-width: 90vw; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); overflow: hidden; display: flex; flex-direction: column; animation: navis-pop 0.15s ease-out;"
+          style="width: 540px; max-width: 90vw; background: #ffffff; border: 1px solid #e7e4dc; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); overflow: hidden; display: flex; flex-direction: column; animation: navis-pop 0.15s ease-out; pointer-events: auto;"
         >
           {/* 搜索输入框 */}
           <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #eae7e1;">
-            <span style="font-size: 15px; color: #8e8b83;">🔍</span>
+            <span style="color: #8e8b83; display: flex; align-items: center;">
+              <IconSearch size={15} />
+            </span>
             <input
               type="text"
               autofocus
@@ -117,7 +120,7 @@ export const CommandPalette: Component<CommandPaletteProps> = (props) => {
           </div>
 
           {/* 命令列表 */}
-          <div style="max-height: 320px; overflow-y: auto; padding: 6px;">
+          <div style="max-height: 320px; overflow-y: auto; padding: 6px; overscroll-behavior: contain;">
             <For
               each={filteredCommands()}
               fallback={<div style="padding: 20px; text-align: center; color: #8e8b83; font-size: 13px;">未找到匹配命令</div>}

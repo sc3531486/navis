@@ -1,4 +1,4 @@
-import { Component, createSignal, onCleanup, Show, For } from 'solid-js';
+import { Component, createSignal, onMount, onCleanup, Show, For } from 'solid-js';
 import type { NavisContext } from '@/core/context';
 import { toast } from '@/core/toast/ToastStore';
 import { gatewayStore, type ProviderItem, type ModelItem } from '@extensions/shared/navis-ai-platform/ExtensionUI/src/store/GatewayStore';
@@ -63,6 +63,18 @@ export const SettingsModal: Component<SettingsModalProps> = (props) => {
       setActiveMainTab('general');
     }
     setOpen(true);
+  });
+
+  onMount(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open()) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    onCleanup(() => {
+      window.removeEventListener('keydown', handleKeyDown);
+    });
   });
 
   onCleanup(() => unsub());

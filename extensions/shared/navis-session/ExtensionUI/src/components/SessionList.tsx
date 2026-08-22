@@ -125,7 +125,7 @@ export const SessionList: Component<{ ctx: NavisContext }> = (props) => {
       </div>
 
       {/* 会话列表区域 */}
-      <div style="flex: 1; overflow-y: auto; padding: 0 8px 12px; display: flex; flex-direction: column; gap: 2px;">
+      <div style="flex: 1; overflow-y: auto; padding: 0 8px 12px; display: flex; flex-direction: column; gap: 2px; overscroll-behavior: contain;">
         <For each={sessions()}>
           {(sess, index) => {
             const isFirstInGroup = () => index() === 0 || sessions()[index() - 1]?.group !== sess.group;
